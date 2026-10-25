@@ -123,7 +123,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         // Open as a NORMAL sized, centered window (never full-screen or maximized).
         // Use the usable desktop area, excluding the Windows taskbar. WPF DIPs
         // already account for display scaling, including 125% and 150%.
-        var workArea = SystemParameters.WorkArea;
+        var workArea = DisplaySizing.WorkArea(this);
         WindowState = WindowState.Normal;
         var targetWidth = Math.Min(1180d, workArea.Width * 0.84);
         var targetHeight = Math.Min(780d, workArea.Height * 0.82);

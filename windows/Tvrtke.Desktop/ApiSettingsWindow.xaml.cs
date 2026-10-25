@@ -72,7 +72,7 @@ public partial class ApiSettingsWindow : Window
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         // This dialog must also fit laptop screens and scaled displays.
-        var available = SystemParameters.WorkArea;
+        var available = DisplaySizing.WorkArea(this);
         Width = Math.Max(MinWidth, Math.Min(700d, available.Width * 0.88));
         Height = Math.Max(MinHeight, Math.Min(520d, available.Height * 0.82));
         if (Owner is not null)
