@@ -23,8 +23,11 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <StackPanel Margin="0,0,0,18">
-            <TextBlock Text="TVRTKE" FontSize="34" FontWeight="Bold" Foreground="#174B85"/>
-            <TextBlock Text="Poslovni registar Hrvatske · službeni podaci Sudskog registra" FontSize="14" Foreground="#53677A"/>
+            <DockPanel LastChildFill="True"><StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button Content="Postavke API-ja" Click="Settings_Click" Margin="8,0,0,0"/>
+                <Button x:Name="FavoritesButton" Content="Favoriti" Click="Favorites_Click" Margin="8,0,0,0"/>
+            </StackPanel><StackPanel><TextBlock Text="TVRTKE" FontSize="34" FontWeight="Bold" Foreground="#174B85"/>
+            <TextBlock Text="Poslovni registar Hrvatske · službeni podaci Sudskog registra" FontSize="14" Foreground="#53677A"/></StackPanel></DockPanel>
         </StackPanel>
         <Border Grid.Row="1" Background="White" CornerRadius="12" Padding="18" Margin="0,0,0,14">
             <Grid>
@@ -94,6 +97,7 @@
         <DockPanel Grid.Row="3" Margin="0,14,0,0" LastChildFill="False">
             <TextBlock x:Name="StatusText" Text="Spremno za pretragu" Foreground="#526173" DockPanel.Dock="Left" VerticalAlignment="Center" TextWrapping="Wrap"/>
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button x:Name="FavoriteButton" Content="Dodaj u favorite" IsEnabled="False" Click="ToggleFavorite_Click" Margin="0,0,14,0"/>
                 <Button Content="Izvezi prikazano (CSV)" Click="Export_Click" Margin="0,0,14,0" ToolTip="Izvozi samo rezultate trenutačne stranice"/>
                 <Button x:Name="PreviousButton" Content="Prethodna" Click="Previous_Click" IsEnabled="False" Margin="0,0,7,0"/>
                 <TextBlock x:Name="PageText" Text="1" VerticalAlignment="Center" Margin="10,0"/>

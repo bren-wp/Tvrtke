@@ -21,7 +21,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private bool _hasMore;
     private bool _busy;
     private Subject? _selected;
-    private readonly string _api = (Environment.GetEnvironmentVariable("TVRTKE_API_URL") ?? "https://api.tvrtke.com.hr").TrimEnd('/');
+    private readonly TvrtkePreferences _preferences = TvrtkePreferences.Load();
+    private string _api = "https://api.tvrtke.com.hr";
+    private bool _favoritesMode;
 
     public event PropertyChangedEventHandler? PropertyChanged;
     public Subject? SelectedSubject
@@ -35,6 +37,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         InitializeComponent();
         DataContext = this;
         ResultsGrid.ItemsSource = _results;
+        _api = (Environment.GetEnvironmentVariable("TVRTKE_API_URL") ?? _preferences.ApiUrl).TrimEnd('/');
     }
 
     private static string Param(string value) => Uri.EscapeDataString(value.Trim());
@@ -46,6 +49,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         StatusText.Text = "Dohvaćanje podataka…";
         try
         {
+            _favoritesMode = false;
+            FavoritesButton.Content = "Favoriti";
             var query = QueryInput.Text.Trim();
             var county = CountyInput.Text.Trim();
             var activity = ActivityInput.Text.Trim();
@@ -152,6 +157,77 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
     }
 
+    private void Settings_Click(object sender, RoutedEventArgs e)
+    {
+        if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("TVRTKE_API_URL")))
+        {
+            MessageBox.Show(this, "API adresa postavljena je varijablom TVRTKE_API_URL i ne može se promijeniti u aplikaciji.", "TVRTKE");
+            return;
+        }
+        var dialog = new ApiSettingsWindow(_api) { Owner = this };
+        if (dialog.ShowDialog() != true) return;
+        _api = dialog.ApiUrl;
+        _preferences.ApiUrl = _api;
+        try { _preferences.Save(); }
+        catch (Exception ex) when (ex is System.IO.IOException or UnauthorizedAccessException)
+        {
+            StatusText.Text = "Adresa je promijenjena za ovu sesiju, ali postavke nisu spremljene.";
+            return;
+        }
+        StatusText.Text = "Nova API adresa spremljena. Pokrenite pretragu.";
+        _results.Clear();
+        _page = 1;
+        PreviousButton.IsEnabled = false;
+        NextButton.IsEnabled = false;
+        SelectedSubject = null;
+    }
+
+    private void Favorites_Click(object sender, RoutedEventArgs e)
+    {
+        _favoritesMode = !_favoritesMode;
+        FavoritesButton.Content = _favoritesMode ? "Natrag na pretragu" : "Favoriti";
+        _results.Clear();
+        if (_favoritesMode)
+        {
+            foreach (var item in _preferences.Favorites.OrderBy(x => x.Name)) _results.Add(item);
+            StatusText.Text = $"Spremljenih favorita: {_results.Count} (lokalno na ovom računalu).";
+        }
+        else
+        {
+            StatusText.Text = "Za povratak na rezultate pokrenite novu pretragu.";
+        }
+        SelectedSubject = null;
+        FavoriteButton.IsEnabled = false;
+        _page = 1;
+        _hasMore = false;
+        PreviousButton.IsEnabled = false;
+        NextButton.IsEnabled = false;
+        PageText.Text = "1";
+    }
+
+    private void ToggleFavorite_Click(object sender, RoutedEventArgs e)
+    {
+        var selected = SelectedSubject;
+        if (selected is null || string.IsNullOrWhiteSpace(selected.Mbs)) return;
+        var previous = _preferences.Favorites.FirstOrDefault(x => x.Mbs == selected.Mbs);
+        if (previous is not null)
+        {
+            _preferences.Favorites.Remove(previous);
+            FavoriteButton.Content = "Dodaj u favorite";
+            if (_favoritesMode) _results.Remove(_results.FirstOrDefault(x => x.Mbs == selected.Mbs)!);
+        }
+        else
+        {
+            _preferences.Favorites.Add(selected);
+            FavoriteButton.Content = "Ukloni iz favorita";
+        }
+        try { _preferences.Save(); StatusText.Text = "Favoriti ažurirani."; }
+        catch (Exception ex) when (ex is System.IO.IOException or UnauthorizedAccessException)
+        {
+            StatusText.Text = "Promjena favorita nije mogla biti spremljena na disk.";
+        }
+    }
+
     private async void Search_Click(object sender, RoutedEventArgs e) { await SearchAsync(1); }
     private async void QueryInput_KeyDown(object sender, KeyEventArgs e)
     {
@@ -170,6 +246,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var selected = ResultsGrid.SelectedItem as Subject;
         _detailRequest?.Cancel();
         SelectedSubject = selected;
+        FavoriteButton.IsEnabled = selected is not null;
+        FavoriteButton.Content = selected is not null && _preferences.Favorites.Any(x => x.Mbs == selected.Mbs) ? "Ukloni iz favorita" : "Dodaj u favorite";
         if (selected is not null) await LoadDetailsAsync(selected);
     }
 }

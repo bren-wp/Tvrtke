@@ -1,0 +1,16 @@
+<Window x:Class="Tvrtke.Desktop.ApiSettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="TVRTKE – API postavke" Width="540" Height="230"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+    <StackPanel Margin="22">
+        <TextBlock Text="Adresa centralnog API-ja (HTTPS)" FontWeight="SemiBold" Margin="0,0,0,8"/>
+        <TextBox x:Name="AddressInput" MinHeight="34" Padding="8" AutomationProperties.Name="HTTPS adresa centralnog API-ja"/>
+        <TextBlock Text="Unesite samo pouzdanu HTTPS adresu. Nema potrebe za unosom tajnih ključeva."
+                   Margin="0,10,0,18" Foreground="#526173" TextWrapping="Wrap"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Odustani" Width="110" Margin="0,0,8,0" Click="Cancel_Click"/>
+            <Button Content="Spremi" Width="110" Click="Save_Click"/>
+        </StackPanel>
+    </StackPanel>
+</Window>
