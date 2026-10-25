@@ -74,7 +74,7 @@ final class DirectoryRepository
             $court = "SELECT CONCAT('sudreg:',s.mbs) AS registry_key,
                   'sudreg' AS source_type,s.mbs AS source_identifier,s.mbs,s.oib,
                   s.status AS status,IF(s.status=1,'Aktivan','Neaktivan / brisan') AS status_label,
-                  n.name,a.county,a.settlement,a.street,a.house_number,a.postal_code,
+                  s.datum_osnivanja,s.datum_brisanja,n.name,a.county,a.settlement,a.street,a.house_number,a.postal_code,
                   l.form_name AS legal_form,l.form_abbreviation AS legal_form_short,
                   NULL AS activity,NULL AS source_url
                 FROM subjects s
