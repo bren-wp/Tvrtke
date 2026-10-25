@@ -400,11 +400,16 @@ final class Tvrtke_Registar
         echo '<div class="tvrtke-preview-search"><span>' .
             esc_html__('Pretraži naziv ili registracijski broj…', 'tvrtke-registar') .
             '</span><b>' . esc_html__('Pretraži', 'tvrtke-registar') . '</b></div>';
-        echo '<div class="tvrtke-preview-cats"><span>▥ ' . esc_html__('Tvrtke', 'tvrtke-registar') .
-            '</span><span>▣ ' . esc_html__('Obrti', 'tvrtke-registar') .
-            '</span><span>♧ ' . esc_html__('Udruge', 'tvrtke-registar') .
-            '</span><span>♡ ' . esc_html__('Zaklade', 'tvrtke-registar') .
-            '</span></div></div></section>';
+        echo '<div class="tvrtke-preview-cats">';
+        foreach ([
+            'sudreg' => __('Tvrtke', 'tvrtke-registar'),
+            'obrt' => __('Obrti', 'tvrtke-registar'),
+            'udruga' => __('Udruge', 'tvrtke-registar'),
+            'zaklada' => __('Zaklade', 'tvrtke-registar'),
+        ] as $kind => $label) {
+            echo '<span>' . self::icon($kind) . esc_html($label) . '</span>';
+        }
+        echo '</div></div></section>';
 
         echo '<section id="tvrtke-kod" class="tvrtke-card"><h2>' .
             esc_html__('Kratki kod / Gutenberg blok', 'tvrtke-registar') . '</h2><p>' .
@@ -510,7 +515,12 @@ final class Tvrtke_Registar
         $enabledFields = get_option('tvrtke_registar_fields', ['settlement', 'activity']);
         if (!is_array($enabledFields)) $enabledFields = ['settlement', 'activity'];
         $output = '<section class="tvrtke-registar" data-view="' . esc_attr($layout) . '" aria-label="' . esc_attr__('Pretraživanje poslovnih subjekata', 'tvrtke-registar') . '">';
-        $output .= '<header class="tvrtke-hero"><p class="tvrtke-hero-eyebrow">' . esc_html__('POSLOVNI IMENIK HRVATSKE', 'tvrtke-registar') . '</p>';
+        $output .= '<header class="tvrtke-hero"><div class="tvrtke-public-brand">';
+        $output .= '<img src="' . esc_url(plugins_url('assets/logo-mark.svg', __FILE__)) .
+            '" width="56" height="56" alt="" loading="lazy" />';
+        $output .= '<span><strong>TVRTKE</strong><small>' .
+            esc_html__('POSLOVNI IMENIK HRVATSKE', 'tvrtke-registar') .
+            '</small></span></div>';
         $output .= '<h2>' . esc_html__('Pronađite prave poslovne informacije', 'tvrtke-registar') . '</h2>';
         $output .= '<p>' . esc_html__('Tvrtke, obrti, udruge i zaklade iz dostupnih službenih izvora — na jednom mjestu.', 'tvrtke-registar') . '</p></header>';
         $output .= '<form method="get" class="tvrtke-form" role="search">';
