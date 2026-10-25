@@ -11,6 +11,8 @@ jobs:
         run: find backend wordpress -name '*.php' -print0 | xargs -0 -n1 php -l
       - name: PHP identity tests
         run: php backend/tests/identity.php
+      - name: PHP HTTP input validation tests
+        run: bash backend/tests/http.sh
   windows:
     runs-on: windows-latest
     steps:

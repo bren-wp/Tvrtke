@@ -70,7 +70,7 @@
                     <StackPanel DataContext="{Binding SelectedSubject}">
                         <TextBlock Text="Profil subjekta" FontSize="19" FontWeight="SemiBold" Margin="0,0,0,16"/>
                         <TextBlock Text="Naziv" Foreground="#5C6C7C"/>
-                        <TextBlock Text="{Binding Name, TargetNullValue=Odaberite subjekt}" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,3,0,13"/>
+                        <TextBlock Text="{Binding Name, TargetNullValue='Odaberite subjekt'}" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,3,0,13"/>
                         <TextBlock Text="MBS / OIB" Foreground="#5C6C7C"/>
                         <TextBlock Text="{Binding Mbs}" Margin="0,3,0,2"/>
                         <TextBlock Text="{Binding Oib}" Margin="0,0,0,13"/>
