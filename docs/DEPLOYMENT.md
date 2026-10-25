@@ -28,7 +28,7 @@ Ako cPanel ne dopušta Document Root unutar `tvrtke-backend/public`, **ne objavl
 ## Instalacija
 
 1. Kreirajte praznu MySQL bazu `CPANELUSER_tvrtke` i korisnika u cPanelu.
-2. Uvezite `backend/database/001_initial.sql`, zatim `backend/database/002_enrichment.sql` (svaku migraciju samo jednom) putem phpMyAdmin (provjerite rezultat migracije).
+2. Uvezite `backend/database/001_initial.sql`, zatim `backend/database/002_enrichment.sql`, zatim `backend/database/003_publication_state.sql` (svaku migraciju samo jednom) putem phpMyAdmin (provjerite rezultat migracije).
 3. Kopirajte `backend/config.example.php` u **`backend/config.local.php`**, stavite stvarne vrijednosti i postavite datoteku izvan Document Roota. Preporučena prava `0600` gdje su podržana; tajni sadržaj nikada ne slati u Git.
 4. U cPanelu podesite `api.tvrtke.com.hr` sa Document Rootom na `backend/public/` i uključite valjani HTTPS certifikat. Provjerite `https://api.tvrtke.com.hr/v1/health`.
 5. Nakon potvrde stvarnih cron limita konfigurirajte npr. svakih **5–10 minuta** (ne češće od dopuštenog):
@@ -48,7 +48,7 @@ Ako cPanel ne dopušta Document Root unutar `tvrtke-backend/public`, **ne objavl
 - `TVRTKE_IMPORT_ROW_LIMIT=10000` **po tablici** sprečava nekontrolirani rast; to je ograničena demonstracijska baza, ne potpuni registar. Mijenjajte tek nakon mjerenja performansi/diska i ponovnog planiranja preuzimanja.
 - Jedan `sync.php` poziv uvozi jednu stranicu (`TVRTKE_IMPORT_BATCH`, zadano 100) zbog kratkog vremena izvršavanja na shared hostingu. Za dovršetak su potrebna ponavljana cron izvršavanja.
 - Podaci u javnom Sudreg API-ju imaju vlastiti ritam osvježavanja. U ovoj verziji se ponovno preuzimaju pet odabranih skupova; `promjene`/SCN i dodatni podaci nisu još implementirani.
-- Svaka nova objavljena snimka prikazuje se atomarno, ali podaci su **ograničen podskup**. Ne prikazivati broj rezultata kao broj svih hrvatskih subjekata.
+- Svaka nova objavljena snimka prikazuje se atomarno, a oznaka djelomičnosti ostaje uz objavljenu snimku čak i tijekom idućeg uvoza. Podaci su **ograničen podskup**. Ne prikazivati broj rezultata kao broj svih hrvatskih subjekata.
 - `prune.php` čisti maksimalno 500 redaka po tablici i izvođenju; pratite prostor baze te raspored cron zadataka.
 - API trenutno nema zaseban sustav korisničkih računa ni production-grade rate limiting: prije javnog prometa dodajte WAF/Cloudflare ili poslužiteljsko rate limiting rješenje i nadzor opterećenja.
 

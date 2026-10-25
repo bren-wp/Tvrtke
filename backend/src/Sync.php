@@ -8,7 +8,7 @@ use PDO;
 /** Small, resumable, version-pinned batches for shared hosting. CLI only. */
 final class Sync
 {
-    private const DATASETS = ['subjekti', 'tvrtke', 'sjedista', 'pravni_oblici', 'predmeti_poslovanja'];
+    private const DATASETS = SnapshotPublication::DATASETS;
 
     public function __construct(private PDO $db, private SudregClient $client) {}
 
@@ -71,9 +71,17 @@ final class Sync
         $stmt->execute([$ongoing]);
         $job = $stmt->fetch();
         if ($job === false) {
+            // An empty / invalid import must never replace the previously published registry.
+            $counts = $this->db->prepare("SELECT dataset,imported_rows,finished,truncated FROM sync_progress WHERE snapshot_id=?");
+            $counts->execute([$ongoing]);
+            $progressRows = $counts->fetchAll(PDO::FETCH_ASSOC);
+            $partial = SnapshotPublication::isPartial($progressRows);
             $this->db->beginTransaction();
             try {
-                $this->db->prepare("INSERT INTO app_state(state_key,state_value) VALUES('active_snapshot',?) ON DUPLICATE KEY UPDATE state_value=VALUES(state_value)")->execute([$ongoing]);
+                $upsert = $this->db->prepare('INSERT INTO app_state(state_key,state_value) VALUES(?,?) ON DUPLICATE KEY UPDATE state_value=VALUES(state_value)');
+                $upsert->execute(['active_snapshot', (string)$ongoing]);
+                $upsert->execute(['published_partial', $partial ? '1' : '0']);
+                $upsert->execute(['published_at', gmdate('Y-m-d H:i:s')]);
                 $this->db->commit();
             } catch (\Throwable $e) {
                 $this->db->rollBack();
