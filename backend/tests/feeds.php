@@ -20,7 +20,6 @@ $good=[
 ];
 $result=RegistryFeedConfig::validate('udruga',$good);
 checked($result['delimiter']===';' && $result['columns']['id']==='REG','valid settings');
-rejected(fn()=>RegistryFeedConfig::validate('udruga',$good+['enabled'=>false]));
 $disabled=$good; $disabled['enabled']=false;
 rejected(fn()=>RegistryFeedConfig::validate('udruga',$disabled));
 $missing=$good; unset($missing['columns']['id']);
