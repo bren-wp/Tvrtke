@@ -82,6 +82,7 @@ expires through standard transient expiration.
 * Multi-registry results enriched with registration provenance and source freshness.
 * More robust WordPress read-only input validation and administrator opt-out.
 * Compatible with a central backend that privately synchronizes official feeds; no API credentials bundled.
+* Displays original registration and status-change dates separately where available.
 
 = 0.7.0 =
 * Multi-registry category search for companies, crafts, associations and foundations.

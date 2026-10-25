@@ -33,10 +33,12 @@ Endpoint `GET /v1/sources` vraća samo **uspješno objavljene vanjske izvore**. 
 - **Udruge, glavna evidencija CTS CSV:** `https://data.gov.hr/ckan/dataset/b04f3da4-d2b6-4789-9e5f-dc4cc18ae6fe/resource/535a5b96-9f28-409a-ae99-e245964c16c9/download/data.csv`
 - **Zaklade, glavna evidencija CTS CSV:** `https://data.gov.hr/ckan/dataset/5ed3fa2b-774f-4c4a-9332-80e8486614bd/resource/16429c50-062b-4381-b624-a849dbc80c12/download/data.csv`
 
-Izravne URL-ove i javnu otvorenu dozvolu potvrđuje katalog. Format zaglavlja i točan stvarni broj redaka **nisu provjereni u ovoj razvojnoj sesiji**. Manifest zato zadržava `enabled=false` i zahtijeva pregled prije uključivanja. Podaci iz resursa "Osobe" nisu obuhvaćeni automatiziranim uvozom.
+Izravne URL-ove i javnu otvorenu dozvolu potvrđuje katalog. Zaglavlja oba službena izvoza **provjerena su 25.10.2026.** u zasebnoj GitHub Actions provjeri. Datoteka udruga tada je imala 71 333 zapisa, među njima aktivne, brisane i prestale udruge. Format datuma je lokalizirani američki `M/D/YYYY hh:mm:ss AM/PM`. Izvoz zaklada povremeno je vraćao HTTP 500 te potpuni broj nije potvrđen. Primjer manifesta ima `enabled=true`, ali se izvršava isključivo nakon što administrator privatno postavi konfiguraciju i cron; izvorna datoteka i stvarna prava uporabe i dalje se moraju provjeriti. Podaci iz resursa "Osobe" nisu obuhvaćeni automatiziranim uvozom.
 
 Za obrte službeni javni pretraživač prikazuje i aktivne i odjavljene obrte, ali preglednik nije isto što i potvrđeni bulk CSV/API. Bez dopuštenog masovnog izvoza nacionalna potpuna baza obrta nije osigurana.
 
 ## Datumi osnivanja i prestanka
 
 Mogu se prikazati samo ako službeni registar za konkretan zapis izričito daje `start_date` ili `end_date`; kod Sudreg zapisa koriste se stvarni `datum_osnivanja` i `datum_brisanja`. `published_at_utc` je vrijeme objave u TVRTKE i ne znači datum osnivanja poslovnog subjekta. Javni Sudreg API ne pruža potpunu povijest svih upisa iz prošlosti; za to su predviđeni prošireni službeni servisi.
+
+Mapirane su samo kolone pravnog subjekta. Izvorni opisi aktivnosti pohranjuju se u `MEDIUMTEXT`, ne skraćuju se prilikom uvoza. Dodani su odvojeni `datum_upisa` i `datum_statusa`, da se promjena statusa ne pogrešno predstavi kao osnivanje ili brisanje.

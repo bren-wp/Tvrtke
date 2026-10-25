@@ -1,5 +1,5 @@
 {
-  "_notice": "Administrator-only example. Copy outside public webroot to feeds.local.json, inspect CSV headers, supply exact official column mapping and explicitly enable approved sources.",
+  "_notice": "Example for an administrator-controlled private backend. Official association and foundation CSV column headers were checked against data.gov.hr on 2026-10-25; COPY PRIVATE, set quotas, check license, then use cPanel cron. Neither public users nor apps see credentials.",
   "udruga": {
     "enabled": true,
     "download_url": "https://data.gov.hr/ckan/dataset/b04f3da4-d2b6-4789-9e5f-dc4cc18ae6fe/resource/535a5b96-9f28-409a-ae99-e245964c16c9/download/data.csv",

@@ -2,7 +2,7 @@
 
 ## Preduvjeti
 
-Instalirajte SQL migracije `001_initial.sql`, `002_enrichment.sql`, `003_publication_state.sql`, **`004_registry_sources.sql`**, **`005_sudreg_full_coverage.sql`** i **`006_registry_lifecycle.sql`** redom. PHP 8.2+, MySQL/MariaDB i izvršavanje PHP CLI skripti su obavezni.
+Instalirajte SQL migracije `001_initial.sql`, `002_enrichment.sql`, `003_publication_state.sql`, **`004_registry_sources.sql`**, **`005_sudreg_full_coverage.sql`** i **`006_registry_lifecycle.sql`** i **`007_registry_details.sql`** redom. PHP 8.2+, MySQL/MariaDB i izvršavanje PHP CLI skripti su obavezni.
 
 Preuzmite isključivo podatke koje pružatelj dopušta ponovno koristiti. CSV datoteku držite u privatnom direktoriju, **izvan web-roota**, nikad u `public_html` ili GitHub repozitoriju.
 
@@ -77,7 +77,7 @@ Ponavljajte naredbu dok ne javi da nema aktivnog uvoza. Svaki poziv briše najvi
 
 ## Automatsko ažuriranje udruga i zaklada
 
-Projekt sadrži administrativni CLI mehanizam `backend/bin/sync-public-feeds.php` za službene CKAN CSV izvoze. Primjerni manifest `backend/feeds.example.json` navodi provjerene izvore za udruge i zaklade s portala data.gov.hr; **nije automatski uključen**, jer je najprije potrebno pregledati zaglavlja i uskladiti dopuštene stupce. Izvoz označen `Osobe` ne koristiti. U programu se ne smiju prikazivati podaci fizičkih osoba koji nisu potrebni za poslovni imenik.
+Projekt sadrži administrativni CLI mehanizam `backend/bin/sync-public-feeds.php` za službene CKAN CSV izvoze. Primjerni manifest `backend/feeds.example.json` navodi provjerene izvore za udruge i zaklade s portala data.gov.hr; **nije automatski uključen**, jer je imena stupaca su 25.10.2026. provjerena u službenom CSV-u, ali format, obuhvat i dozvolu treba provjeriti na svakom novom izvozu. Izvoz označen `Osobe` ne koristiti. U programu se ne smiju prikazivati podaci fizičkih osoba koji nisu potrebni za poslovni imenik.
 
 1. Napraviti privatni `backend/feeds.local.json` iz primjera; ne kopirati u `public_html`, web-accessible `api/public` ili Git.
 2. Preuzeti službeni CSV iz odobrenog izvora u privremenu privatnu mapu i utvrditi stvarne nazive stupaca:
@@ -86,7 +86,7 @@ Projekt sadrži administrativni CLI mehanizam `backend/bin/sync-public-feeds.php
    ```
    Parametar `--inspect` ispisuje samo **nazive stupaca**, ne sadržaj fizičkih osoba.
 3. U `columns` unijeti stvarni `id` i `name`, te opcionalno `status`, `county`, `settlement`, `activity`, `start_date`, `end_date`. Kolone koje ne postoje **ne izmišljati**. Ne dodavati podatke o zastupnicima ili vlasnicima.
-4. Tek nakon provjere licence, identifikatora i formata uključiti `"enabled": true` za pojedini izvor. Potpunost (`coverage: complete`) dopuštena je samo uz neovisno potvrđen `expected_rows`.
+4. Primjer sadrži `"enabled": true` za dva službena kataloška resursa s provjerenim zaglavljima. Kopiranje privatnog manifesta i aktiviranje cron zadatka predstavljaju izričitu administratorsku odluku. Ako službeni CSV promijeni strukturu ili sadrži nevaljane podatke, importer obustavlja objavu bez mijenjanja aktivne baze. Potpunost (`coverage: complete`) dopuštena je samo uz neovisno potvrđen `expected_rows`.
 5. Pozivati kratku sinkronizaciju za pojedini izvor iz cPanela:
    ```cron
    */10 * * * * /usr/local/bin/php /home/ACCOUNT/tvrtke-backend/bin/sync-public-feeds.php --source=udruga >/dev/null 2>&1
@@ -98,3 +98,11 @@ Projekt sadrži administrativni CLI mehanizam `backend/bin/sync-public-feeds.php
 Službene nacionalne podatke o svim obrtima **nije moguće deklarirati preuzetima** dok nije potvrđen bulk izvor ili autorizirani pristup takvom izvoru. Ne zaobilaziti ograničenja Portala obrtnog registra. Ažuriranje Sudreg API-ja i ovih feedova izvršava se potpuno na privatnom poslužitelju; Windows i WordPress ne dobivaju ključeve ni pristup MySQL-u.
 
 Prilikom povećanja limita tijekom Sudreg uvoza i dalje su potrebni kontrola kvote i dostupnost iste službene snimke; novi limit sam po sebi ne jamči dovršetak prije isteka snimke.
+
+### Provjereni podaci hrvatskih registara (25.10.2026.)
+
+- **Udruge CTS CSV:** 71 333 redaka u trenutačnom izvoru; statusi `AKTIVAN` (43 171), `BRISAN` (26 373), `PRESTANAK DJELOVANJA` (1 789). To je stanje pregledanog izvoza, ne trajno jamstvo nacionalne pokrivenosti. Mapiranje koristi `REGISTARSKI_BROJ`, `NAZIV`, `OIB` pravne osobe, `STATUS`, `ZUPANIJA`, `SJEDISTE`, `OPIS_DJELATNOSTI`, `DATUM_OSNIVACKE_SKUPSTINE`, `DATUM_UPISA` i `DATUM_STATUSA`.
+- **Zaklade CTS CSV:** potvrđeno zaglavlje: `REGISTARSKI_BROJ`, `NAZIV`, `STATUS`, `OIB_ZAKLADE`, `SJEDISTE`, `DATUM_UPISA` i `DATUM_STATUSA`. Broj zapisa nije potvrđen jer su agregatni zahtjevi povremeno vraćali pogrešku HTTP 500; importer pri tome ne objavljuje nepotpun CSV.
+- Datumski format u izvozu udruga je mjesec/dan/godina s 12-satnim vremenom, npr. struktura `M/D/YYYY hh:mm:ss AM`. Parser uz ISO i hrvatski datum prihvaća i ovaj službeni format.
+- `OPIS_DJELATNOSTI` kod pojedinih udruga premašuje 33 000 znakova. Za te podatke koristi se `MEDIUMTEXT`, dok rezultati pretrage šalju skraćeni sažetak; detalj može sadržavati puni javni opis. Ne uvoziti osobne podatke iz zasebnih resursa `Osobe`.
+- `DATUM_OSNIVACKE_SKUPSTINE` je datum osnivačke skupštine, a ne nužno datum pravnog upisa. `DATUM_UPISA` i `DATUM_STATUSA` ostaju zasebna polja.
