@@ -24,7 +24,7 @@ final class RegistryFeedConfig
             throw new \InvalidArgumentException('Inspect official CSV and map id/name columns before enabling feed');
         }
         $columns = $raw['columns'];
-        $allowed = ['id','name','oib','status','county','settlement','address','activity','start_date','end_date'];
+        $allowed = ['id','name','oib','status','county','settlement','address','activity','start_date','end_date','registration_date','status_date'];
         foreach ($columns as $field => $column) {
             if (!in_array($field,$allowed,true) || !is_string($column) ||
                 $column === '' || strlen($column) > 150) {
