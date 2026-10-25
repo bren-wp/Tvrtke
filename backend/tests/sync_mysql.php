@@ -110,4 +110,36 @@ try {
 }
 $active=$db->query("SELECT state_value FROM app_state WHERE state_key='active_snapshot'")->fetchColumn();
 verify((string)$active==='20261025','Failed next snapshot cannot replace published records');
-echo "Sudreg MySQL integration: OK\n";
+
+// Official-source ingestion and public directory search with real MariaDB.
+$temp = tempnam(sys_get_temp_dir(),'tvrtke-source-');
+verify(is_string($temp),'Temporary fixture location');
+file_put_contents($temp,"id,name,oib,status,county,settlement,start_date,end_date\n".
+    "000123,Primjer testni obrt,12345678901,U radu,Primorsko-goranska,Rijeka,10.2.2019.,\n".
+    "000124,Primjer odjavljeni obrt,12345678902,Odjavljen,Grad Zagreb,Zagreb,2011-05-20,2022-07-31\n");
+$map = ['id'=>'id','name'=>'name','oib'=>'oib','status'=>'status','county'=>'county',
+    'settlement'=>'settlement','start_date'=>'start_date','end_date'=>'end_date'];
+$datasetUrl='https://data.gov.hr/ckan/dataset/obrtni-registar';
+try {
+    $importer = new Tvrtke\RegistryImporter($db);
+    $result = null;
+    for ($i=0;$i<5;$i++) {
+        $result = $importer->tick('obrt',$temp,$datasetUrl,null,$map,',',1,100,2,'complete');
+        if ($result['status']==='published') break;
+    }
+    verify(($result['status'] ?? '')==='published','External CSV source must publish');
+    $directory = new Tvrtke\DirectoryRepository($db);
+    $inactive = $directory->search('Primjer',1,20,['type'=>'obrt','status'=>'0']);
+    verify(count($inactive['items'])===1,'Inactive craft appears only when filtered');
+    $craft = $inactive['items'][0];
+    verify(($craft['datum_osnivanja'] ?? null)==='2022-07-31' ? false : true,
+        'Founding date should not be overwritten by cessation');
+    verify(($craft['datum_osnivanja'] ?? '')==='2011-05-20','Craft start date');
+    verify(($craft['datum_brisanja'] ?? '')==='2022-07-31','Craft end date');
+    verify($craft['oib'] === null,'Craft owner OIB withheld');
+    $detail = $directory->one('obrt',substr((string)$craft['registry_key'],5));
+    verify(($detail['datum_brisanja'] ?? '')==='2022-07-31','External detail cessation date');
+} finally {
+    unlink($temp);
+}
+echo "Sudreg + multi-source MariaDB integration: OK\n";

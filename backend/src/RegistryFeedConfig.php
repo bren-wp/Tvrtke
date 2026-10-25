@@ -80,8 +80,8 @@ final class RegistryFeedConfig
         $host = strtolower((string)($parts['host'] ?? ''));
         if (($parts['scheme'] ?? '') !== 'https' ||
             !in_array($host,['data.gov.hr','p-data.gov.hr'],true) ||
-            isset($parts['user'],$parts['pass']) ||
-            isset($parts['port']) || isset($parts['fragment']) ||
+            isset($parts['user']) || isset($parts['pass']) ||
+            isset($parts['port']) || isset($parts['fragment']) || isset($parts['query']) ||
             !str_starts_with((string)($parts['path'] ?? ''),'/ckan/dataset/') ||
             !str_ends_with(strtolower((string)($parts['path'] ?? '')),'.csv')) {
             throw new \InvalidArgumentException('Download URL must point to an approved official CKAN CSV resource');

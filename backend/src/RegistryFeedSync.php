@@ -48,6 +48,13 @@ final class RegistryFeedSync
         $currentFile = $dir.'/tvrtke-'.$type.'.csv';
         $pendingDigest = $dir.'/tvrtke-'.$type.'.pending.sha256';
         $publishedDigest = $dir.'/tvrtke-'.$type.'.published.sha256';
+        $lastCheck = $dir.'/tvrtke-'.$type.'.last-check';
+        // A new official export is expected approximately daily. Polling
+        // more often must not repeatedly transfer the entire national CSV.
+        if (is_file($lastCheck) && !is_file($currentFile) &&
+            (time() - (int)filemtime($lastCheck)) < 21600) {
+            return ['type'=>$type,'status'=>'checked_recently','rows'=>null];
+        }
         $job = $this->db->prepare('SELECT import_id FROM registry_import_jobs WHERE source_type=? LIMIT 1');
         $job->execute([$type]);
         $staging = $job->fetchColumn() !== false;
@@ -63,6 +70,7 @@ final class RegistryFeedSync
                 if (!is_string($digest)) throw new \RuntimeException('Cannot verify official CSV checksum');
                 $old = is_file($publishedDigest) ? trim((string)file_get_contents($publishedDigest)) : '';
                 if ($old !== '' && hash_equals($old,$digest)) {
+                    touch($lastCheck);
                     return ['type'=>$type,'status'=>'unchanged','rows'=>null];
                 }
                 if (!rename($temporary,$currentFile)) throw new \RuntimeException('Cannot stage official CSV');
@@ -103,6 +111,7 @@ final class RegistryFeedSync
                     throw new \RuntimeException('Cannot remember published official source version');
                 }
                 if (is_file($currentFile)) unlink($currentFile);
+                touch($lastCheck);
                 break;
             }
         }

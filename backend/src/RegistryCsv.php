@@ -73,7 +73,7 @@ final class RegistryCsv
         foreach (self::FIELDS as $field) {
             $label = $mapping[$field] ?? $field;
             if (isset($positions[$label])) $indexes[$field] = $positions[$label];
-            elseif (in_array($field, ['id', 'name'], true)) {
+            elseif (in_array($field, ['id', 'name'], true) || array_key_exists($field,$mapping)) {
                 throw new \InvalidArgumentException('Required CSV column is missing: ' . $label);
             }
         }
