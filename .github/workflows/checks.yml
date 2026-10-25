@@ -60,5 +60,8 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
+      - name: Generate multi-resolution TVRTKE icon
+        shell: pwsh
+        run: ./windows/Tvrtke.Desktop/Assets/Generate-TVRTKEIcon.ps1
       - name: Build WPF application
         run: dotnet build windows/Tvrtke.Desktop/Tvrtke.Desktop.csproj --configuration Release

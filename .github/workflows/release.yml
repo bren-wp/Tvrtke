@@ -16,6 +16,9 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
+      - name: Build TVRTKE branded application icon
+        shell: pwsh
+        run: ./windows/Tvrtke.Desktop/Assets/Generate-TVRTKEIcon.ps1
       - name: Build portable Windows executable and packaging assets
         shell: pwsh
         env:
