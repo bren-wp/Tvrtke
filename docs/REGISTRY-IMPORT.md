@@ -64,3 +64,13 @@ Importer namjerno preuzima samo tražene stupce javnog subjekta. Informacije o z
 Održavajte slobodan prostor dovoljan za novu seriju i eventualnu staru seriju tijekom atomic publish. Za veoma velike registre potreban je jači hosting ili vanjski podatkovni servis. Umjesto velikih učitavanja koristite male CLI serije i cPanel cron po dogovorenom rasporedu.
 
 Nikad nemojte slati OAuth2 Client Secret ili MySQL lozinku na WordPress/frontend ili u javni repozitorij.
+
+## Oporavak neuspjelog uvoza
+
+Ako službeni CSV sadrži duplikate, pogrešne stupce ili nevaljane zapise, importer zaustavlja posao bez promjene već objavljenog izvora. Popravite izvor i zatim **namjerno uklonite isključivo njegovu neobjavljenu seriju**:
+
+```sh
+php backend/bin/abort-registry-import.php --source=udruga --confirm=DELETE_STAGING
+```
+
+Ponavljajte naredbu dok ne javi da nema aktivnog uvoza. Svaki poziv briše najviše 250 redaka i **nikada ne briše aktivno objavljenu seriju**. Ako želite samo nastaviti isti uvoz, nemojte pokretati ovu naredbu.
