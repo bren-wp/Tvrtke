@@ -111,3 +111,33 @@
  .tvrtke-admin .tvrtke-preview-search b{flex:1 1 100%}
  .tvrtke-admin .tvrtke-preview-cats{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+/* v0.9 consistent settings and SVG pictograms */
+.tvrtke-admin .tvrtke-duration{display:flex;align-items:center;gap:12px;max-width:100%}
+.tvrtke-admin .tvrtke-duration input{max-width:130px;flex:0 1 130px}
+.tvrtke-admin .tvrtke-duration span{font-size:12px;color:#587490}
+.tvrtke-admin .tvrtke-field-choices{display:flex;flex-wrap:wrap;align-items:center;gap:14px}
+.tvrtke-admin .tvrtke-field-choices label{display:inline-flex;align-items:center;gap:7px;
+  color:#2d4d6d;white-space:normal}
+.tvrtke-admin .tvrtke-field-choices input[type=checkbox]{accent-color:#00aaa5}
+.tvrtke-admin .tvrtke-page-tabs a:focus-visible{outline:3px solid #1b8cc9;outline-offset:-3px}
+.tvrtke-admin .tvrtke-preview-cats span{display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:8px;min-width:0;padding:13px 6px;line-height:1.3}
+.tvrtke-admin .tvrtke-icon{display:block;width:25px;height:25px;color:#08649c;flex:none}
+.tvrtke-admin .tvrtke-preview-cats span:nth-child(2) .tvrtke-icon,
+.tvrtke-admin .tvrtke-preview-cats span:nth-child(4) .tvrtke-icon{color:#00a89d}
+.tvrtke-admin .tvrtke-tabs a[aria-current=page]{font-weight:800;color:#008e96;border-color:#00a99f}
+.tvrtke-admin .tvrtke-admin-layout{align-items:start}
+.tvrtke-admin .tvrtke-card input,.tvrtke-admin .tvrtke-card select{max-width:100%}
+.tvrtke-admin .tvrtke-admin-layout{min-width:0}
+.tvrtke-admin .tvrtke-card{overflow-wrap:anywhere}
+@container (max-width:580px){
+ .tvrtke-admin .tvrtke-page-tabs a{padding:11px 13px;font-size:12px}
+ .tvrtke-admin .tvrtke-field-choices{align-items:flex-start;flex-direction:column;gap:10px}
+ .tvrtke-admin .tvrtke-duration{flex-wrap:wrap}
+ .tvrtke-admin .tvrtke-duration input{max-width:130px}
+}
+@media(prefers-contrast:more){
+ .tvrtke-admin .tvrtke-card,.tvrtke-registar .tvrtke-result{border-color:#344f6a}
+ .tvrtke-admin .tvrtke-tabs a[aria-current=page]{outline:2px solid #007c87}
+}
