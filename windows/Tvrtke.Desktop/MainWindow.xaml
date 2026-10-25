@@ -94,6 +94,7 @@
         <DockPanel Grid.Row="3" Margin="0,14,0,0" LastChildFill="False">
             <TextBlock x:Name="StatusText" Text="Spremno za pretragu" Foreground="#526173" DockPanel.Dock="Left" VerticalAlignment="Center" TextWrapping="Wrap"/>
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Izvezi prikazano (CSV)" Click="Export_Click" Margin="0,0,14,0" ToolTip="Izvozi samo rezultate trenutačne stranice"/>
                 <Button x:Name="PreviousButton" Content="Prethodna" Click="Previous_Click" IsEnabled="False" Margin="0,0,7,0"/>
                 <TextBlock x:Name="PageText" Text="1" VerticalAlignment="Center" Margin="10,0"/>
                 <Button x:Name="NextButton" Content="Sljedeća" Click="Next_Click" IsEnabled="False"/>

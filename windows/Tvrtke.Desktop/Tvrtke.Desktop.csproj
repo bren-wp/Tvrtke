@@ -6,6 +6,11 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>Tvrtke.Desktop</AssemblyName>
+    <Version>0.3.0</Version>
+    <FileVersion>0.3.0.0</FileVersion>
+    <AssemblyVersion>0.3.0.0</AssemblyVersion>
+    <Product>TVRTKE – Poslovni registar Hrvatske</Product>
+    <Company>Brendigo</Company>
     <RootNamespace>Tvrtke.Desktop</RootNamespace>
   </PropertyGroup>
 </Project>
