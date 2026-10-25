@@ -7,11 +7,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>Tvrtke.Desktop</AssemblyName>
     <ApplicationIcon>Assets/Tvrtke.ico</ApplicationIcon>
-    <Version>0.7.0</Version>
-    <FileVersion>0.7.0.0</FileVersion>
-    <AssemblyVersion>0.7.0.0</AssemblyVersion>
+    <Version>0.8.0</Version>
+    <FileVersion>0.8.0.0</FileVersion>
+    <AssemblyVersion>0.8.0.0</AssemblyVersion>
     <Product>TVRTKE – Poslovni imenik Hrvatske</Product>
     <Company>Brendigo</Company>
+    <Authors>Brendigo</Authors>
+    <Copyright>Copyright © Brendigo 2026</Copyright>
+    <NeutralLanguage>hr-HR</NeutralLanguage>
     <RootNamespace>Tvrtke.Desktop</RootNamespace>
   </PropertyGroup>
 </Project>
