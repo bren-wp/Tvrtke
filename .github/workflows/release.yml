@@ -32,7 +32,8 @@ jobs:
           if (!(Test-Path $portableSource)) { throw 'Published EXE not found' }
           Copy-Item $portableSource (Join-Path $dist "TVRTKE-Portable-v$version-win-x64.exe")
           Compress-Archive -Path 'wordpress/tvrtke-registar' -DestinationPath (Join-Path $dist "TVRTKE-WordPress-v$version.zip") -CompressionLevel Optimal
-          git archive --format=zip --output=(Join-Path $dist "TVRTKE-v$version-source.zip") HEAD
+          $sourceZip = Join-Path $dist "TVRTKE-v$version-source.zip"
+          git archive --format=zip "--output=$sourceZip" HEAD
           if ($LASTEXITCODE -ne 0) { throw 'git archive failed' }
           'DIST_DIR=' + $dist | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - name: Install Inno Setup
