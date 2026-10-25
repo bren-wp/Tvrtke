@@ -86,7 +86,7 @@ expires through standard transient expiration.
 * No OAuth secrets or private MySQL credentials in the plugin.
 
 
-= 0.10.0 =
+= 0.9.0 =
 * Consistent navy/teal reference-based SVG icons across public search and WordPress admin screens.
 * Public profile cards for registration information, location, official provenance and activities.
 * Optional field visibility (settlement, activity, legal-entity OIB) and configurable 1–1440 minute cache.
