@@ -24,6 +24,74 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private readonly TvrtkePreferences _preferences = TvrtkePreferences.Load();
     private string _api = "https://api.tvrtke.com.hr";
     private bool _favoritesMode;
+    private bool? _twoRowFilters;
+    private bool? _stackedResults;
+
+    /// <summary>
+    /// Keeps search, profile and actions usable at 720–3840 DIPs,
+    /// including Windows scaling (100%, 125%, 150% and larger).
+    /// The content scrolls vertically when the workspace is shorter.
+    /// </summary>
+    private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        // WPF may dispatch SizeChanged while InitializeComponent is still running.
+        if (SidebarColumn is null || WorkspaceGrid is null || SearchFilterGrid is null || ResultsLayout is null)
+            return;
+
+        var compactNavigation = ActualWidth < 1120;
+        var splitFilters = ActualWidth < 1230;
+        var stackProfile = ActualWidth < 995;
+
+        SidebarColumn.Width = new GridLength(compactNavigation ? 0 : ActualWidth < 1330 ? 210 : 252);
+        Sidebar.Visibility = compactNavigation ? Visibility.Collapsed : Visibility.Visible;
+        CompactNavigation.Visibility = compactNavigation ? Visibility.Visible : Visibility.Collapsed;
+        SourceBadge.Visibility = ActualWidth < 930 ? Visibility.Collapsed : Visibility.Visible;
+        HeroTitle.FontSize = ActualWidth < 930 ? 20 : ActualWidth < 1230 ? 23 : 27;
+
+        if (_twoRowFilters != splitFilters)
+        {
+            _twoRowFilters = splitFilters;
+            SearchRow.Height = new GridLength(splitFilters ? 225 : 160);
+            SearchFilterGrid.RowDefinitions[1].Height = splitFilters
+                ? GridLength.Auto : new GridLength(0);
+            SearchFilterGrid.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
+            SearchFilterGrid.ColumnDefinitions[1].Width = new GridLength(1, GridUnitType.Star);
+            SearchFilterGrid.ColumnDefinitions[2].Width = splitFilters
+                ? new GridLength(0) : new GridLength(1.15, GridUnitType.Star);
+            SearchFilterGrid.ColumnDefinitions[3].Width = splitFilters
+                ? new GridLength(0) : new GridLength(.95, GridUnitType.Star);
+            Grid.SetRow(CategoryFilter, 0);
+            Grid.SetColumn(CategoryFilter, 0);
+            Grid.SetRow(CountyFilter, 0);
+            Grid.SetColumn(CountyFilter, 1);
+            Grid.SetRow(ActivityFilter, splitFilters ? 1 : 0);
+            Grid.SetColumn(ActivityFilter, splitFilters ? 0 : 2);
+            Grid.SetRow(StatusFilter, splitFilters ? 1 : 0);
+            Grid.SetColumn(StatusFilter, splitFilters ? 1 : 3);
+            CategoryFilter.Margin = CountyFilter.Margin = ActivityFilter.Margin =
+                splitFilters ? new Thickness(0, 0, 10, 8) : new Thickness(0, 0, 9, 0);
+            StatusFilter.Margin = splitFilters ? new Thickness(0, 0, 0, 8) : new Thickness(0);
+        }
+
+        if (_stackedResults != stackProfile)
+        {
+            _stackedResults = stackProfile;
+            ResultsLayout.ColumnDefinitions[0].Width = new GridLength(
+                stackProfile ? 1 : 1.65, GridUnitType.Star);
+            ResultsLayout.ColumnDefinitions[1].Width = new GridLength(stackProfile ? 0 : 13);
+            ResultsLayout.ColumnDefinitions[2].Width = stackProfile
+                ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
+            ResultsLayout.RowDefinitions[1].Height = stackProfile
+                ? new GridLength(1, GridUnitType.Star) : new GridLength(0);
+            Grid.SetRow(DetailsCard, stackProfile ? 1 : 0);
+            Grid.SetColumn(DetailsCard, stackProfile ? 0 : 2);
+            DetailsCard.Margin = stackProfile ? new Thickness(0, 12, 0, 0) : new Thickness(0);
+        }
+
+        WorkspaceGrid.MinHeight = Math.Max(
+            stackProfile ? 1180 : splitFilters ? 820 : 730,
+            Math.Max(0, ActualHeight - 30));
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
     public Subject? SelectedSubject
@@ -50,8 +118,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private async void Category_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not Button button) return;
-        var type = button.Tag?.ToString() ?? "all";
+        if (sender is not FrameworkElement element) return;
+        var type = element.Tag?.ToString() ?? "all";
         foreach (var item in CategoryInput.Items.OfType<ComboBoxItem>())
         {
             if (item.Tag?.ToString() == type)
