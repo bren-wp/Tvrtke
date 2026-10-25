@@ -1,7 +1,7 @@
 <Window x:Class="Tvrtke.Desktop.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="TVRTKE – Poslovni registar" Width="1220" Height="760"
+        Title="TVRTKE – Poslovni imenik Hrvatske" Width="1220" Height="760"
         MinWidth="850" MinHeight="560" Background="#F4F7FB">
     <Window.Resources>
         <Style TargetType="Button">
@@ -27,16 +27,16 @@
                 <Button Content="Postavke API-ja" Click="Settings_Click" Margin="8,0,0,0"/>
                 <Button x:Name="FavoritesButton" Content="Favoriti" Click="Favorites_Click" Margin="8,0,0,0"/>
             </StackPanel><StackPanel><TextBlock Text="TVRTKE" FontSize="34" FontWeight="Bold" Foreground="#174B85"/>
-            <TextBlock Text="Poslovni registar Hrvatske · službeni podaci Sudskog registra" FontSize="14" Foreground="#53677A"/></StackPanel></DockPanel>
+            <TextBlock Text="Tvrtke, obrti, udruge i zaklade · dostupni javni registri Hrvatske" FontSize="14" Foreground="#53677A"/></StackPanel></DockPanel>
         </StackPanel>
         <Border Grid.Row="1" Background="White" CornerRadius="12" Padding="18" Margin="0,0,0,14">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/><ColumnDefinition Width="2*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/><ColumnDefinition Width="2*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel Margin="0,0,10,0">
-                    <TextBlock Text="Naziv, OIB ili MBS" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                    <TextBox x:Name="QueryInput" ToolTip="Pretraži po nazivu, OIB-u ili MBS-u" KeyDown="QueryInput_KeyDown"/>
+                    <TextBlock Text="Naziv ili registracijski broj" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <TextBox x:Name="QueryInput" ToolTip="Pretraži po nazivu ili broju poslovnog subjekta" KeyDown="QueryInput_KeyDown"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Margin="0,0,10,0">
                     <TextBlock Text="Županija" FontWeight="SemiBold" Margin="0,0,0,6"/>
@@ -47,12 +47,23 @@
                     <TextBox x:Name="ActivityInput" ToolTip="Početak opisa ili NKD šifra" KeyDown="QueryInput_KeyDown"/>
                 </StackPanel>
                 <StackPanel Grid.Column="3" Margin="0,0,10,0">
+                    <TextBlock Text="Vrsta subjekta" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <ComboBox x:Name="CategoryInput" SelectedIndex="0" MinWidth="148" Height="37">
+                        <ComboBoxItem Content="Svi registri" Tag="all"/>
+                        <ComboBoxItem Content="Sudski registar" Tag="sudreg"/>
+                        <ComboBoxItem Content="Obrti" Tag="obrt"/>
+                        <ComboBoxItem Content="Udruge" Tag="udruga"/>
+                        <ComboBoxItem Content="Zaklade" Tag="zaklada"/>
+                        <ComboBoxItem Content="Ostali" Tag="ostalo"/>
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Grid.Column="4" Margin="0,0,10,0">
                     <TextBlock Text="Status" FontWeight="SemiBold" Margin="0,0,0,6"/>
                     <ComboBox x:Name="StatusInput" SelectedIndex="0" MinWidth="120" Height="37">
                         <ComboBoxItem Content="Svi" Tag=""/><ComboBoxItem Content="Aktivni" Tag="1"/><ComboBoxItem Content="Neaktivni" Tag="0"/>
                     </ComboBox>
                 </StackPanel>
-                <Button Grid.Column="4" Content="Pretraži" Width="110" VerticalAlignment="Bottom" Click="Search_Click" Background="#174B85" Foreground="White" BorderThickness="0"/>
+                <Button Grid.Column="5" Content="Pretraži" Width="110" VerticalAlignment="Bottom" Click="Search_Click" Background="#174B85" Foreground="White" BorderThickness="0"/>
             </Grid>
         </Border>
         <Border Grid.Row="2" Background="White" CornerRadius="12" Padding="14">
@@ -63,6 +74,7 @@
                           BorderThickness="0" AlternatingRowBackground="#F7FAFD" RowHeight="40" CanUserAddRows="False">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Naziv" Binding="{Binding Name}" Width="2*"/>
+                        <DataGridTextColumn Header="Izvor" Binding="{Binding SourceLabel}" Width="100"/>
                         <DataGridTextColumn Header="OIB" Binding="{Binding Oib}" Width="118"/>
                         <DataGridTextColumn Header="Mjesto" Binding="{Binding Settlement}" Width="*"/>
                         <DataGridTextColumn Header="Oblik" Binding="{Binding LegalFormShort}" Width="80"/>
@@ -74,6 +86,9 @@
                         <TextBlock Text="Profil subjekta" FontSize="19" FontWeight="SemiBold" Margin="0,0,0,16"/>
                         <TextBlock Text="Naziv" Foreground="#5C6C7C"/>
                         <TextBlock Text="{Binding Name, TargetNullValue='Odaberite subjekt'}" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,3,0,13"/>
+                        <TextBlock Text="Izvor i broj registra" Foreground="#5C6C7C"/>
+                        <TextBlock Text="{Binding SourceLabel}" Margin="0,3,0,2"/>
+                        <TextBlock Text="{Binding SourceIdentifier}" Margin="0,0,0,9"/>
                         <TextBlock Text="MBS / OIB" Foreground="#5C6C7C"/>
                         <TextBlock Text="{Binding Mbs}" Margin="0,3,0,2"/>
                         <TextBlock Text="{Binding Oib}" Margin="0,0,0,13"/>
