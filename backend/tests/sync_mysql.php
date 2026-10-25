@@ -83,6 +83,7 @@ $sync=new Sync($db,$mock);
 $published=false;
 for ($i=0;$i<12;$i++) {
     $message=$sync->tick();
+    echo "sync tick ", $i, ": ", $message, PHP_EOL;
     if (str_contains($message,'Objavljena snimka')) { $published=true; break; }
 }
 verify($published,'Snapshot should publish after all five verified datasets');
