@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-labelledby="title desc">
+<title id="title">TVRTKE — Hrvatski poslovni imenik</title>
+<desc id="desc">Brendirani prikaz aplikacije za pretraživanje subjekata iz više hrvatskih registara.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#091a39"/><stop offset=".64" stop-color="#124477"/><stop offset="1" stop-color="#087a9b"/></linearGradient>
+  <linearGradient id="glow" x1="0" x2="1"><stop stop-color="#63e2d2" stop-opacity=".9"/><stop offset="1" stop-color="#8cc8ff" stop-opacity=".7"/></linearGradient>
+  <filter id="blur"><feGaussianBlur stdDeviation="35"/></filter>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#03162e" flood-opacity=".26"/></filter>
+</defs>
+<rect width="1200" height="420" rx="26" fill="url(#bg)"/>
+<circle cx="1000" cy="35" r="175" fill="#1dc9d1" opacity=".12" filter="url(#blur)"/>
+<circle cx="740" cy="430" r="190" fill="#7c89ff" opacity=".10" filter="url(#blur)"/>
+<g fill="none" stroke="#67c5e1" stroke-opacity=".15" stroke-width="1">
+ <path d="M610 40H1170M610 100H1170M610 160H1170M610 220H1170M610 280H1170M610 340H1170"/>
+ <path d="M640 20V400M720 20V400M800 20V400M880 20V400M960 20V400M1040 20V400M1120 20V400"/>
+</g>
+<rect x="54" y="48" width="62" height="62" rx="17" fill="#d9fffa" opacity=".98"/>
+<path d="M71 66H99V72H89V97H81V72H71Z" fill="#124477"/>
+<circle cx="96" cy="92" r="4" fill="#1fb4b1"/><circle cx="103" cy="82" r="3" fill="#1fb4b1"/>
+<text x="132" y="93" font-family="Arial, sans-serif" font-size="33" font-weight="800" fill="#fff" letter-spacing="2">TVRTKE</text>
+<text x="57" y="168" font-family="Arial, sans-serif" font-size="45" font-weight="700" fill="#fff">Poslovne informacije</text>
+<text x="57" y="218" font-family="Arial, sans-serif" font-size="45" font-weight="700" fill="#fff">na jednom mjestu.</text>
+<text x="58" y="266" font-family="Arial, sans-serif" font-size="21" fill="#c7e8f1">Tvrtke · Obrti · Udruge · Zaklade</text>
+<rect x="57" y="303" width="254" height="52" rx="14" fill="#77ecd6"/>
+<text x="82" y="336" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#08374a">Pronađite poslovni subjekt</text>
+<g filter="url(#shadow)">
+<rect x="682" y="75" width="460" height="276" rx="23" fill="#ffffff" opacity=".98"/>
+<rect x="707" y="102" width="408" height="51" rx="12" fill="#f1f6fb" stroke="#dbe5f0"/>
+<circle cx="733" cy="127" r="8" fill="none" stroke="#4f7f9e" stroke-width="3"/>
+<path d="m739 133 7 7" stroke="#4f7f9e" stroke-width="3" stroke-linecap="round"/>
+<text x="765" y="133" font-family="Arial, sans-serif" font-size="16" fill="#58728b">Naziv ili registracijski broj...</text>
+<g font-family="Arial, sans-serif">
+ <rect x="706" y="175" width="410" height="46" rx="12" fill="#f8fbff" stroke="#edf2f8"/>
+ <rect x="721" y="188" width="22" height="22" rx="7" fill="#dceafd"/>
+ <path d="M727 202V194h10v8m-12 0h14" fill="none" stroke="#326fbe" stroke-width="2"/>
+ <text x="757" y="195" font-size="15" font-weight="700" fill="#153655">Tvrtke</text>
+ <text x="757" y="210" font-size="11" fill="#73859a">Sudski registar</text>
+ <rect x="1037" y="187" width="64" height="19" rx="9" fill="#e1f6ed"/>
+ <text x="1051" y="201" font-size="10" font-weight="700" fill="#247c62">Izvor</text>
+ <rect x="706" y="229" width="410" height="46" rx="12" fill="#f8fbff" stroke="#edf2f8"/>
+ <rect x="721" y="242" width="22" height="22" rx="7" fill="#e3f5f4"/>
+ <path d="M727 247h10v12h-10zm-2 2 7-4 7 4" stroke="#12998e" stroke-width="1.8" fill="none"/>
+ <text x="757" y="249" font-size="15" font-weight="700" fill="#153655">Obrti</text>
+ <text x="757" y="264" font-size="11" fill="#73859a">Obrtni registar</text>
+ <rect x="706" y="283" width="410" height="46" rx="12" fill="#f8fbff" stroke="#edf2f8"/>
+ <rect x="721" y="296" width="22" height="22" rx="7" fill="#efeafb"/>
+ <circle cx="728" cy="301" r="3" fill="#8260ca"/><circle cx="736" cy="301" r="3" fill="#8260ca"/>
+ <path d="M723 312q9-14 18 0" fill="none" stroke="#8260ca" stroke-width="2"/>
+ <text x="757" y="303" font-size="15" font-weight="700" fill="#153655">Udruge i zaklade</text>
+ <text x="757" y="318" font-size="11" fill="#73859a">Javno dostupni registri</text>
+</g>
+</g>
+<text x="57" y="390" font-family="Arial, sans-serif" font-size="14" fill="#c7deeb">tvrtke.com.hr</text>
+</svg>

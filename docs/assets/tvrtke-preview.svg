@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600" role="img" aria-labelledby="title desc">
+<title id="title">TVRTKE — Ilustracija korisničkog sučelja</title>
+<desc id="desc">Koncept responzivne pretrage s filtrima po vrsti subjekta, popisom rezultata i detaljima.</desc>
+<rect width="1200" height="600" rx="24" fill="#eaf0f7"/>
+<rect x="42" y="34" width="1116" height="532" rx="22" fill="#fff" stroke="#d5e0eb"/>
+<rect x="42" y="34" width="1116" height="66" rx="22" fill="#12385f"/>
+<path d="M42 77h1116v23H42Z" fill="#12385f"/>
+<rect x="67" y="53" width="31" height="31" rx="8" fill="#66e4cc"/>
+<text x="76" y="75" font-family="Arial" font-size="21" font-weight="700" fill="#154777">T</text>
+<text x="115" y="78" font-family="Arial" font-size="22" font-weight="700" fill="#fff">TVRTKE</text>
+<text x="932" y="75" font-family="Arial" font-size="15" fill="#d7f4ff">Hrvatski poslovni imenik</text>
+<text x="76" y="143" font-family="Arial" font-size="27" font-weight="700" fill="#173655">Pronađite poslovni subjekt</text>
+<g font-family="Arial">
+<rect x="74" y="168" width="360" height="50" rx="10" fill="#f6f9fd" stroke="#c8d5e2"/>
+<text x="94" y="199" font-size="16" fill="#7990a4">Naziv ili registracijski broj</text>
+<rect x="448" y="168" width="218" height="50" rx="10" fill="#f6f9fd" stroke="#c8d5e2"/>
+<text x="469" y="199" font-size="16" fill="#3b5b74">Vrsta subjekta  ▾</text>
+<rect x="680" y="168" width="206" height="50" rx="10" fill="#f6f9fd" stroke="#c8d5e2"/>
+<text x="703" y="199" font-size="16" fill="#6d8294">Županija   ▾</text>
+<rect x="900" y="168" width="217" height="50" rx="10" fill="#126cb0"/>
+<text x="966" y="199" font-size="16" font-weight="700" fill="white">Pretraži</text>
+<text x="76" y="268" font-size="15" font-weight="700" fill="#2c516f">PRIMJER IZGLEDA REZULTATA</text>
+<g>
+<rect x="74" y="286" width="502" height="108" rx="13" fill="#fbfdff" stroke="#dce6ef"/>
+<rect x="92" y="305" width="52" height="50" rx="12" fill="#e0edfa"/>
+<path d="M105 344v-23h26v23m-33 0h40" fill="none" stroke="#286aa3" stroke-width="3"/>
+<text x="161" y="324" font-size="19" font-weight="700" fill="#1d4162">Naziv poslovnog subjekta</text>
+<text x="161" y="349" font-size="14" fill="#6e8297">Sudski registar · Zagreb</text>
+<rect x="161" y="361" width="106" height="22" rx="11" fill="#e5f5ed"/>
+<text x="184" y="377" font-size="12" fill="#21745b">Izvor podataka</text>
+<rect x="591" y="286" width="526" height="108" rx="13" fill="#fbfdff" stroke="#dce6ef"/>
+<rect x="609" y="305" width="52" height="50" rx="12" fill="#e6f7f3"/>
+<path d="m618 327 17-10 17 10v18h-34z" fill="none" stroke="#128979" stroke-width="3"/>
+<text x="678" y="324" font-size="19" font-weight="700" fill="#1d4162">Registrirani obrt</text>
+<text x="678" y="349" font-size="14" fill="#6e8297">Obrtni registar · Rijeka</text>
+<rect x="678" y="361" width="106" height="22" rx="11" fill="#e5f5ed"/>
+<text x="701" y="377" font-size="12" fill="#21745b">Izvor podataka</text>
+<rect x="74" y="410" width="502" height="108" rx="13" fill="#fbfdff" stroke="#dce6ef"/>
+<rect x="92" y="429" width="52" height="50" rx="12" fill="#f3edfc"/>
+<circle cx="111" cy="443" r="6" fill="#8563bf"/><circle cx="127" cy="443" r="6" fill="#8563bf"/>
+<path d="M104 459q15-23 30 0" fill="none" stroke="#8563bf" stroke-width="3"/>
+<text x="161" y="448" font-size="19" font-weight="700" fill="#1d4162">Registrirana udruga</text>
+<text x="161" y="473" font-size="14" fill="#6e8297">Registar udruga · Split</text>
+<rect x="161" y="485" width="106" height="22" rx="11" fill="#e5f5ed"/>
+<text x="184" y="501" font-size="12" fill="#21745b">Izvor podataka</text>
+<rect x="591" y="410" width="526" height="108" rx="13" fill="#fbfdff" stroke="#dce6ef"/>
+<rect x="609" y="429" width="52" height="50" rx="12" fill="#fff0db"/>
+<path d="M621 467v-26l14-8 14 8v26m-28-12h28" fill="none" stroke="#bd8332" stroke-width="3"/>
+<text x="678" y="448" font-size="19" font-weight="700" fill="#1d4162">Registrirana zaklada</text>
+<text x="678" y="473" font-size="14" fill="#6e8297">Registar zaklada · Osijek</text>
+<rect x="678" y="485" width="106" height="22" rx="11" fill="#e5f5ed"/>
+<text x="701" y="501" font-size="12" fill="#21745b">Izvor podataka</text>
+</g></g>
+<text x="73" y="549" font-family="Arial" font-size="13" fill="#708296">Ilustracija sučelja. Podaci na prikazu nisu stvarni registracijski zapisi.</text>
+</svg>
