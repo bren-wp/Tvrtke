@@ -1,0 +1,13 @@
+{
+  "apiVersion": 3,
+  "name": "tvrtke-registar/pretraga",
+  "title": "TVRTKE pretraga",
+  "category": "widgets",
+  "icon": "building",
+  "description": "Javna pretraga poslovnih subjekata iz konfiguriranog TVRTKE API-ja.",
+  "textdomain": "tvrtke-registar",
+  "editorScript": "tvrtke-registar-editor",
+  "supports": {
+    "html": false
+  }
+}

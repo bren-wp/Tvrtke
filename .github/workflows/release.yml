@@ -19,7 +19,7 @@ jobs:
       - name: Build portable Windows executable and packaging assets
         shell: pwsh
         env:
-          VERSION: '0.4.0'
+          VERSION: '0.5.0'
         run: |
           $ErrorActionPreference = 'Stop'
           $version = $env:VERSION
@@ -48,7 +48,7 @@ jobs:
       - name: Build per-user Setup EXE
         shell: pwsh
         env:
-          VERSION: '0.4.0'
+          VERSION: '0.5.0'
         run: |
           $compiler = 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe'
           $publish = Join-Path $env:RUNNER_TEMP 'tvrtke-publish'
@@ -59,7 +59,7 @@ jobs:
       - name: Checksums and asset verification
         shell: pwsh
         env:
-          VERSION: '0.4.0'
+          VERSION: '0.5.0'
         run: |
           $expected = @(
             "TVRTKE-Portable-v$env:VERSION-win-x64.exe",
@@ -78,13 +78,13 @@ jobs:
           Get-ChildItem $env:DIST_DIR | Format-Table Name,Length
       - uses: actions/upload-artifact@v4
         with:
-          name: TVRTKE-v0.4.0-release-assets
+          name: TVRTKE-v0.5.0-release-assets
           path: ${{ runner.temp }}/tvrtke-release/*
           if-no-files-found: error
           retention-days: 30
 
   publish:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/release/v0.4.0'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/release/v0.5.0'
     needs: package
     runs-on: ubuntu-latest
     permissions:
@@ -93,21 +93,21 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
-          name: TVRTKE-v0.4.0-release-assets
+          name: TVRTKE-v0.5.0-release-assets
           path: dist
-      - name: Publish v0.4.0 prerelease to GitHub
+      - name: Publish v0.5.0 prerelease to GitHub
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           ls -lh dist
-          if gh release view v0.4.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload v0.4.0 dist/* --repo "$GITHUB_REPOSITORY" --clobber
+          if gh release view v0.5.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload v0.5.0 dist/* --repo "$GITHUB_REPOSITORY" --clobber
           else
-            gh release create v0.4.0 dist/* \
+            gh release create v0.5.0 dist/* \
               --repo "$GITHUB_REPOSITORY" \
               --target "$GITHUB_SHA" \
-              --title 'TVRTKE v0.4.0 (razvojno izdanje)' \
+              --title 'TVRTKE v0.5.0 (razvojno izdanje)' \
               --notes-file docs/RELEASE-0.4.md \
               --prerelease
           fi
