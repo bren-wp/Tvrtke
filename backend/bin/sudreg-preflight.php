@@ -22,7 +22,7 @@ $report = [
         'mbstring' => extension_loaded('mbstring'),
         'json' => extension_loaded('json'),
     ],
-    'credentials_configured' => Configured('SUDREG_CLIENT_ID') && Configured('SUDREG_CLIENT_SECRET'),
+    'credentials_configured' => isConfigured('SUDREG_CLIENT_ID') && isConfigured('SUDREG_CLIENT_SECRET'),
     'sync' => [
         'include_inactive' => Tvrtke\Config::get('TVRTKE_SYNC_INCLUDE_INACTIVE', '1') === '1',
         'batch_size' => Tvrtke\SudregCoverage::batchSize((int)Tvrtke\Config::get('TVRTKE_IMPORT_BATCH','200')),
@@ -31,7 +31,7 @@ $report = [
     ],
 ];
 
-function Configured(string $name): bool
+function isConfigured(string $name): bool
 {
     $value = Tvrtke\Config::get($name);
     return $value !== '' && !str_contains(strtoupper($value), 'CHANGE_ME');
