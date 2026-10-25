@@ -14,7 +14,7 @@ try {
         $staging = $db->query('SELECT snapshot_id FROM sync_progress LIMIT 1')->fetchColumn();
         if ($active === false) exit(0); // Keep all data until the first publication.
         $keep = array_values(array_unique(array_map('strval', array_filter([$active, $staging], fn($v) => $v !== false))));
-        foreach (['subjects', 'company_names', 'addresses'] as $table) {
+        foreach (['subjects', 'company_names', 'addresses', 'subject_legal_forms', 'subject_activities'] as $table) {
             $placeholders = implode(',', array_fill(0, count($keep), '?'));
             $stmt = $db->prepare("DELETE FROM $table WHERE snapshot_id NOT IN ($placeholders) LIMIT 500");
             $stmt->execute($keep);

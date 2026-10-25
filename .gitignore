@@ -8,8 +8,8 @@ backend/config.local.php
 *.pem
 *.keystore
 *.jks
-bin/
-obj/
+windows/**/bin/
+windows/**/obj/
 .vs/
 .vscode/
 .idea/
