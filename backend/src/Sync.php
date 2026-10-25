@@ -8,7 +8,7 @@ use PDO;
 /** Small, resumable, version-pinned batches for shared hosting. CLI only. */
 final class Sync
 {
-    private const DATASETS = ['subjekti', 'tvrtke', 'sjedista'];
+    private const DATASETS = ['subjekti', 'tvrtke', 'sjedista', 'pravni_oblici', 'predmeti_poslovanja'];
 
     public function __construct(private PDO $db, private SudregClient $client) {}
 
@@ -33,6 +33,18 @@ final class Sync
         if ($fresh < 1) throw new \RuntimeException('No Sudreg snapshots available');
         $progress = $this->db->query('SELECT dataset,snapshot_id,finished FROM sync_progress')->fetchAll(PDO::FETCH_ASSOC);
         $active = $this->db->query("SELECT state_value FROM app_state WHERE state_key='active_snapshot'")->fetchColumn();
+        // Upgrade an existing v0.1 installation in place without dropping published data.
+        // Missing datasets are imported into the same pinned snapshot before marking it complete.
+        if ($progress !== [] && count(array_unique(array_column($progress, 'snapshot_id'))) === 1) {
+            $present = array_column($progress, 'dataset');
+            $add = $this->db->prepare('INSERT IGNORE INTO sync_progress(dataset,snapshot_id) VALUES(?,?)');
+            foreach (self::DATASETS as $dataset) {
+                if (!in_array($dataset, $present, true)) {
+                    $add->execute([$dataset, $progress[0]['snapshot_id']]);
+                    $progress[] = ['dataset' => $dataset, 'snapshot_id' => $progress[0]['snapshot_id'], 'finished' => 0];
+                }
+            }
+        }
         $unfinished = array_values(array_filter($progress, fn(array $p) => !(int) $p['finished']));
         $ongoing = $unfinished !== [] ? (int) $unfinished[0]['snapshot_id'] : $fresh;
         $available = array_map(fn(array $s) => (int) ($s['id'] ?? 0), $snapshots);
@@ -55,7 +67,7 @@ final class Sync
                 throw $e;
             }
         }
-        $stmt = $this->db->prepare('SELECT * FROM sync_progress WHERE finished=0 AND snapshot_id=? ORDER BY FIELD(dataset,\'subjekti\',\'tvrtke\',\'sjedista\') LIMIT 1');
+        $stmt = $this->db->prepare('SELECT * FROM sync_progress WHERE finished=0 AND snapshot_id=? ORDER BY FIELD(dataset,\'subjekti\',\'tvrtke\',\'sjedista\',\'pravni_oblici\',\'predmeti_poslovanja\') LIMIT 1');
         $stmt->execute([$ongoing]);
         $job = $stmt->fetch();
         if ($job === false) {
@@ -79,7 +91,7 @@ final class Sync
             return $dataset . ': dosegnuto ograničenje ' . $maxRows;
         }
         $limit = min($pageSize, $remaining);
-        $response = $this->client->get($dataset, ['snapshot_id' => $ongoing, 'offset' => $offset, 'limit' => $limit]);
+        $response = $this->client->get($dataset, ['snapshot_id' => $ongoing, 'offset' => $offset, 'limit' => $limit] + (in_array($dataset, ['pravni_oblici', 'predmeti_poslovanja'], true) ? ['expand_relations' => 'true'] : []));
         if (isset($response['headers']['snapshot-id']) && (int) $response['headers']['snapshot-id'] !== $ongoing) {
             throw new \RuntimeException('Snapshot mismatch; batch rejected');
         }
@@ -110,6 +122,8 @@ final class Sync
             'subjekti' => 'INSERT INTO subjects (snapshot_id,mbs,oib,status,datum_osnivanja,datum_brisanja) VALUES (?,?,?,?,?,?) ON DUPLICATE KEY UPDATE oib=VALUES(oib),status=VALUES(status),datum_osnivanja=VALUES(datum_osnivanja),datum_brisanja=VALUES(datum_brisanja)',
             'tvrtke' => 'INSERT INTO company_names(snapshot_id,mbs,name) VALUES (?,?,?) ON DUPLICATE KEY UPDATE name=VALUES(name)',
             'sjedista' => 'INSERT INTO addresses(snapshot_id,mbs,county,municipality,settlement,street,house_number,postal_code) VALUES (?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE county=VALUES(county),municipality=VALUES(municipality),settlement=VALUES(settlement),street=VALUES(street),house_number=VALUES(house_number),postal_code=VALUES(postal_code)',
+            'pravni_oblici' => 'INSERT INTO subject_legal_forms(snapshot_id,mbs,form_code,form_name,form_abbreviation) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE form_code=VALUES(form_code),form_name=VALUES(form_name),form_abbreviation=VALUES(form_abbreviation)',
+            'predmeti_poslovanja' => 'INSERT INTO subject_activities(snapshot_id,mbs,activity_rbr,activity_text,nkd_code,nkd_name,nkd_version) VALUES (?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE activity_text=VALUES(activity_text),nkd_code=VALUES(nkd_code),nkd_name=VALUES(nkd_name),nkd_version=VALUES(nkd_version)',
         };
         $statement = $this->db->prepare($sql);
         foreach ($rows as $row) {
@@ -119,6 +133,8 @@ final class Sync
                 'subjekti' => [$snapshot, $mbs, Identity::oib($row['oib'] ?? null), (int) ($row['status'] ?? 0), Identity::date($row['datum_osnivanja'] ?? null), Identity::date($row['datum_brisanja'] ?? null)],
                 'tvrtke' => [$snapshot, $mbs, mb_substr((string) ($row['ime'] ?? ''), 0, 512)],
                 'sjedista' => [$snapshot, $mbs, $row['naziv_zupanije'] ?? null, $row['naziv_opcine'] ?? null, $row['naziv_naselja'] ?? ($row['naselje_van_sifrarnika'] ?? null), $row['ulica'] ?? null, isset($row['kucni_broj']) ? (string) $row['kucni_broj'] . (string) ($row['kucni_podbroj'] ?? '') : null, isset($row['postanski_broj']) ? (string) $row['postanski_broj'] : null],
+                'pravni_oblici' => [$snapshot, $mbs, isset($row['vrsta_pravnog_oblika']['sifra']) ? (string)$row['vrsta_pravnog_oblika']['sifra'] : null, $row['vrsta_pravnog_oblika']['naziv'] ?? null, $row['vrsta_pravnog_oblika']['kratica'] ?? null],
+                'predmeti_poslovanja' => [$snapshot, $mbs, (int)($row['djelatnost_rbr'] ?? throw new \RuntimeException('Missing activity sequence')), $row['djelatnost_tekst'] ?? null, $row['nacionalna_klasifikacija_djelatnosti']['sifra'] ?? null, $row['nacionalna_klasifikacija_djelatnosti']['puni_naziv'] ?? null, $row['nacionalna_klasifikacija_djelatnosti']['verzija'] ?? null],
             };
             $statement->execute($values);
         }

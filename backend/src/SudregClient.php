@@ -81,7 +81,7 @@ final class SudregClient
     /** @return array{data:array,headers:array} */
     public function get(string $endpoint, array $params = []): array
     {
-        $allowed = ['snapshots', 'subjekti', 'tvrtke', 'sjedista'];
+        $allowed = ['snapshots', 'subjekti', 'tvrtke', 'sjedista', 'pravni_oblici', 'predmeti_poslovanja'];
         if (!in_array($endpoint, $allowed, true)) {
             throw new \InvalidArgumentException('Endpoint not allowed');
         }

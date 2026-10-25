@@ -50,3 +50,13 @@ Za stvarnu pretragu potrebna je MySQL baza s instaliranom shemom i objavljena sn
 ## Licenca
 
 MIT. Prije javne objave velike baze treba provjeriti uvjete korištenja službenih podataka, osobne podatke i GDPR te odgovarajuće obveze informiranja korisnika.
+
+## Novosti v0.2.0 (razvojna grana)
+
+- Dodatna migracija [`002_enrichment.sql`](backend/database/002_enrichment.sql) za pravne oblike i registrirane djelatnosti.
+- `Sync` sada preuzima i `pravni_oblici` i `predmeti_poslovanja` u ograničenim serijama, koristeći `expand_relations=true`.
+- API podržava filtre `county`, `settlement`, `status`, `activity`, `legal_form`; detalji subjekta uključuju listu djelatnosti.
+- WordPress shortcode prikazuje kartice, pojedinačne profile i mobilno prilagodljive filtre.
+- Windows klijent nudi filtre i učitavanje detalja pri odabiru subjekta.
+
+Upute za nadogradnju i ograničenja: [`docs/RELEASE-0.2.md`](docs/RELEASE-0.2.md). **Ova grana nije produkcijsko izdanje.**
