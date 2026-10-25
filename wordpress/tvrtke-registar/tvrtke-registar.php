@@ -2,7 +2,7 @@
 /**
  * Plugin Name: TVRTKE – Poslovni registar
  * Description: Hrvatski poslovni imenik za pretraživanje tvrtki, obrta, udruga i zaklada iz povezanih javnih registara.
- * Version: 0.9.0
+ * Version: 0.10.0
  * Author: Brendigo
  * Plugin URI: https://tvrtke.com.hr
  * License URI: https://opensource.org/license/mit
@@ -48,7 +48,7 @@ final class Tvrtke_Registar
             'tvrtke-registar-editor',
             plugins_url('blocks/editor.js', __FILE__),
             ['wp-blocks', 'wp-element', 'wp-i18n'],
-            '0.9.0',
+            '0.10.0',
             true
         );
         register_block_type(__DIR__ . '/blocks', ['render_callback' => [self::class, 'shortcode']]);
@@ -135,8 +135,8 @@ final class Tvrtke_Registar
         if (!in_array($hook, ['toplevel_page_tvrtke-registar',
             'tvrtke_page_tvrtke-pretraga', 'tvrtke_page_tvrtke-izvori',
             'tvrtke_page_tvrtke-statistika', 'tvrtke_page_tvrtke-pomoc'], true)) return;
-        wp_enqueue_style('tvrtke-admin', plugins_url('assets/admin.css', __FILE__), [], '0.9.0');
-        wp_enqueue_script('tvrtke-admin', plugins_url('assets/admin.js', __FILE__), [], '0.9.0', true);
+        wp_enqueue_style('tvrtke-admin', plugins_url('assets/admin.css', __FILE__), [], '0.10.0');
+        wp_enqueue_script('tvrtke-admin', plugins_url('assets/admin.js', __FILE__), [], '0.10.0', true);
     }
 
     private static function admin_page_header(string $title, string $description): void
@@ -489,7 +489,7 @@ final class Tvrtke_Registar
     /** @return string Fully escaped public read-only search markup. */
     public static function shortcode(): string
     {
-        wp_enqueue_style('tvrtke-registar', plugins_url('assets/search.css', __FILE__), [], '0.9.0');
+        wp_enqueue_style('tvrtke-registar', plugins_url('assets/search.css', __FILE__), [], '0.10.0');
         // These public GET filters are read-only: no database writes, accounts, or privileged actions.
         // A nonce is deliberately not required so search result links remain shareable.
         $get = static function (string $key, int $max = 100): string {

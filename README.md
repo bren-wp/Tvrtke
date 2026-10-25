@@ -36,7 +36,7 @@ TVRTKE okuplja pretraživanje poslovnih subjekata u jednostavno, moderno sučelj
 | ⭐ **Favoriti i liste na Windowsu** | Spremite subjekte, organizirajte vlastite liste i pretražujte ih u zasebnom prilagodljivom prozoru. |
 | 📁 **CSV izvoz** | Izvezite trenutačno prikazane rezultate iz Windows aplikacije. |
 | 📱 **Mobilni prikaz** | WordPress tražilica prilagođava se širini samoga bloka na mobitelu, tabletu i računalu. |
-| 🖥️ **Prilagodljivi Windows prozori** | Glavni ekran, favoriti i API postavke prilagođavaju se monitoru, DPI-ju i širini te se ne otvaraju maksimalizirani. |
+| 🖥️ **Prilagodljivi Windows prozori** | Glavni ekran, zasebni prozor profila, favoriti i API postavke prilagođavaju se monitoru, DPI-ju i širini te se ne otvaraju maksimalizirani. |
 | 🔐 **Sigurna veza** | Windows i WordPress komuniciraju s centralnim API-jem putem HTTPS-a. |
 
 ## 🖼️ Jednostavno sučelje, jasni rezultati
@@ -47,7 +47,7 @@ TVRTKE okuplja pretraživanje poslovnih subjekata u jednostavno, moderno sučelj
 
 ## 🪟 TVRTKE za Windows
 
-Svakodnevni rad s poslovnim informacijama, uz preglednu tražilicu, profile, favorite, vlastite liste i CSV izvoz. Program se otvara u **običnom centriranom prozoru**, ne preko cijelog zaslona.
+Svakodnevni rad s poslovnim informacijama, uz preglednu tražilicu, zasebni prozor detalja subjekta, favorite, vlastite liste i CSV izvoz. Program se otvara u **običnom centriranom prozoru**, ne preko cijelog zaslona.
 
 **Odaberite način korištenja:**
 
@@ -60,7 +60,7 @@ Svakodnevni rad s poslovnim informacijama, uz preglednu tražilicu, profile, fav
 
 Dodajte profesionalnu tražilicu poslovnih subjekata na svoju WordPress stranicu.
 
-**Što dobivate?** Gutenberg blok, shortcode `[tvrtke_pretraga]`, prilagodljive kartice i popise, javne profile, SVG ikone i filtre. Administrator određuje izgled, vidljiva polja i trajanje predmemorije.
+**Što dobivate?** Gutenberg blok, shortcode `[tvrtke_pretraga]`, prilagodljive kartice i popise, javne profile, SVG ikone i filtre. Administrator određuje izgled, vidljiva polja i trajanje predmemorije. Kratki kod može kopirati jednim klikom iz sučelja dodatka.
 
 [⬇️ Preuzmite WordPress dodatak](https://github.com/bren-wp/Tvrtke/releases)
 
