@@ -9,8 +9,8 @@ namespace Tvrtke.Desktop;
 /// </summary>
 public partial class SubjectWindow : Window
 {
-    private sealed record ProfileRow(string Label, string Value);
-    private sealed class ProfileContent
+    public sealed record ProfileRow(string Label, string Value);
+    public sealed class ProfileContent
     {
         public string Name { get; init; } = "";
         public string SourceLabel { get; init; } = "";

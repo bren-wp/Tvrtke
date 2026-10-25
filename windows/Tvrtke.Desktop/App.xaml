@@ -3,13 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <SolidColorBrush x:Key="Accent" Color="#1766AD" />
+        <SolidColorBrush x:Key="Accent" Color="#00AFA9" />
         <Style TargetType="Button">
             <Setter Property="Background" Value="{StaticResource Accent}" />
             <Setter Property="Foreground" Value="White" />
             <Setter Property="Padding" Value="14,9" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="MinHeight" Value="37" />
         </Style>
     </Application.Resources>
 </Application>
