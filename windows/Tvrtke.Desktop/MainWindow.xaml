@@ -67,7 +67,7 @@
     </Window.Resources>
 
     <Grid x:Name="ShellGrid">
-        <Grid.ColumnDefinitions><ColumnDefinition x:Name="SidebarColumn" Width="252"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+        <Grid.ColumnDefinitions><ColumnDefinition x:Name="SidebarColumn" Width="270"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
         <!-- Reference: compact left rail, real navigation and no dummy statistics -->
         <Border x:Name="Sidebar" Grid.Column="0" Background="White" BorderBrush="#E0EDF3" BorderThickness="0,0,1,0">
             <DockPanel>

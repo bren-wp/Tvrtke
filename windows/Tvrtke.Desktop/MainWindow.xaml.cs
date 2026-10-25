@@ -41,7 +41,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var filterColumns = ActualWidth < 790 ? 1 : ActualWidth < 1230 ? 2 : 4;
         var stackProfile = ActualWidth < 995;
 
-        SidebarColumn.Width = new GridLength(compactNavigation ? 0 : ActualWidth < 1330 ? 210 : 252);
+        SidebarColumn.Width = new GridLength(compactNavigation ? 0 : ActualWidth < 1330 ? 210 : 270);
         Sidebar.Visibility = compactNavigation ? Visibility.Collapsed : Visibility.Visible;
         CompactNavigation.Visibility = compactNavigation ? Visibility.Visible : Visibility.Collapsed;
         SourceBadge.Visibility = ActualWidth < 930 ? Visibility.Collapsed : Visibility.Visible;
@@ -84,7 +84,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             _stackedResults = stackProfile;
             ResultsLayout.ColumnDefinitions[0].Width = new GridLength(
-                stackProfile ? 1 : 1.65, GridUnitType.Star);
+                stackProfile ? 1 : 1.48, GridUnitType.Star);
             ResultsLayout.ColumnDefinitions[1].Width = new GridLength(stackProfile ? 0 : 13);
             ResultsLayout.ColumnDefinitions[2].Width = stackProfile
                 ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
