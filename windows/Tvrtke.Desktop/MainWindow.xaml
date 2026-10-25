@@ -1,132 +1,251 @@
 <Window x:Class="Tvrtke.Desktop.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="TVRTKE – Poslovni imenik Hrvatske" Width="1220" Height="760"
-        MinWidth="850" MinHeight="560" Background="#F4F7FB">
+        Title="TVRTKE — Poslovni imenik Hrvatske"
+        Width="1448" Height="960" MinWidth="1010" MinHeight="660"
+        WindowStartupLocation="CenterScreen" Background="#EFF7FA"
+        FontFamily="Segoe UI" Loaded="Window_Loaded"
+        UseLayoutRounding="True" SnapsToDevicePixels="True">
     <Window.Resources>
-        <Style TargetType="Button">
-            <Setter Property="MinHeight" Value="36"/>
-            <Setter Property="Padding" Value="14,7"/>
+        <SolidColorBrush x:Key="Navy" Color="#0B2D4A"/>
+        <SolidColorBrush x:Key="Teal" Color="#00AFA9"/>
+        <SolidColorBrush x:Key="Muted" Color="#607A96"/>
+        <SolidColorBrush x:Key="Line" Color="#DDE9F2"/>
+        <Style x:Key="NavButton" TargetType="Button">
+            <Setter Property="Height" Value="47"/><Setter Property="Margin" Value="8,2"/>
+            <Setter Property="Padding" Value="18,0"/><Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Foreground" Value="#183C62"/><Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/><Setter Property="FontSize" Value="15"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="#E6F6F7"/></Trigger>
+                <Trigger Property="IsKeyboardFocused" Value="True"><Setter Property="Background" Value="#DDF6F5"/></Trigger></Style.Triggers>
+        </Style>
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Background" Value="#00AFA9"/><Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#00AFA9"/><Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="20,9"/><Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/><Setter Property="MinHeight" Value="43"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="#008F91"/></Trigger>
+                <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value=".5"/></Trigger></Style.Triggers>
+        </Style>
+        <Style x:Key="GhostButton" TargetType="Button">
+            <Setter Property="Background" Value="White"/><Setter Property="Foreground" Value="#0B3356"/>
+            <Setter Property="BorderBrush" Value="#D6E5F1"/><Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="13,8"/><Setter Property="MinHeight" Value="38"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="#E7F7F9"/></Trigger></Style.Triggers>
         </Style>
         <Style TargetType="TextBox">
-            <Setter Property="MinHeight" Value="37"/>
-            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="MinHeight" Value="42"/><Setter Property="Padding" Value="12,7"/>
+            <Setter Property="Background" Value="White"/><Setter Property="BorderBrush" Value="#CBDDEB"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="MinHeight" Value="42"/><Setter Property="Padding" Value="8,6"/>
+            <Setter Property="BorderBrush" Value="#CBDDEB"/><Setter Property="Background" Value="White"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Foreground" Value="#67819D"/><Setter Property="Background" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Padding" Value="12,13"/>
+            <Setter Property="BorderBrush" Value="#EDF2F7"/><Setter Property="BorderThickness" Value="0,0,0,1"/>
+        </Style>
+        <Style TargetType="DataGridCell">
+            <Setter Property="Padding" Value="12,0"/><Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Style.Triggers><Trigger Property="IsSelected" Value="True"><Setter Property="Foreground" Value="#073452"/></Trigger></Style.Triggers>
+        </Style>
+        <Style TargetType="DataGridRow">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#ECF1F6"/><Setter Property="BorderThickness" Value="0,0,0,1"/>
+            <Style.Triggers><Trigger Property="IsSelected" Value="True"><Setter Property="Background" Value="#DDF5F5"/></Trigger>
+                <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="#EDF9FA"/></Trigger></Style.Triggers>
         </Style>
     </Window.Resources>
-    <Grid Margin="26">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <StackPanel Margin="0,0,0,18">
-            <DockPanel LastChildFill="True"><StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                <Button Content="Postavke API-ja" Click="Settings_Click" Margin="8,0,0,0"/>
-                <Button x:Name="FavoritesButton" Content="Favoriti" Click="Favorites_Click" Margin="8,0,0,0"/>
-            </StackPanel><StackPanel><TextBlock Text="TVRTKE" FontSize="34" FontWeight="Bold" Foreground="#174B85"/>
-            <TextBlock Text="Tvrtke, obrti, udruge i zaklade · dostupni javni registri Hrvatske" FontSize="14" Foreground="#53677A"/></StackPanel></DockPanel>
-        </StackPanel>
-        <Border Grid.Row="1" Background="White" CornerRadius="12" Padding="18" Margin="0,0,0,14">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/><ColumnDefinition Width="2*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <StackPanel Margin="0,0,10,0">
-                    <TextBlock Text="Naziv ili registracijski broj" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                    <TextBox x:Name="QueryInput" ToolTip="Pretraži po nazivu ili broju poslovnog subjekta" KeyDown="QueryInput_KeyDown"/>
+
+    <Grid>
+        <Grid.ColumnDefinitions><ColumnDefinition Width="252"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+        <!-- Reference: compact left rail, real navigation and no dummy statistics -->
+        <Border Grid.Column="0" Background="White" BorderBrush="#E0EDF3" BorderThickness="0,0,1,0">
+            <DockPanel>
+                <Border DockPanel.Dock="Bottom" Background="#F1FAFA" Padding="18" Margin="12,8,12,16" CornerRadius="12">
+                    <StackPanel>
+                        <TextBlock Foreground="#0B2D4A" FontWeight="Bold" FontSize="15" TextWrapping="Wrap" Text="Svi poslovni subjekti Hrvatske na jednom mjestu."/>
+                        <TextBlock Margin="0,9,0,0" Foreground="#647F99" FontSize="12" TextWrapping="Wrap" Text="Službeni izvori · pretraga i pregled dopuštenih zapisa"/>
+                    </StackPanel>
+                </Border>
+                <StackPanel DockPanel.Dock="Top" Margin="18,22,10,22" Orientation="Horizontal">
+                    <Border Width="53" Height="53" Background="#0B2D4A" CornerRadius="12" Margin="0,0,12,0">
+                        <Grid>
+                            <Path Data="M 8,40 L 8,31 L 17,24 L 17,40 Z M 20,40 L 20,15 L 30,9 L 30,40 Z M 33,40 L 33,22 L 43,31 L 43,40 Z"
+                                  Fill="#15C9BD" Stretch="Uniform" Margin="10"/>
+                            <Path Data="M 10,33 L 21,28 L 30,32 L 40,18" Stroke="White" StrokeThickness="2.4" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stretch="Fill" Margin="9,10,9,10"/>
+                        </Grid>
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="TVRTKE" FontWeight="ExtraBold" FontSize="24" Foreground="#0B2D4A"/>
+                        <TextBlock Text="POSLOVNI IMENIK" FontSize="9" FontWeight="SemiBold" Foreground="#466887"/>
+                    </StackPanel>
                 </StackPanel>
-                <StackPanel Grid.Column="1" Margin="0,0,10,0">
-                    <TextBlock Text="Županija" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                    <TextBox x:Name="CountyInput" ToolTip="Početak naziva županije" KeyDown="QueryInput_KeyDown"/>
-                </StackPanel>
-                <StackPanel Grid.Column="2" Margin="0,0,10,0">
-                    <TextBlock Text="Djelatnost / NKD" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                    <TextBox x:Name="ActivityInput" ToolTip="Početak opisa ili NKD šifra" KeyDown="QueryInput_KeyDown"/>
-                </StackPanel>
-                <StackPanel Grid.Column="3" Margin="0,0,10,0">
-                    <TextBlock Text="Vrsta subjekta" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                    <ComboBox x:Name="CategoryInput" SelectedIndex="0" MinWidth="148" Height="37">
-                        <ComboBoxItem Content="Svi registri" Tag="all"/>
-                        <ComboBoxItem Content="Sudski registar" Tag="sudreg"/>
-                        <ComboBoxItem Content="Obrti" Tag="obrt"/>
-                        <ComboBoxItem Content="Udruge" Tag="udruga"/>
-                        <ComboBoxItem Content="Zaklade" Tag="zaklada"/>
-                        <ComboBoxItem Content="Ostali" Tag="ostalo"/>
-                    </ComboBox>
-                </StackPanel>
-                <StackPanel Grid.Column="4" Margin="0,0,10,0">
-                    <TextBlock Text="Status" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                    <ComboBox x:Name="StatusInput" SelectedIndex="0" MinWidth="120" Height="37">
-                        <ComboBoxItem Content="Svi" Tag=""/><ComboBoxItem Content="Aktivni" Tag="1"/><ComboBoxItem Content="Neaktivni" Tag="0"/>
-                    </ComboBox>
-                </StackPanel>
-                <Button Grid.Column="5" Content="Pretraži" Width="110" VerticalAlignment="Bottom" Click="Search_Click" Background="#174B85" Foreground="White" BorderThickness="0"/>
-            </Grid>
-        </Border>
-        <Border Grid.Row="2" Background="White" CornerRadius="12" Padding="14">
-            <Grid>
-                <Grid.ColumnDefinitions><ColumnDefinition Width="2*"/><ColumnDefinition Width="6"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                <DataGrid x:Name="ResultsGrid" Grid.Column="0" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single"
-                          SelectionChanged="ResultsGrid_SelectionChanged" GridLinesVisibility="Horizontal" HeadersVisibility="Column"
-                          BorderThickness="0" AlternatingRowBackground="#F7FAFD" RowHeight="40" CanUserAddRows="False">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Naziv" Binding="{Binding Name}" Width="2*"/>
-                        <DataGridTextColumn Header="Izvor" Binding="{Binding SourceLabel}" Width="100"/>
-                        <DataGridTextColumn Header="OIB" Binding="{Binding Oib}" Width="118"/>
-                        <DataGridTextColumn Header="Mjesto" Binding="{Binding Settlement}" Width="*"/>
-                        <DataGridTextColumn Header="Oblik" Binding="{Binding LegalFormShort}" Width="80"/>
-                        <DataGridTextColumn Header="Status" Binding="{Binding StatusLabel}" Width="105"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-                <GridSplitter Grid.Column="1" Width="6" HorizontalAlignment="Stretch" Background="#E9EFF5"/>
-                <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="14,0,0,0">
-                    <StackPanel DataContext="{Binding SelectedSubject}">
-                        <TextBlock Text="Profil subjekta" FontSize="19" FontWeight="SemiBold" Margin="0,0,0,16"/>
-                        <TextBlock Text="Naziv" Foreground="#5C6C7C"/>
-                        <TextBlock Text="{Binding Name, TargetNullValue='Odaberite subjekt'}" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,3,0,13"/>
-                        <TextBlock Text="Izvor i broj registra" Foreground="#5C6C7C"/>
-                        <TextBlock Text="{Binding SourceLabel}" Margin="0,3,0,2"/>
-                        <TextBlock Text="{Binding SourceIdentifier}" Margin="0,0,0,9"/>
-                        <TextBlock Text="MBS / OIB" Foreground="#5C6C7C"/>
-                        <TextBlock Text="{Binding Mbs}" Margin="0,3,0,2"/>
-                        <TextBlock Text="{Binding Oib}" Margin="0,0,0,13"/>
-                        <TextBlock Text="Pravni oblik" Foreground="#5C6C7C"/>
-                        <TextBlock Text="{Binding LegalForm}" TextWrapping="Wrap" Margin="0,3,0,13"/>
-                        <TextBlock Text="Status" Foreground="#5C6C7C"/>
-                        <TextBlock Text="{Binding StatusLabel}" Margin="0,3,0,13"/>
-                        <TextBlock Text="Datum osnivanja" Foreground="#5C6C7C"/>
-                        <TextBlock Text="{Binding FoundedAt}" Margin="0,3,0,13"/>
-                        <TextBlock Text="Datum brisanja" Foreground="#5C6C7C"/>
-                        <TextBlock Text="{Binding DeletedAt}" Margin="0,3,0,13"/>
-                        <TextBlock Text="Datum upisa u registar" Foreground="#5C6C7C"/>
-                        <TextBlock Text="{Binding RegisteredAt}" Margin="0,3,0,13"/>
-                        <TextBlock Text="Datum promjene statusa" Foreground="#5C6C7C"/>
-                        <TextBlock Text="{Binding StatusChangedAt}" Margin="0,3,0,13"/>
-                        <TextBlock Text="Županija i mjesto" Foreground="#5C6C7C"/>
-                        <TextBlock Text="{Binding Location}" TextWrapping="Wrap" Margin="0,3,0,13"/>
-                        <TextBlock Text="Adresa" Foreground="#5C6C7C"/>
-                        <TextBlock Text="{Binding Address}" TextWrapping="Wrap" Margin="0,3,0,13"/>
-                        <TextBlock Text="Registrirane djelatnosti" Foreground="#5C6C7C"/>
-                        <ItemsControl ItemsSource="{Binding Activities}" Margin="0,5,0,0">
-                            <ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding Display}" TextWrapping="Wrap" Margin="0,2,0,8"/></DataTemplate></ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                        <TextBlock Text="Djelomični uvoz – podaci mogu nedostajati." Foreground="#946200" Visibility="{Binding PartialVisibility}" TextWrapping="Wrap" Margin="0,12,0,0"/>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <Button Style="{StaticResource NavButton}" Tag="all" Click="Category_Click" Background="#DBF6F6" Foreground="#007D83" Content="⌕   Pretraživanje"/>
+                        <Button Style="{StaticResource NavButton}" Tag="sudreg" Click="Category_Click" Content="▥   Tvrtke"/>
+                        <Button Style="{StaticResource NavButton}" Tag="obrt" Click="Category_Click" Content="▣   Obrti"/>
+                        <Button Style="{StaticResource NavButton}" Tag="udruga" Click="Category_Click" Content="♧   Udruge"/>
+                        <Button Style="{StaticResource NavButton}" Tag="zaklada" Click="Category_Click" Content="♡   Zaklade"/>
+                        <Border Height="1" Background="#E1EAF1" Margin="19,17"/>
+                        <Button x:Name="FavoritesButton" Style="{StaticResource NavButton}" Click="Favorites_Click" Content="☆   Moji favoriti"/>
+                        <Button Style="{StaticResource NavButton}" Click="Export_Click" Content="⇩   Uvoz / Izvoz"/>
+                        <Border Height="1" Background="#E1EAF1" Margin="19,17"/>
+                        <Button Style="{StaticResource NavButton}" Click="Settings_Click" Content="⚙   Postavke API-ja"/>
+                        <Button Style="{StaticResource NavButton}" Click="Help_Click" Content="?   Pomoć"/>
                     </StackPanel>
                 </ScrollViewer>
-            </Grid>
+            </DockPanel>
         </Border>
-        <DockPanel Grid.Row="3" Margin="0,14,0,0" LastChildFill="False">
-            <TextBlock x:Name="StatusText" Text="Spremno za pretragu" Foreground="#526173" DockPanel.Dock="Left" VerticalAlignment="Center" TextWrapping="Wrap"/>
-            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button x:Name="FavoriteButton" Content="Dodaj u favorite" IsEnabled="False" Click="ToggleFavorite_Click" Margin="0,0,14,0"/>
-                <Button Content="Izvezi prikazano (CSV)" Click="Export_Click" Margin="0,0,14,0" ToolTip="Izvozi samo rezultate trenutačne stranice"/>
-                <Button x:Name="PreviousButton" Content="Prethodna" Click="Previous_Click" IsEnabled="False" Margin="0,0,7,0"/>
-                <TextBlock x:Name="PageText" Text="1" VerticalAlignment="Center" Margin="10,0"/>
-                <Button x:Name="NextButton" Content="Sljedeća" Click="Next_Click" IsEnabled="False"/>
-            </StackPanel>
-        </DockPanel>
+
+        <Grid Grid.Column="1" Margin="16,16,18,14">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="116"/>
+                <RowDefinition Height="132"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="50"/>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0" Background="White" CornerRadius="13" BorderBrush="#E5EFF5" BorderThickness="1" Padding="24,17" Margin="0,0,0,11">
+                <DockPanel>
+                    <Border DockPanel.Dock="Right" Background="#F2F9FC" CornerRadius="9" Padding="16,10" Margin="10,0,0,0" VerticalAlignment="Center">
+                        <StackPanel>
+                            <TextBlock Text="IZVORI PODATAKA" FontSize="10" Foreground="#637F9B" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="SourceCountText" Text="Provjera dostupnosti…" Foreground="#008E94" FontSize="15" FontWeight="Bold" Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Pronađite prave poslovne informacije" FontWeight="Bold" FontSize="27" Foreground="#0B2D4A"/>
+                        <TextBlock Text="Tvrtke, obrti, udruge i zaklade iz dostupnih javnih registara Hrvatske."
+                                   Foreground="#54769A" FontSize="14" Margin="0,7,0,0" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+            <Border Grid.Row="1" Background="White" CornerRadius="13" BorderBrush="#E5EFF5" BorderThickness="1" Padding="16,13" Margin="0,0,0,11">
+                <Grid>
+                    <Grid.RowDefinitions><RowDefinition Height="46"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="148"/></Grid.ColumnDefinitions>
+                        <TextBox x:Name="QueryInput" ToolTip="Naziv, OIB ili registracijski broj" KeyDown="QueryInput_KeyDown"
+                                 AutomationProperties.Name="Pretraživanje poslovnih subjekata" Margin="0,0,12,0"/>
+                        <Button Grid.Column="1" Style="{StaticResource PrimaryButton}" Content="⌕  Pretraži" Click="Search_Click"/>
+                    </Grid>
+                    <Grid Grid.Row="1" Margin="0,9,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.15*"/><ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1.15*"/><ColumnDefinition Width=".95*"/>
+                        </Grid.ColumnDefinitions>
+                        <ComboBox x:Name="CategoryInput" Grid.Column="0" Margin="0,0,9,0" SelectedIndex="0" AutomationProperties.Name="Vrsta subjekta">
+                            <ComboBoxItem Content="Svi subjekti" Tag="all"/><ComboBoxItem Content="Tvrtke" Tag="sudreg"/>
+                            <ComboBoxItem Content="Obrti" Tag="obrt"/><ComboBoxItem Content="Udruge" Tag="udruga"/>
+                            <ComboBoxItem Content="Zaklade" Tag="zaklada"/><ComboBoxItem Content="Ostali" Tag="ostalo"/>
+                        </ComboBox>
+                        <TextBox Grid.Column="1" x:Name="CountyInput" Margin="0,0,9,0" ToolTip="Županija" AutomationProperties.Name="Županija"
+                                 KeyDown="QueryInput_KeyDown"/>
+                        <TextBox Grid.Column="2" x:Name="ActivityInput" Margin="0,0,9,0" ToolTip="Djelatnost / NKD" AutomationProperties.Name="Djelatnost"
+                                 KeyDown="QueryInput_KeyDown"/>
+                        <ComboBox x:Name="StatusInput" Grid.Column="3" SelectedIndex="0" AutomationProperties.Name="Status poslovnog subjekta">
+                            <ComboBoxItem Content="Svi statusi" Tag=""/><ComboBoxItem Content="Aktivni" Tag="1"/>
+                            <ComboBoxItem Content="Brisani / neaktivni" Tag="0"/>
+                        </ComboBox>
+                    </Grid>
+                </Grid>
+            </Border>
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="1.65*"/><ColumnDefinition Width="13"/><ColumnDefinition Width="1*"/></Grid.ColumnDefinitions>
+                <Border Grid.Column="0" Background="White" CornerRadius="13" BorderBrush="#E0EAF3" BorderThickness="1" Padding="12">
+                    <Grid>
+                        <Grid.RowDefinitions><RowDefinition Height="44"/><RowDefinition Height="*"/><RowDefinition Height="46"/></Grid.RowDefinitions>
+                        <DockPanel Grid.Row="0" Margin="5,2,5,0">
+                            <TextBlock DockPanel.Dock="Left" Text="Rezultati pretraživanja" VerticalAlignment="Center" FontSize="19" FontWeight="Bold" Foreground="#0B2D4A"/>
+                            <TextBlock x:Name="ResultCountText" DockPanel.Dock="Right" Text="—" Margin="18,0,0,0"
+                                       Foreground="#5F7995" VerticalAlignment="Center"/>
+                        </DockPanel>
+                        <DataGrid x:Name="ResultsGrid" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True"
+                                  SelectionMode="Single" SelectionChanged="ResultsGrid_SelectionChanged"
+                                  Background="White" BorderThickness="0" GridLinesVisibility="None"
+                                  HeadersVisibility="Column" RowHeight="52" CanUserAddRows="False"
+                                  RowHeaderWidth="0" ColumnHeaderHeight="42" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Naziv subjekta" Binding="{Binding Name}" Width="2.1*"/>
+                                <DataGridTextColumn Header="Izvor" Binding="{Binding SourceLabel}" Width="108"/>
+                                <DataGridTextColumn Header="Mjesto" Binding="{Binding Settlement}" Width="*"/>
+                                <DataGridTextColumn Header="Status" Binding="{Binding StatusLabel}" Width="130"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <DockPanel Grid.Row="2" Margin="5,10,4,1">
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                <Button x:Name="PreviousButton" Style="{StaticResource GhostButton}" Content="‹" Width="42" Click="Previous_Click" IsEnabled="False"/>
+                                <TextBlock x:Name="PageText" Text="1" Margin="13,0" VerticalAlignment="Center" Foreground="#0B2D4A" FontWeight="Bold"/>
+                                <Button x:Name="NextButton" Style="{StaticResource GhostButton}" Content="›" Width="42" Click="Next_Click" IsEnabled="False"/>
+                            </StackPanel>
+                            <TextBlock Text="Samo dostupni i objavljeni izvori" Foreground="#6E8196" VerticalAlignment="Center" FontSize="12"/>
+                        </DockPanel>
+                    </Grid>
+                </Border>
+                <Border Grid.Column="2" Background="White" CornerRadius="13" BorderBrush="#E0EAF3" BorderThickness="1" Padding="16">
+                    <Grid>
+                        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                        <DockPanel Grid.Row="0" Margin="0,0,0,14">
+                            <Button x:Name="FavoriteButton" DockPanel.Dock="Right" Style="{StaticResource GhostButton}"
+                                    Content="♡  Dodaj u favorite" Click="ToggleFavorite_Click" IsEnabled="False"/>
+                            <TextBlock Text="Osnovni podaci" Foreground="#0B2D4A" FontWeight="Bold" FontSize="19" VerticalAlignment="Center"/>
+                        </DockPanel>
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel DataContext="{Binding SelectedSubject}" Margin="0,1,7,0">
+                                <Border Background="#E8F7F8" CornerRadius="10" Padding="12" Margin="0,0,0,12">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name, TargetNullValue='Odaberite poslovni subjekt'}"
+                                                   TextWrapping="Wrap" Foreground="#0B2D4A" FontWeight="Bold" FontSize="18"/>
+                                        <TextBlock Text="{Binding SourceLabel}" Foreground="#007E86" FontSize="12" Margin="0,6,0,0"/>
+                                        <TextBlock Text="{Binding StatusLabel}" Foreground="#07896A" FontWeight="SemiBold" Margin="0,6,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                                <TextBlock Text="OIB" Foreground="#5C7694" FontSize="12"/><TextBlock Text="{Binding Oib}" Margin="0,3,0,10"/>
+                                <TextBlock Text="MBS / broj registra" Foreground="#5C7694" FontSize="12"/>
+                                <TextBlock Text="{Binding SourceIdentifier}" Margin="0,3,0,10"/>
+                                <TextBlock Text="Pravni oblik" Foreground="#5C7694" FontSize="12"/>
+                                <TextBlock Text="{Binding LegalForm}" TextWrapping="Wrap" Margin="0,3,0,10"/>
+                                <TextBlock Text="Sjedište" Foreground="#5C7694" FontSize="12"/>
+                                <TextBlock Text="{Binding Location}" TextWrapping="Wrap" Margin="0,3,0,10"/>
+                                <TextBlock Text="Adresa" Foreground="#5C7694" FontSize="12"/>
+                                <TextBlock Text="{Binding Address}" TextWrapping="Wrap" Margin="0,3,0,10"/>
+                                <TextBlock Text="Datum osnivanja" Foreground="#5C7694" FontSize="12"/>
+                                <TextBlock Text="{Binding FoundedAt}" Margin="0,3,0,10"/>
+                                <TextBlock Text="Datum upisa" Foreground="#5C7694" FontSize="12"/>
+                                <TextBlock Text="{Binding RegisteredAt}" Margin="0,3,0,10"/>
+                                <TextBlock Text="Datum brisanja / prestanka" Foreground="#5C7694" FontSize="12"/>
+                                <TextBlock Text="{Binding DeletedAt}" Margin="0,3,0,10"/>
+                                <TextBlock Text="Datum promjene statusa" Foreground="#5C7694" FontSize="12"/>
+                                <TextBlock Text="{Binding StatusChangedAt}" Margin="0,3,0,10"/>
+                                <TextBlock Text="Registrirane djelatnosti" FontWeight="SemiBold" Foreground="#0B2D4A" Margin="0,8,0,7"/>
+                                <ItemsControl ItemsSource="{Binding Activities}">
+                                    <ItemsControl.ItemTemplate><DataTemplate>
+                                        <TextBlock Text="{Binding Display}" Margin="0,0,0,8" Foreground="#526B87" TextWrapping="Wrap"/>
+                                    </DataTemplate></ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <TextBlock Text="Djelomični uvoz — podaci mogu nedostajati." TextWrapping="Wrap"
+                                           Foreground="#A36B19" Visibility="{Binding PartialVisibility}" Margin="0,8,0,0"/>
+                            </StackPanel>
+                        </ScrollViewer>
+                        <Button Grid.Row="2" Margin="0,12,0,0" Style="{StaticResource GhostButton}"
+                                Content="⇩  Izvezi prikazano (CSV)" Click="Export_Click"
+                                ToolTip="Izvozi samo rezultate trenutačne stranice"/>
+                    </Grid>
+                </Border>
+            </Grid>
+            <DockPanel Grid.Row="3" Margin="6,8,4,0">
+                <TextBlock x:Name="StatusText" Text="Spremno za pretragu." Foreground="#52718F"
+                           VerticalAlignment="Center" TextWrapping="Wrap" FontSize="12"/>
+            </DockPanel>
+        </Grid>
     </Grid>
 </Window>
