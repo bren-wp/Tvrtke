@@ -13,6 +13,8 @@ jobs:
         run: php backend/tests/identity.php
       - name: PHP snapshot publication tests
         run: php -d zend.assertions=1 -d assert.exception=1 backend/tests/publication.php
+      - name: CSV source normalization tests
+        run: php backend/tests/registry_csv.php
       - name: PHP HTTP input validation tests
         run: bash backend/tests/http.sh
   windows:
