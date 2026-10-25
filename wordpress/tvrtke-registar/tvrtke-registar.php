@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: TVRTKE – Poslovni registar
- * Description: Pretraživanje subjekata Sudskog registra preko centralnog API-ja tvrtke.com.hr.
- * Version: 0.5.0
+ * Description: Hrvatski poslovni imenik za pretraživanje tvrtki, obrta, udruga i zaklada iz povezanih javnih registara.
+ * Version: 0.6.0
  * Author: Brendigo
  * Plugin URI: https://tvrtke.com.hr
  * License URI: https://opensource.org/license/mit
@@ -47,7 +47,7 @@ final class Tvrtke_Registar
             'tvrtke-registar-editor',
             plugins_url('blocks/editor.js', __FILE__),
             ['wp-blocks', 'wp-element', 'wp-i18n'],
-            '0.5.0',
+            '0.6.0',
             true
         );
         register_block_type(__DIR__ . '/blocks', ['render_callback' => [self::class, 'shortcode']]);
@@ -70,7 +70,7 @@ final class Tvrtke_Registar
     {
         $url = untrailingslashit(esc_url_raw((string) $value, ['https']));
         if (!$url || wp_parse_url($url, PHP_URL_SCHEME) !== 'https' ||
-            wp_parse_url($url, PHP_URL_USER) !== null || wp_parse_url($url, PHP_URL_PASS) !== null ||
+            wp_parse_url($url, PHP_URL_HOST) === null || wp_parse_url($url, PHP_URL_USER) !== null || wp_parse_url($url, PHP_URL_PASS) !== null ||
             wp_parse_url($url, PHP_URL_QUERY) !== null || wp_parse_url($url, PHP_URL_FRAGMENT) !== null) {
             add_settings_error(self::OPTION, 'invalid', __('Potrebna je valjana HTTPS adresa API-ja.', 'tvrtke-registar'));
             return (string) get_option(self::OPTION, self::DEFAULT_API);
@@ -131,7 +131,7 @@ final class Tvrtke_Registar
     /** @return string */
     public static function shortcode(): string
     {
-        wp_enqueue_style('tvrtke-registar', plugins_url('assets/search.css', __FILE__), [], '0.5.0');
+        wp_enqueue_style('tvrtke-registar', plugins_url('assets/search.css', __FILE__), [], '0.6.0');
         // These public GET filters are read-only: no database writes, accounts, or privileged actions.
         // A nonce is deliberately not required so search result links remain shareable.
         $get = static function (string $key, int $max = 100): string {
@@ -143,6 +143,16 @@ final class Tvrtke_Registar
         $county = $get('tvrtke_county');
         $activity = $get('tvrtke_activity');
         $settlement = $get('tvrtke_settlement');
+        $registryType = $get('tvrtke_type', 16);
+        $types = [
+            'all' => __('Svi registri', 'tvrtke-registar'),
+            'sudreg' => __('Subjekti Sudskog registra', 'tvrtke-registar'),
+            'obrt' => __('Obrti', 'tvrtke-registar'),
+            'udruga' => __('Udruge', 'tvrtke-registar'),
+            'zaklada' => __('Zaklade', 'tvrtke-registar'),
+            'ostalo' => __('Ostali subjekti', 'tvrtke-registar'),
+        ];
+        if (!array_key_exists($registryType, $types)) $registryType = 'all';
         $legalForm = $get('tvrtke_legal_form', 12);
         if ($legalForm !== '' && !preg_match('/^[0-9]{1,12}$/D', $legalForm)) $legalForm = '';
         $status = $get('tvrtke_status', 1);
@@ -150,10 +160,14 @@ final class Tvrtke_Registar
         $requestedPage = filter_input(INPUT_GET, 'tvrtke_page', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 10000]]);
         $page = is_int($requestedPage) ? $requestedPage : 1;
         $mbs = $get('tvrtke_mbs', 9);
+        $ref = $get('tvrtke_ref', 80);
         $id = wp_unique_id('tvrtke-');
         $output = '<section class="tvrtke-registar" aria-label="' . esc_attr__('Pretraživanje poslovnih subjekata', 'tvrtke-registar') . '">';
         $output .= '<form method="get" class="tvrtke-form" role="search">';
-        $output .= '<div><label for="' . esc_attr($id) . '-q">' . esc_html__('Tvrtka, OIB ili MBS', 'tvrtke-registar') . '</label><input id="' . esc_attr($id) . '-q" type="search" name="tvrtke_q" value="' . esc_attr($query) . '" maxlength="100" placeholder="' . esc_attr__('Unesite naziv ili identifikator', 'tvrtke-registar') . '"></div>';
+        $output .= '<div><label for="' . esc_attr($id) . '-q">' . esc_html__('Naziv ili registracijski broj', 'tvrtke-registar') . '</label><input id="' . esc_attr($id) . '-q" type="search" name="tvrtke_q" value="' . esc_attr($query) . '" maxlength="100" placeholder="' . esc_attr__('Unesite naziv ili identifikator', 'tvrtke-registar') . '"></div>';
+        $output .= '<div><label for="' . esc_attr($id) . '-type">' . esc_html__('Vrsta subjekta', 'tvrtke-registar') . '</label><select id="' . esc_attr($id) . '-type" name="tvrtke_type">';
+        foreach ($types as $v => $label) $output .= '<option value="' . esc_attr($v) . '" ' . selected($registryType, $v, false) . '>' . esc_html($label) . '</option>';
+        $output .= '</select></div>';
         $output .= '<div><label for="' . esc_attr($id) . '-county">' . esc_html__('Županija', 'tvrtke-registar') . '</label><input id="' . esc_attr($id) . '-county" name="tvrtke_county" value="' . esc_attr($county) . '" maxlength="100"></div>';
         $output .= '<div><label for="' . esc_attr($id) . '-place">' . esc_html__('Mjesto', 'tvrtke-registar') . '</label><input id="' . esc_attr($id) . '-place" name="tvrtke_settlement" value="' . esc_attr($settlement) . '" maxlength="100"></div>';
         $output .= '<div><label for="' . esc_attr($id) . '-act">' . esc_html__('Djelatnost ili NKD šifra', 'tvrtke-registar') . '</label><input id="' . esc_attr($id) . '-act" name="tvrtke_activity" value="' . esc_attr($activity) . '" maxlength="100"></div>';
@@ -164,14 +178,23 @@ final class Tvrtke_Registar
         }
         $output .= '</select></div><button type="submit">' . esc_html__('Pretraži', 'tvrtke-registar') . '</button></form>';
 
-        if ($mbs !== '') {
-            if (!preg_match('/^\d{1,9}$/D', $mbs)) return $output . '<p role="alert">' . esc_html__('Neispravan MBS.', 'tvrtke-registar') . '</p></section>';
-            $detail = self::request('/v1/subjects/' . str_pad($mbs, 9, '0', STR_PAD_LEFT));
+        if ($mbs !== '' || $ref !== '') {
+            if ($ref !== '') {
+                if (!preg_match('/^(sudreg|obrt|udruga|zaklada|ostalo):([a-f0-9]{64}|[0-9]{9})$/D', $ref, $match)) {
+                    return $output . '<p role="alert">' . esc_html__('Neispravan identifikator.', 'tvrtke-registar') . '</p></section>';
+                }
+                $detail = self::request('/v1/directory/' . $match[1] . '/' . $match[2]);
+            } else {
+                if (!preg_match('/^\d{1,9}$/D', $mbs)) {
+                    return $output . '<p role="alert">' . esc_html__('Neispravan MBS.', 'tvrtke-registar') . '</p></section>';
+                }
+                $detail = self::request('/v1/directory/sudreg/' . str_pad($mbs, 9, '0', STR_PAD_LEFT));
+            }
             if (is_wp_error($detail)) return $output . '<p role="alert">' . esc_html($detail->get_error_message()) . '</p></section>';
             $item = $detail['item'] ?? null;
             if (!is_array($item)) return $output . '<p role="alert">' . esc_html__('Podaci nisu dostupni.', 'tvrtke-registar') . '</p></section>';
             $output .= '<div class="tvrtke-detail"><h2>' . esc_html((string)($item['name'] ?? '')) . '</h2><dl>';
-            foreach (['mbs' => 'MBS', 'oib' => 'OIB', 'legal_form' => 'Pravni oblik', 'county' => 'Županija', 'settlement' => 'Mjesto', 'street' => 'Ulica', 'house_number' => 'Kućni broj', 'datum_osnivanja' => 'Datum osnivanja'] as $field => $label) {
+            foreach (['source_type' => 'Registar', 'source_identifier' => 'Broj u registru', 'mbs' => 'MBS', 'oib' => 'OIB', 'status_label' => 'Status', 'legal_form' => 'Pravni oblik', 'county' => 'Županija', 'settlement' => 'Mjesto', 'street' => 'Ulica', 'house_number' => 'Kućni broj', 'datum_osnivanja' => 'Datum osnivanja'] as $field => $label) {
                 $output .= '<dt>' . esc_html($label) . '</dt><dd>' . esc_html((string)($item[$field] ?? '—')) . '</dd>';
             }
             $output .= '</dl><h3>' . esc_html__('Registrirane djelatnosti', 'tvrtke-registar') . '</h3><ul>';
@@ -183,33 +206,35 @@ final class Tvrtke_Registar
             if (!empty($item['partial'])) $output .= self::partialNotice();
             return $output . '</section>';
         }
-        if ($query === '' && $county === '' && $settlement === '' && $activity === '' && $status === '' && $legalForm === '') {
+        if ($query === '' && $county === '' && $settlement === '' && $activity === '' && $status === '' && $legalForm === '' && $registryType === 'all') {
             return $output . '<p>' . esc_html__('Unesite kriterij za početak pretraživanja.', 'tvrtke-registar') . '</p></section>';
         }
-        $data = self::request('/v1/subjects', [
-            'q' => $query, 'county' => $county, 'settlement' => $settlement, 'activity' => $activity, 'legal_form' => $legalForm, 'status' => $status,
+        $data = self::request('/v1/directory', [
+            'q' => $query, 'type' => $registryType, 'county' => $county, 'settlement' => $settlement, 'activity' => $activity, 'legal_form' => $legalForm, 'status' => $status,
             'page' => $page, 'limit' => 20,
         ]);
         if (is_wp_error($data)) return $output . '<p role="alert">' . esc_html($data->get_error_message()) . '</p></section>';
         if (!isset($data['items']) || !is_array($data['items'])) return $output . '<p role="alert">' . esc_html__('Neispravan odgovor API-ja.', 'tvrtke-registar') . '</p></section>';
-        if (empty($data['snapshot_id'])) return $output . '<p role="status">' . esc_html__('Baza još nije sinkronizirana. Pretraga će biti dostupna nakon prvog uvoza.', 'tvrtke-registar') . '</p></section>';
+        if (empty($data['snapshot_id']) && empty($data['sources'])) return $output . '<p role="status">' . esc_html__('Baza još nije sinkronizirana. Pretraga će biti dostupna nakon prvog uvoza.', 'tvrtke-registar') . '</p></section>';
         $output .= '<div class="tvrtke-results" aria-live="polite">';
         $output .= '<p class="tvrtke-count">' . esc_html(sprintf(/* translators: %d: Number of results on the current page. */ __('Rezultati na stranici: %d', 'tvrtke-registar'), count($data['items']))) . '</p>';
         if (empty($data['items'])) $output .= '<p>' . esc_html__('Nema rezultata u dostupnom skupu.', 'tvrtke-registar') . '</p>';
         foreach (array_slice($data['items'], 0, 20) as $row) {
             if (!is_array($row)) continue;
             $itemMbs = (string)($row['mbs'] ?? '');
-            $url = add_query_arg(['tvrtke_mbs' => $itemMbs], remove_query_arg(['tvrtke_mbs', 'tvrtke_page']));
+            $key = (string)($row['registry_key'] ?? '');
+            if (!preg_match('/^(sudreg|obrt|udruga|zaklada|ostalo):([a-f0-9]{64}|[0-9]{9})$/D', $key)) continue;
+            $url = add_query_arg(['tvrtke_ref' => $key], remove_query_arg(['tvrtke_mbs', 'tvrtke_ref', 'tvrtke_page']));
             $output .= '<article class="tvrtke-result"><h3><a href="' . esc_url($url) . '">' . esc_html((string)($row['name'] ?? $itemMbs)) . '</a></h3>';
-            $output .= '<p>' . esc_html((string)($row['legal_form_short'] ?? '')) . ' · ' . esc_html((string)($row['settlement'] ?? '')) . '</p>';
-            $output .= '<p><strong>MBS:</strong> ' . esc_html($itemMbs) . ' &nbsp; <strong>OIB:</strong> ' . esc_html((string)($row['oib'] ?? '—')) . '</p></article>';
+            $output .= '<p>' . esc_html((string)($types[(string)($row['source_type'] ?? '')] ?? __('Poslovni subjekt', 'tvrtke-registar'))) . ' · ' . esc_html((string)($row['settlement'] ?? '')) . '</p>';
+            $output .= '<p><strong>' . esc_html__('Registracijski broj:', 'tvrtke-registar') . '</strong> ' . esc_html((string)($row['source_identifier'] ?? $itemMbs)) . '</p></article>';
         }
         $output .= '</div><nav class="tvrtke-pages" aria-label="' . esc_attr__('Stranice rezultata', 'tvrtke-registar') . '">';
         if ($page > 1) $output .= '<a href="' . esc_url(add_query_arg('tvrtke_page', $page - 1, remove_query_arg('tvrtke_mbs'))) . '">' . esc_html__('Prethodna', 'tvrtke-registar') . '</a>';
         if (!empty($data['has_more'])) $output .= '<a href="' . esc_url(add_query_arg('tvrtke_page', $page + 1, remove_query_arg('tvrtke_mbs'))) . '">' . esc_html__('Sljedeća', 'tvrtke-registar') . '</a>';
         $output .= '</nav>';
         if (!empty($data['partial'])) $output .= self::partialNotice();
-        return $output . '<p class="tvrtke-source">' . esc_html__('Informativni podaci iz lokalno sinkronizirane baze Sudskog registra RH.', 'tvrtke-registar') . '</p></section>';
+        return $output . '<p class="tvrtke-source">' . esc_html__('Informativni podaci iz dostupnih javnih registara. Opseg baze može biti djelomičan.', 'tvrtke-registar') . '</p></section>';
     }
 
     private static function partialNotice(): string
