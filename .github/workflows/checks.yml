@@ -13,10 +13,44 @@ jobs:
         run: php backend/tests/identity.php
       - name: PHP snapshot publication tests
         run: php -d zend.assertions=1 -d assert.exception=1 backend/tests/publication.php
+      - name: Verified Sudreg page coverage tests
+        run: php backend/tests/coverage.php
       - name: CSV source normalization tests
         run: php backend/tests/registry_csv.php
       - name: PHP HTTP input validation tests
         run: bash backend/tests/http.sh
+  sudreg-mysql:
+    runs-on: ubuntu-latest
+    services:
+      mariadb:
+        image: mariadb:11.4
+        env:
+          MARIADB_ROOT_PASSWORD: test_root_only
+          MARIADB_DATABASE: tvrtke_test
+          MARIADB_USER: tvrtke
+          MARIADB_PASSWORD: test_db_only
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_mysql, mbstring, curl
+          coverage: none
+      - name: Import complete/failed Sudreg snapshots into real MariaDB
+        env:
+          TVRTKE_DB_HOST: 127.0.0.1
+          TVRTKE_DB_PORT: '3306'
+          TVRTKE_DB_NAME: tvrtke_test
+          TVRTKE_DB_USER: tvrtke
+          TVRTKE_DB_PASSWORD: test_db_only
+        run: php backend/tests/sync_mysql.php
   windows:
     runs-on: windows-latest
     steps:
