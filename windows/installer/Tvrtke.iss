@@ -35,7 +35,6 @@ CloseApplications=yes
 RestartApplications=no
 
 [Languages]
-Name: "croatian"; MessagesFile: "compiler:Languages\Croatian.isl"
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
