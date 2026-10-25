@@ -1,0 +1,5 @@
+TVRTKE v0.7.0 Windows and WordPress development release.
+
+No Sudreg client secret, database password, private export or prepopulated full registry data may be bundled.
+Deployment needs backend migrations 005–007 and private MyDataKnox configuration.
+See docs/RELEASE-0.7.md and docs/UI-REFERENCE-AUDIT.md.
