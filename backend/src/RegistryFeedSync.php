@@ -49,15 +49,15 @@ final class RegistryFeedSync
         $pendingDigest = $dir.'/tvrtke-'.$type.'.pending.sha256';
         $publishedDigest = $dir.'/tvrtke-'.$type.'.published.sha256';
         $lastCheck = $dir.'/tvrtke-'.$type.'.last-check';
-        // A new official export is expected approximately daily. Polling
-        // more often must not repeatedly transfer the entire national CSV.
-        if (is_file($lastCheck) && !is_file($currentFile) &&
-            (time() - (int)filemtime($lastCheck)) < 21600) {
-            return ['type'=>$type,'status'=>'checked_recently','rows'=>null];
-        }
         $job = $this->db->prepare('SELECT import_id FROM registry_import_jobs WHERE source_type=? LIMIT 1');
         $job->execute([$type]);
         $staging = $job->fetchColumn() !== false;
+        // Never mask an unfinished batch merely because the official feed
+        // was checked recently. A pending job must resume or fail explicitly.
+        if (!$staging && is_file($lastCheck) && !is_file($currentFile) &&
+            (time() - (int)filemtime($lastCheck)) < 21600) {
+            return ['type'=>$type,'status'=>'checked_recently','rows'=>null];
+        }
         if (!$staging) {
             // Download only once per new batch. New external files cannot mutate
             // CSV bytes underneath an in-flight resumable import.
