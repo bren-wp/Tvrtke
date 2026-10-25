@@ -1,65 +1,82 @@
-=== TVRTKE – Poslovni registar ===
+=== TVRTKE – Croatian Company Registry ===
 Contributors: bren-wp
-Tags: hrvatska, poslovni registar, tvrtke, sudski registar
+Tags: business directory, company search, registry, croatia
 Requires at least: 6.4
+Tested up to: 7.1
 Requires PHP: 8.2
 Stable tag: 0.5.0
 License: MIT
 License URI: https://opensource.org/license/mit
 
-Pretraživanje javnih subjekata Sudskog registra RH pomoću centralnog TVRTKE API-ja.
+Search Croatian court-registered companies through a separately hosted API, using a searchable public directory.
 
 == Description ==
 
-TVRTKE prikazuje javnu tražilicu i osnovne profile poslovnih subjekata pomoću
-centralnog TVRTKE API servisa. Podržava naziv, OIB, MBS, županiju, mjesto,
-djelatnost i status. Nudi Gutenberg blok "TVRTKE pretraga" te shortcode [tvrtke_pretraga].
+TVRTKE displays a search form and public profiles for Croatian companies based on
+locally synchronized data from the Croatian Court Registry. Users can search by
+business name, tax identifier (OIB), registration number (MBS), county, settlement,
+registered activity, and status.
 
-**Vanjska usluga i obrada podataka:** ovaj plugin ne sadrži Sudreg bazu;
-ne može pretraživati bez odvojeno postavljenog centralnog API-ja. Administrator
-unosi HTTPS adresu API-ja i posebno aktivira korištenje vanjske usluge.
-Prije aktivacije plugin ne šalje upite na API. Nakon aktivacije, pri korisničkoj
-pretrazi WordPress poslužitelj šalje upit (naziv ili OIB/MBS), županiju,
-mjesto, djelatnost, status, stranicu i standardne mrežne metapodatke
-(uključujući IP adresu WordPress poslužitelja) na postavljeni API.
-API može bilježiti metapodatke HTTP zahtjeva. Posjetiteljev IP nije
-izričito uključen u parametre. Nema telemetrije, reklamnog praćenja
-ni vanjskih JS/CSS biblioteka. WordPress predmemorira odgovor do 5 minuta.
+The plugin provides a Gutenberg block named "TVRTKE pretraga" and the shortcode
+[tvrtke_pretraga]. The visible user interface is in Croatian and uses WordPress
+translation functions to support localization.
 
-**Pružatelj usluge:** TVRTKE, https://tvrtke.com.hr/ .
-**Izvorni kod backend usluge:** https://github.com/bren-wp/Tvrtke .
-Za prijavu u WordPress.org direktorij pružatelj usluge treba prije toga
-objaviti zasebnu javnu politiku privatnosti i uvjete korištenja, a zatim
-njihove stvarne poveznice dodati u ovaj readme (nisu potvrđene).
+**External service disclosure:** This plugin needs a separately hosted central
+TVRTKE API and a database. It does not include the registry database itself.
+The administrator configures an HTTPS service endpoint and must explicitly opt in
+on the Settings > TVRTKE page before any external API query is made.
+
+When an administrator has enabled the service and a visitor performs a search,
+the WordPress server sends search terms (which can include company name, OIB,
+MBS), selected filters, pagination and normal HTTP metadata to the configured
+API server. The API host can see the requesting WordPress server's IP address
+and normal network metadata. This plugin does not add visitors' IP addresses
+as an explicit request parameter. Responses are cached using WordPress transients
+for up to five minutes. No third-party scripts, analytics, advertising trackers
+or cookies are added by the plugin.
+
+Service operator: TVRTKE, https://tvrtke.com.hr/
+Open-source central backend: https://github.com/bren-wp/Tvrtke
+
+**Before WordPress.org submission:** the service operator must publish public
+Terms of Service and a Privacy Policy covering API requests, retention and
+possible server logs, and add verified links to both documents here. These pages
+have not yet been verified for this prerelease.
+
+The source data may be incomplete, especially when the shared-hosting importer
+has a row limit. This plugin is not an official government service.
 
 == Installation ==
 
-1. Postavite vlastiti PHP/MySQL backend prema repozitoriju.
-2. Instalirajte WordPress dodatak i otvorite Postavke > TVRTKE.
-3. Unesite pouzdanu HTTPS adresu API-ja i izričito uključite vanjsku uslugu.
-4. Dodajte Gutenberg blok "TVRTKE pretraga" ili shortcode [tvrtke_pretraga].
-5. Dovršite inicijalnu sinkronizaciju prije očekivanja potpunijih rezultata.
+1. Set up the separate PHP and MySQL central API according to the GitHub documentation.
+2. Install the TVRTKE plugin ZIP in WordPress.
+3. Open Settings > TVRTKE, provide a trusted HTTPS API URL and explicitly enable the service.
+4. Add the "TVRTKE pretraga" Gutenberg block or the [tvrtke_pretraga] shortcode to a page.
+5. Ensure an initial Court Registry synchronization has been published before searching.
 
 == Frequently Asked Questions ==
 
-= Je li baza poslovnih subjekata uključena u dodatak? =
-Ne. Centralni API i MySQL bazu potrebno je zasebno postaviti.
+= Is the business registry database included? =
+No. A separately hosted PHP/MySQL API is required.
 
-= Je li potreban korisnički račun za posjetitelje? =
-Ne. Samo administrator konfigurira vanjsku uslugu.
+= Do visitors need an account? =
+No. The site administrator configures access to the external API.
 
-= Prikazuje li plugin sve poslovne subjekte u Hrvatskoj? =
-Ne nužno. Uvoz može biti ograničen resursima hostinga; plugin tada prikazuje upozorenje.
+= Does the plugin display every Croatian company? =
+Not necessarily. Shared hosting imports may be partial, in which case the
+public search interface shows a partial-data warning.
 
-= Brišu li se postavke pri deinstalaciji? =
-Da, lokalne postavke. Predmemorirani podaci istječu prema WordPress pravilima.
+= What is removed when the plugin is uninstalled? =
+The plugin's local options are removed. Temporary cached API responses expire
+according to the WordPress transient timeout.
 
 == Changelog ==
 
 = 0.5.0 =
-* Izričita aktivacija API usluge, precizniji opis prijenosa podataka.
-* Gutenberg blok, filter mjesta, poboljšano stiliziranje i pristupačnost.
-* Brisanje opcija pri deinstalaciji.
+* Added explicit administrator consent for external API connectivity.
+* Added a dynamic Gutenberg block and a settlement filter.
+* Added privacy-policy guidance and improved responsive interface styling.
+* Removed plugin settings on uninstall.
 
 = 0.4.0 =
-* Poboljšanja prikaza djelomičnih rezultata.
+* Improved the display of incomplete synchronization status.
