@@ -1,0 +1,2 @@
+TVRTKE v0.5.0 prerelease packaging trigger.
+Windows EXE is unsigned. Production Sudreg and MyDataKnox integration require external credentials and deployment testing.
