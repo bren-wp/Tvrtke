@@ -2,7 +2,7 @@
 
 Razvojna verzija zajedničkog sustava za **tvrtke.com.hr**: centralni PHP/MySQL API, WordPress plugin i Windows desktop klijent. Izvor podataka je javni API Sudskog registra RH **v3.0.4**. Ciljana platforma je **MyDataKnox KNOX L**, uz ograničen kapacitet shared hostinga.
 
-> **Status: v0.1.0 – razvojni temelj, nije spremno za produkciju.** Nije postavljeno na tvrtke.com.hr; stvarna sinkronizacija nije provjerena bez tvojih OAuth2 pristupnih podataka i hostinga. Trenutačni uvoz sadrži samo tri osnovna skupa (`subjekti`, `tvrtke`, `sjedista`) i može biti namjerno ograničen brojem redaka. Time baza nije potpuni Sudski registar.
+> **Status: v0.3.0 – razvojno izdanje, nije spremno za produkciju.** Nije postavljeno na tvrtke.com.hr; stvarna sinkronizacija nije provjerena bez tvojih OAuth2 pristupnih podataka i hostinga. Trenutačni uvoz sadrži pet odabranih skupova (`subjekti`, `tvrtke`, `sjedista`, `pravni_oblici`, `predmeti_poslovanja`) i može biti namjerno ograničen brojem redaka. Time baza nije potpuni Sudski registar.
 
 ## Komponente
 
@@ -17,7 +17,7 @@ Razvojna verzija zajedničkog sustava za **tvrtke.com.hr**: centralni PHP/MySQL 
 1. Cron pokreće `backend/bin/sync.php` (jedna ograničena API stranica po izvođenju).
 2. Importer dohvaća najnoviji dostupni Sudreg `snapshot_id` i drži ga konstantnim tijekom uvoza.
 3. Podaci se pohranjuju u MySQL s ključem `(snapshot_id, MBS)`. Napredak se atomarno sprema sa svakom serijom.
-4. Tek nakon uvoza sva tri skupa objavljuje se nova aktivna snimka u `app_state`.
+4. Tek nakon uvoza svih pet skupova objavljuje se nova aktivna snimka u `app_state`.
 5. Windows i WordPress čitaju **isti** skup s API-ja, bez izravne veze na MySQL iz Windows aplikacije.
 6. Zasebni cron `backend/bin/prune.php` postupno briše stare snimke radi kontrole prostora.
 
@@ -60,3 +60,12 @@ MIT. Prije javne objave velike baze treba provjeriti uvjete korištenja služben
 - Windows klijent nudi filtre i učitavanje detalja pri odabiru subjekta.
 
 Upute za nadogradnju i ograničenja: [`docs/RELEASE-0.2.md`](docs/RELEASE-0.2.md). **Ova grana nije produkcijsko izdanje.**
+
+## Izdavanje i Windows instalacija (v0.3.0)
+
+- `windows/installer/Tvrtke.iss` — Inno Setup 6 skripta za instalaciju po korisniku.
+- `.github/workflows/release.yml` — Windows self-contained single-file x64 EXE, Setup EXE, WordPress ZIP, izvorni ZIP i SHA256SUMS.
+- Izdanje se generira nakon commita na `release/v0.3.0` granu putem GitHub Actions.
+- Windows izvoz u CSV obuhvaća **samo trenutačno prikazanu stranicu** rezultata.
+- Detalji: [`docs/RELEASE-0.3.md`](docs/RELEASE-0.3.md).
+- Binarke nisu digitalno potpisane, a stvarna Sudreg sinkronizacija i produkcijska instalacija nisu provjerene.
