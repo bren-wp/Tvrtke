@@ -38,7 +38,7 @@ identifier), selected filters, and pagination to the configured TVRTKE API.
 The receiving API can see ordinary HTTP metadata such as the WordPress server IP.
 This plugin does not deliberately transmit visitors' IP addresses as query
 parameters, does not set tracking cookies, and does not include external scripts.
-Responses are cached in WordPress transients for up to five minutes.
+Responses are cached in WordPress transients for 1 to 1440 minutes, as configured by the site administrator.
 
 Service operator and information: https://tvrtke.com.hr/
 Open-source central backend: https://github.com/bren-wp/Tvrtke
