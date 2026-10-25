@@ -42,6 +42,38 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private static string Param(string value) => Uri.EscapeDataString(value.Trim());
 
+    private async void Window_Loaded(object sender, RoutedEventArgs e)
+    {
+        // Show only live authorized records; no fabricated counts or demo companies.
+        await SearchAsync(1);
+    }
+
+    private async void Category_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button button) return;
+        var type = button.Tag?.ToString() ?? "all";
+        foreach (var item in CategoryInput.Items.OfType<ComboBoxItem>())
+        {
+            if (item.Tag?.ToString() == type)
+            {
+                CategoryInput.SelectedItem = item;
+                break;
+            }
+        }
+        await SearchAsync(1);
+    }
+
+    private void Help_Click(object sender, RoutedEventArgs e)
+    {
+        MessageBox.Show(this,
+            "Pretražujte javne podatke tvrtki, obrta, udruga i zaklada. " +
+            "Odaberite vrstu subjekta i status, zatim kliknite Pretraži. " +
+            "Favoriti se čuvaju samo na ovom računalu. " +
+            "API ključevi i MySQL pristup nikada nisu dostupni ovoj aplikaciji. " +
+            "Prikazani izvori mogu biti djelomični ili privremeno nedostupni.",
+            "TVRTKE — Pomoć", MessageBoxButton.OK, MessageBoxImage.Information);
+    }
+
     private async Task SearchAsync(int? requestedPage = null)
     {
         if (_busy) return;
@@ -50,7 +82,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         try
         {
             _favoritesMode = false;
-            FavoritesButton.Content = "Favoriti";
+            FavoritesButton.Content = "☆   Moji favoriti";
             var query = QueryInput.Text.Trim();
             var county = CountyInput.Text.Trim();
             var activity = ActivityInput.Text.Trim();
@@ -83,7 +115,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             PreviousButton.IsEnabled = _page > 1;
             NextButton.IsEnabled = _hasMore;
             PageText.Text = _page.ToString();
-            StatusText.Text = $"Prikazano {_results.Count} zapisa · izvora: {data.Sources.Count + (data.SnapshotId is null ? 0 : 1)}" +
+            ResultCountText.Text = $"{_results.Count} na stranici";
+            var publishedSources = data.Sources.Count + (data.SnapshotId is null ? 0 : 1);
+            SourceCountText.Text = publishedSources > 0 ? $"{publishedSources} objavljenih izvora" : "Još nema objavljenih izvora";
+            StatusText.Text = $"Prikazano {_results.Count} zapisa · izvora: {publishedSources}" +
                               (data.Partial ? " · baza nije potpuna" : "") +
                               (string.IsNullOrWhiteSpace(data.PublishedAtUtc) ? "" : " · Sudreg ažuriran: " + data.PublishedAtUtc);
         }
@@ -201,16 +236,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void Favorites_Click(object sender, RoutedEventArgs e)
     {
         _favoritesMode = !_favoritesMode;
-        FavoritesButton.Content = _favoritesMode ? "Natrag na pretragu" : "Favoriti";
+        FavoritesButton.Content = _favoritesMode ? "←   Natrag na pretragu" : "☆   Moji favoriti";
         _results.Clear();
         if (_favoritesMode)
         {
             foreach (var item in _preferences.Favorites.OrderBy(x => x.Name)) _results.Add(item);
             StatusText.Text = $"Spremljenih favorita: {_results.Count} (lokalno na ovom računalu).";
+            ResultCountText.Text = $"{_results.Count} favorita";
         }
         else
         {
             StatusText.Text = "Za povratak na rezultate pokrenite novu pretragu.";
+            ResultCountText.Text = "—";
         }
         SelectedSubject = null;
         FavoriteButton.IsEnabled = false;
