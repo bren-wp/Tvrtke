@@ -10,7 +10,24 @@ namespace Tvrtke;
 final class RegistryCsv
 {
     public const TYPES = ['obrt', 'udruga', 'zaklada', 'ostalo'];
-    private const FIELDS = ['id', 'name', 'oib', 'status', 'county', 'settlement', 'address', 'activity'];
+    private const FIELDS = ['id', 'name', 'oib', 'status', 'county', 'settlement', 'address', 'activity', 'start_date', 'end_date'];
+
+    /**
+     * Preserve original registry dates; do not infer dates from import time.
+     */
+    private static function date(?string $input): ?string
+    {
+        if ($input === null || $input === '') return null;
+        $value = rtrim(trim($input), '.');
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/D', $value)) $format = '!Y-m-d';
+        elseif (preg_match('/^\d{1,2}\.\d{1,2}\.\d{4}$/D', $value)) $format = '!j.n.Y';
+        else throw new \InvalidArgumentException('Unsupported registry date format');
+        $date = \DateTimeImmutable::createFromFormat($format, $value);
+        if (!$date || $date->format('Y-m-d') < '1800-01-01' || $date->format($format === '!Y-m-d' ? 'Y-m-d' : 'j.n.Y') !== $value) {
+            throw new \InvalidArgumentException('Invalid registry date');
+        }
+        return $date->format('Y-m-d');
+    }
 
     public static function type(string $value): string
     {
@@ -103,6 +120,8 @@ final class RegistryCsv
             'settlement' => $get('settlement', 128),
             'address' => $get('address', 255),
             'activity' => $get('activity', 512),
+            'start_date' => self::date($get('start_date', 20)),
+            'end_date' => self::date($get('end_date', 20)),
         ];
     }
 }

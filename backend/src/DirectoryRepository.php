@@ -103,7 +103,7 @@ final class DirectoryRepository
                      r.source_type,r.source_identifier,NULL AS mbs,r.oib,
                      CASE WHEN r.status='active' THEN 1 WHEN r.status='inactive' THEN 0 ELSE NULL END AS status,
                      CASE r.status WHEN 'active' THEN 'Aktivan' WHEN 'inactive' THEN 'Neaktivan' ELSE 'Nepoznat' END AS status_label,
-                     NULL AS datum_osnivanja,NULL AS datum_brisanja,r.name,r.county,r.settlement,r.address AS street,NULL AS house_number,
+                     r.datum_osnivanja,r.datum_brisanja,r.name,r.county,r.settlement,r.address AS street,NULL AS house_number,
                      NULL AS postal_code,NULL AS legal_form,NULL AS legal_form_short,
                      r.activity,src.source_url
                 FROM registry_records r
@@ -157,6 +157,7 @@ final class DirectoryRepository
         }
         $stmt = $this->db->prepare("SELECT r.source_type,r.record_hash,r.source_identifier,r.name,r.oib,
               r.status AS registry_status,r.county,r.settlement,r.address AS street,r.activity,
+              r.datum_osnivanja,r.datum_brisanja,
               src.source_url,src.coverage,src.published_at_utc
             FROM registry_records r INNER JOIN registry_sources src
                  ON src.source_type=r.source_type AND src.active_import_id=r.import_id
