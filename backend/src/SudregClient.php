@@ -42,7 +42,13 @@ final class SudregClient
         $payload = substr($body, $headerLength);
         curl_close($handle);
         if ($code < 200 || $code >= 300) {
-            throw new \RuntimeException('Sudreg HTTP ' . $code . ' (response body omitted)');
+            $retryAfter = null;
+            if (preg_match('/^retry-after:\\s*(\\d+)\\s*$/im', $headerBlock, $m)) {
+                $retryAfter = min(3, max(0, (int)$m[1]));
+            }
+            // OAuth2 tokens, the original API response and raw client credentials
+            // are deliberately excluded from exception text.
+            throw new SudregHttpException($code, $retryAfter);
         }
         $decoded = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
         if (!is_array($decoded)) {
@@ -81,16 +87,32 @@ final class SudregClient
     /** @return array{data:array,headers:array} */
     public function get(string $endpoint, array $params = []): array
     {
-        $allowed = ['snapshots', 'subjekti', 'tvrtke', 'sjedista', 'pravni_oblici', 'predmeti_poslovanja'];
+        $allowed = ['snapshots', 'counts', 'subjekti', 'tvrtke', 'sjedista', 'pravni_oblici', 'predmeti_poslovanja'];
         if (!in_array($endpoint, $allowed, true)) {
             throw new \InvalidArgumentException('Endpoint not allowed');
         }
         $params['no_data_error'] = 'false';
         $url = self::BASE . '/' . $endpoint . '?' . http_build_query($params);
-        return $this->request($url, null, [
-            'Authorization: Bearer ' . $this->accessToken(),
-            'Accept: application/json',
-            'Content-Type: application/json',
-        ]);
+        for ($attempt = 0; $attempt < 3; ++$attempt) {
+            try {
+                return $this->request($url, null, [
+                    'Authorization: Bearer ' . $this->accessToken(),
+                    'Accept: application/json',
+                    'Content-Type: application/json',
+                ]);
+            } catch (SudregHttpException $error) {
+                // A token can expire or be invalidated independently of its expiry.
+                if ($error->status === 401 && $attempt === 0) {
+                    $this->token = null;
+                    $this->expiresAt = 0;
+                    continue;
+                }
+                if (!in_array($error->status, [429,500,502,503,504], true) || $attempt === 2) {
+                    throw $error;
+                }
+                sleep($error->retryAfter ?? ($attempt + 1));
+            }
+        }
+        throw new \RuntimeException('Sudreg request retry budget exceeded');
     }
 }
