@@ -111,6 +111,17 @@ final class Sync
             $counts->execute([$ongoing]);
             $progressRows = $counts->fetchAll(PDO::FETCH_ASSOC);
             $partial = SnapshotPublication::isPartial($progressRows);
+            if ($archiveRaw) {
+                $archiveCount = $this->db->prepare(
+                    'SELECT COUNT(*) FROM sudreg_raw_records WHERE snapshot_id=? AND dataset=?'
+                );
+                foreach ($progressRows as $row) {
+                    $archiveCount->execute([$ongoing, $row['dataset']]);
+                    if ((int)$archiveCount->fetchColumn() !== (int)$row['imported_rows']) {
+                        throw new \RuntimeException('Lossless Sudreg archive count mismatch for ' . $row['dataset']);
+                    }
+                }
+            }
             $this->db->beginTransaction();
             try {
                 $upsert = $this->db->prepare('INSERT INTO app_state(state_key,state_value) VALUES(?,?) ON DUPLICATE KEY UPDATE state_value=VALUES(state_value)');
