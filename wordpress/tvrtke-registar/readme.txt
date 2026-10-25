@@ -1,4 +1,4 @@
-=== TVRTKE – Croatian Company Registry ===
+=== TVRTKE – Poslovni registar ===
 Contributors: bren-wp
 Tags: business directory, company search, registry, croatia
 Requires at least: 6.4
