@@ -132,6 +132,8 @@ final class Tvrtke_Registar
     public static function shortcode(): string
     {
         wp_enqueue_style('tvrtke-registar', plugins_url('assets/search.css', __FILE__), [], '0.5.0');
+        // These public GET filters are read-only: no database writes, accounts, or privileged actions.
+        // A nonce is deliberately not required so search result links remain shareable.
         $get = static function (string $key, int $max = 100): string {
             $raw = $_GET[$key] ?? '';
             if (!is_string($raw)) return '';
@@ -142,6 +144,8 @@ final class Tvrtke_Registar
         $county = $get('tvrtke_county');
         $activity = $get('tvrtke_activity');
         $settlement = $get('tvrtke_settlement');
+        $legalForm = $get('tvrtke_legal_form', 12);
+        if ($legalForm !== '' && !preg_match('/^[0-9]{1,12}$/D', $legalForm)) $legalForm = '';
         $status = $get('tvrtke_status', 1);
         if (!in_array($status, ['', '0', '1'], true)) $status = '';
         $page = isset($_GET['tvrtke_page']) && is_scalar($_GET['tvrtke_page']) ? max(1, min(10000, absint($_GET['tvrtke_page']))) : 1;
@@ -153,6 +157,7 @@ final class Tvrtke_Registar
         $output .= '<div><label for="' . esc_attr($id) . '-county">' . esc_html__('Županija', 'tvrtke-registar') . '</label><input id="' . esc_attr($id) . '-county" name="tvrtke_county" value="' . esc_attr($county) . '" maxlength="100"></div>';
         $output .= '<div><label for="' . esc_attr($id) . '-place">' . esc_html__('Mjesto', 'tvrtke-registar') . '</label><input id="' . esc_attr($id) . '-place" name="tvrtke_settlement" value="' . esc_attr($settlement) . '" maxlength="100"></div>';
         $output .= '<div><label for="' . esc_attr($id) . '-act">' . esc_html__('Djelatnost ili NKD šifra', 'tvrtke-registar') . '</label><input id="' . esc_attr($id) . '-act" name="tvrtke_activity" value="' . esc_attr($activity) . '" maxlength="100"></div>';
+        $output .= '<div><label for="' . esc_attr($id) . '-legal">' . esc_html__('Šifra pravnog oblika', 'tvrtke-registar') . '</label><input id="' . esc_attr($id) . '-legal" name="tvrtke_legal_form" value="' . esc_attr($legalForm) . '" maxlength="12" inputmode="numeric"></div>';
         $output .= '<div><label for="' . esc_attr($id) . '-status">' . esc_html__('Status', 'tvrtke-registar') . '</label><select id="' . esc_attr($id) . '-status" name="tvrtke_status">';
         foreach (['' => __('Svi', 'tvrtke-registar'), '1' => __('Aktivni', 'tvrtke-registar'), '0' => __('Brisani / neaktivni', 'tvrtke-registar')] as $v => $label) {
             $output .= '<option value="' . esc_attr((string)$v) . '" ' . selected($status, (string)$v, false) . '>' . esc_html($label) . '</option>';
@@ -178,11 +183,11 @@ final class Tvrtke_Registar
             if (!empty($item['partial'])) $output .= self::partialNotice();
             return $output . '</section>';
         }
-        if ($query === '' && $county === '' && $settlement === '' && $activity === '' && $status === '') {
+        if ($query === '' && $county === '' && $settlement === '' && $activity === '' && $status === '' && $legalForm === '') {
             return $output . '<p>' . esc_html__('Unesite kriterij za početak pretraživanja.', 'tvrtke-registar') . '</p></section>';
         }
         $data = self::request('/v1/subjects', [
-            'q' => $query, 'county' => $county, 'settlement' => $settlement, 'activity' => $activity, 'status' => $status,
+            'q' => $query, 'county' => $county, 'settlement' => $settlement, 'activity' => $activity, 'legal_form' => $legalForm, 'status' => $status,
             'page' => $page, 'limit' => 20,
         ]);
         if (is_wp_error($data)) return $output . '<p role="alert">' . esc_html($data->get_error_message()) . '</p></section>';
