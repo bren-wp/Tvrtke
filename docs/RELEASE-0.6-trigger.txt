@@ -1,0 +1,4 @@
+TVRTKE v0.6.0 prerelease package trigger.
+The release does not ship a complete Croatian registry or any OAuth2 credentials.
+
+See docs/RELEASE-0.6.md for scope, migration and verification requirements.
