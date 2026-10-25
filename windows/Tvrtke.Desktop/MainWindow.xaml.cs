@@ -102,7 +102,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         try
         {
             var key = selected.RegistryKey;
-            if (string.IsNullOrWhiteSpace(key) && selected.Mbs.Length == 9) key = "sudreg:" + selected.Mbs;
+            if (string.IsNullOrWhiteSpace(key) && selected.Mbs?.Length == 9) key = "sudreg:" + selected.Mbs;
             var parts = key.Split(':', 2);
             if (parts.Length != 2 || !new[] { "sudreg", "obrt", "udruga", "zaklada", "ostalo" }.Contains(parts[0]) ||
                 !System.Text.RegularExpressions.Regex.IsMatch(parts[1], @"^([a-f0-9]{64}|[0-9]{9})$"))
@@ -276,12 +276,12 @@ public sealed class Activity
 
 public sealed class Subject
 {
-    [JsonPropertyName("mbs")] public string Mbs { get; set; } = "";
+    [JsonPropertyName("mbs")] public string? Mbs { get; set; }
     [JsonPropertyName("registry_key")] public string RegistryKey { get; set; } = "";
     [JsonPropertyName("source_type")] public string SourceType { get; set; } = "sudreg";
     [JsonPropertyName("source_identifier")] public string? SourceIdentifier { get; set; }
     [JsonPropertyName("status_label")] public string? ApiStatusLabel { get; set; }
-    public string UniqueKey => !string.IsNullOrWhiteSpace(RegistryKey) ? RegistryKey : (Mbs.Length == 9 ? "sudreg:" + Mbs : "");
+    public string UniqueKey => !string.IsNullOrWhiteSpace(RegistryKey) ? RegistryKey : (Mbs?.Length == 9 ? "sudreg:" + Mbs : "");
     public string SourceLabel => SourceType switch
     {
         "sudreg" => "Sudski registar",
