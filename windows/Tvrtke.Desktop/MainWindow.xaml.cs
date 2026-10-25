@@ -24,11 +24,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private readonly TvrtkePreferences _preferences = TvrtkePreferences.Load();
     private string _api = "https://api.tvrtke.com.hr";
     private bool _favoritesMode;
-    private bool? _twoRowFilters;
+    private int? _filterColumns;
     private bool? _stackedResults;
 
     /// <summary>
-    /// Keeps search, profile and actions usable at 720–3840 DIPs,
+    /// Keeps search, profile and actions usable at 540–3840 DIPs,
     /// including Windows scaling (100%, 125%, 150% and larger).
     /// The content scrolls vertically when the workspace is shorter.
     /// </summary>
@@ -39,38 +39,46 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             return;
 
         var compactNavigation = ActualWidth < 1120;
-        var splitFilters = ActualWidth < 1230;
+        var filterColumns = ActualWidth < 790 ? 1 : ActualWidth < 1230 ? 2 : 4;
         var stackProfile = ActualWidth < 995;
 
         SidebarColumn.Width = new GridLength(compactNavigation ? 0 : ActualWidth < 1330 ? 210 : 252);
         Sidebar.Visibility = compactNavigation ? Visibility.Collapsed : Visibility.Visible;
         CompactNavigation.Visibility = compactNavigation ? Visibility.Visible : Visibility.Collapsed;
         SourceBadge.Visibility = ActualWidth < 930 ? Visibility.Collapsed : Visibility.Visible;
-        HeroTitle.FontSize = ActualWidth < 930 ? 20 : ActualWidth < 1230 ? 23 : 27;
+        ResultCountText.Visibility = ActualWidth < 790 ? Visibility.Collapsed : Visibility.Visible;
+        HeroTitle.FontSize = ActualWidth < 790 ? 18 : ActualWidth < 930 ? 20 : ActualWidth < 1230 ? 23 : 27;
 
-        if (_twoRowFilters != splitFilters)
+        if (_filterColumns != filterColumns)
         {
-            _twoRowFilters = splitFilters;
-            SearchRow.Height = new GridLength(splitFilters ? 225 : 160);
-            SearchFilterGrid.RowDefinitions[1].Height = splitFilters
+            _filterColumns = filterColumns;
+            SearchRow.Height = new GridLength(filterColumns == 1 ? 350 : filterColumns == 2 ? 225 : 160);
+            SearchFilterGrid.RowDefinitions[1].Height = filterColumns < 4
+                ? GridLength.Auto : new GridLength(0);
+            SearchFilterGrid.RowDefinitions[2].Height = filterColumns == 1
+                ? GridLength.Auto : new GridLength(0);
+            SearchFilterGrid.RowDefinitions[3].Height = filterColumns == 1
                 ? GridLength.Auto : new GridLength(0);
             SearchFilterGrid.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
-            SearchFilterGrid.ColumnDefinitions[1].Width = new GridLength(1, GridUnitType.Star);
-            SearchFilterGrid.ColumnDefinitions[2].Width = splitFilters
+            SearchFilterGrid.ColumnDefinitions[1].Width = filterColumns == 1
+                ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
+            SearchFilterGrid.ColumnDefinitions[2].Width = filterColumns < 4
                 ? new GridLength(0) : new GridLength(1.15, GridUnitType.Star);
-            SearchFilterGrid.ColumnDefinitions[3].Width = splitFilters
+            SearchFilterGrid.ColumnDefinitions[3].Width = filterColumns < 4
                 ? new GridLength(0) : new GridLength(.95, GridUnitType.Star);
             Grid.SetRow(CategoryFilter, 0);
             Grid.SetColumn(CategoryFilter, 0);
-            Grid.SetRow(CountyFilter, 0);
-            Grid.SetColumn(CountyFilter, 1);
-            Grid.SetRow(ActivityFilter, splitFilters ? 1 : 0);
-            Grid.SetColumn(ActivityFilter, splitFilters ? 0 : 2);
-            Grid.SetRow(StatusFilter, splitFilters ? 1 : 0);
-            Grid.SetColumn(StatusFilter, splitFilters ? 1 : 3);
-            CategoryFilter.Margin = CountyFilter.Margin = ActivityFilter.Margin =
-                splitFilters ? new Thickness(0, 0, 10, 8) : new Thickness(0, 0, 9, 0);
-            StatusFilter.Margin = splitFilters ? new Thickness(0, 0, 0, 8) : new Thickness(0);
+            Grid.SetRow(CountyFilter, filterColumns == 1 ? 1 : 0);
+            Grid.SetColumn(CountyFilter, filterColumns == 1 ? 0 : 1);
+            Grid.SetRow(ActivityFilter, filterColumns == 1 ? 2 : filterColumns == 2 ? 1 : 0);
+            Grid.SetColumn(ActivityFilter, filterColumns < 4 ? 0 : 2);
+            Grid.SetRow(StatusFilter, filterColumns == 1 ? 3 : filterColumns == 2 ? 1 : 0);
+            Grid.SetColumn(StatusFilter, filterColumns == 1 ? 0 : filterColumns == 2 ? 1 : 3);
+            var fieldMargin = filterColumns < 4
+                ? new Thickness(0, 0, filterColumns == 2 ? 10 : 0, 9)
+                : new Thickness(0, 0, 9, 0);
+            CategoryFilter.Margin = CountyFilter.Margin = ActivityFilter.Margin = fieldMargin;
+            StatusFilter.Margin = filterColumns < 4 ? new Thickness(0, 0, 0, 9) : new Thickness(0);
         }
 
         if (_stackedResults != stackProfile)
@@ -89,7 +97,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
 
         WorkspaceGrid.MinHeight = Math.Max(
-            stackProfile ? 1180 : splitFilters ? 820 : 730,
+            filterColumns == 1 ? 1520 : stackProfile ? 1180 : filterColumns == 2 ? 820 : 730,
             Math.Max(0, ActualHeight - 30));
     }
 
