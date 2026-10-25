@@ -1,0 +1,20 @@
+# Private secrets and build outputs
+backend/config.local.php
+.env
+.env.*
+!.env.example
+*.pfx
+*.key
+*.pem
+*.keystore
+*.jks
+bin/
+obj/
+.vs/
+.vscode/
+.idea/
+.DS_Store
+*.user
+*.suo
+*.log
+node_modules/
