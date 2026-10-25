@@ -33,10 +33,10 @@ TVRTKE okuplja pretraživanje poslovnih subjekata u jednostavno, moderno sučelj
 | 🎛️ **Napredni filtri** | Suzite prikaz prema vrsti subjekta, županiji, djelatnosti i statusu. |
 | 📋 **Pregledni profili** | Registracijski podaci, lokacija i raspoložive informacije iz izvora. |
 | 🏷️ **Podrijetlo podataka** | Jasno naznačen registar i dostupna informacija o ažurnosti. |
-| ⭐ **Favoriti na Windowsu** | Spremite subjekte koje najčešće provjeravate. |
+| ⭐ **Favoriti i liste na Windowsu** | Spremite subjekte, organizirajte vlastite liste i pretražujte ih u zasebnom prilagodljivom prozoru. |
 | 📁 **CSV izvoz** | Izvezite trenutačno prikazane rezultate iz Windows aplikacije. |
 | 📱 **Mobilni prikaz** | WordPress tražilica prilagođava se širini samoga bloka na mobitelu, tabletu i računalu. |
-| 🖥️ **Prilagodljiv Windows prozor** | Bočna navigacija, 4/2/1 filtri i profil subjekta prelamaju se na manjim zaslonima. |
+| 🖥️ **Prilagodljivi Windows prozori** | Glavni ekran, favoriti i API postavke prilagođavaju se monitoru, DPI-ju i širini te se ne otvaraju maksimalizirani. |
 | 🔐 **Sigurna veza** | Windows i WordPress komuniciraju s centralnim API-jem putem HTTPS-a. |
 
 ## 🖼️ Jednostavno sučelje, jasni rezultati
@@ -47,7 +47,7 @@ TVRTKE okuplja pretraživanje poslovnih subjekata u jednostavno, moderno sučelj
 
 ## 🪟 TVRTKE za Windows
 
-Svakodnevni rad s poslovnim informacijama na velikom ekranu, uz preglednu tražilicu, profile, favorite i CSV izvoz.
+Svakodnevni rad s poslovnim informacijama, uz preglednu tražilicu, profile, favorite, vlastite liste i CSV izvoz. Program se otvara u **običnom centriranom prozoru**, ne preko cijelog zaslona.
 
 **Odaberite način korištenja:**
 
@@ -60,7 +60,7 @@ Svakodnevni rad s poslovnim informacijama na velikom ekranu, uz preglednu traži
 
 Dodajte profesionalnu tražilicu poslovnih subjekata na svoju WordPress stranicu.
 
-**Što dobivate?** Gutenberg blok, shortcode `[tvrtke_pretraga]`, responzivni prikaz, profile i filtre za jednostavno pregledavanje dostupnih registara.
+**Što dobivate?** Gutenberg blok, shortcode `[tvrtke_pretraga]`, prilagodljive kartice i popise, javne profile, SVG ikone i filtre. Administrator određuje izgled, vidljiva polja i trajanje predmemorije.
 
 [⬇️ Preuzmite WordPress dodatak](https://github.com/bren-wp/Tvrtke/releases)
 
