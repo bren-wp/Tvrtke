@@ -15,6 +15,8 @@ jobs:
         run: php -d zend.assertions=1 -d assert.exception=1 backend/tests/publication.php
       - name: Verified Sudreg page coverage tests
         run: php backend/tests/coverage.php
+      - name: Official feed and download-source validation tests
+        run: php backend/tests/feeds.php
       - name: CSV source normalization tests
         run: php backend/tests/registry_csv.php
       - name: PHP HTTP input validation tests
