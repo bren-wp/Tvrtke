@@ -105,17 +105,20 @@ final class RegistryImporter
             }
             $importId = (string)$job['import_id'];
             $total = (int)$job['imported_rows'];
-            if ($total >= $maxTotalRows) throw new \RuntimeException('Maximum record limit reached; nothing published');
+            $atLimit = $total >= $maxTotalRows;
+            if ($atLimit && fgetcsv($handle, 0, $delimiter, '"', '') !== false) {
+                throw new \RuntimeException('Maximum record limit reached; no partial source published');
+            }
             $insert = $this->db->prepare('INSERT INTO registry_records
               (source_type,import_id,record_hash,source_identifier,name,oib,status,county,settlement,address,activity)
               VALUES (?,?,?,?,?,?,?,?,?,?,?)');
             $progress = $this->db->prepare('UPDATE registry_import_jobs
               SET next_byte_offset=?,imported_rows=? WHERE source_type=? AND import_id=?');
             $count = 0;
-            $finished = false;
+            $finished = $atLimit;
             $this->db->beginTransaction();
             try {
-                while ($count < $rowsPerTick && $total < $maxTotalRows) {
+                while (!$finished && $count < $rowsPerTick && $total < $maxTotalRows) {
                     $row = fgetcsv($handle, 0, $delimiter, '"', '');
                     if ($row === false) { $finished = true; break; }
                     if ($row === [null] || $row === []) continue;
