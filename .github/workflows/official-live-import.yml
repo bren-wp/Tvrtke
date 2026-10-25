@@ -1,0 +1,43 @@
+name: Real official CSV import smoke test
+on:
+  push:
+    paths:
+      - 'backend/tests/live_feed_mysql.php'
+      - '.github/workflows/official-live-import.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  associations:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    services:
+      mariadb:
+        image: mariadb:11.4
+        env:
+          MARIADB_ROOT_PASSWORD: test_root_only
+          MARIADB_DATABASE: tvrtke_test
+          MARIADB_USER: tvrtke
+          MARIADB_PASSWORD: test_db_only
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_mysql, mbstring, curl
+          coverage: none
+      - name: Download official organization-only columns and import all published CSV rows
+        env:
+          TVRTKE_DB_HOST: 127.0.0.1
+          TVRTKE_DB_PORT: '3306'
+          TVRTKE_DB_NAME: tvrtke_test
+          TVRTKE_DB_USER: tvrtke
+          TVRTKE_DB_PASSWORD: test_db_only
+        run: php backend/tests/live_feed_mysql.php
