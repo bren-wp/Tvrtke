@@ -70,12 +70,13 @@ try {
             reply(422, ['error' => 'Neispravna šifra pravnog oblika']);
         }
     }
-    $repo = new SubjectsRepository(Database::connect());
+    $db = Database::connect();
+    $repo = new SubjectsRepository($db);
     if ($path === '/v1/status') reply(200, $repo->status());
-    if ($path === '/v1/sources') reply(200, ['sources' => (new DirectoryRepository(Database::connect()))->sources()]);
-    if ($path === '/v1/directory') reply(200, (new DirectoryRepository(Database::connect()))->search($query, $page, $limit, $filters));
+    if ($path === '/v1/sources') reply(200, ['sources' => (new DirectoryRepository($db))->sources()]);
+    if ($path === '/v1/directory') reply(200, (new DirectoryRepository($db))->search($query, $page, $limit, $filters));
     if (preg_match('~^/v1/directory/(sudreg|obrt|udruga|zaklada|ostalo)/([a-f0-9]{64}|[0-9]{1,9})$~D', $path, $match)) {
-        $record = (new DirectoryRepository(Database::connect()))->one($match[1], $match[2]);
+        $record = (new DirectoryRepository($db))->one($match[1], $match[2]);
         if ($record === null) reply(404, ['error' => 'Zapis nije pronađen']);
         reply(200, ['item' => $record]);
     }
