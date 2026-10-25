@@ -2,7 +2,7 @@
 
 Razvojna verzija zajedničkog sustava za **tvrtke.com.hr**: centralni PHP/MySQL API, WordPress plugin i Windows desktop klijent. Izvor podataka je javni API Sudskog registra RH **v3.0.4**. Ciljana platforma je **MyDataKnox KNOX L**, uz ograničen kapacitet shared hostinga.
 
-> **Status: v0.4.0 – razvojno izdanje, nije spremno za produkciju.** Nije postavljeno na tvrtke.com.hr; stvarna sinkronizacija nije provjerena bez tvojih OAuth2 pristupnih podataka i hostinga. Trenutačni uvoz sadrži pet odabranih skupova (`subjekti`, `tvrtke`, `sjedista`, `pravni_oblici`, `predmeti_poslovanja`) i može biti namjerno ograničen brojem redaka. Time baza nije potpuni Sudski registar.
+> **Status: v0.5.0 – razvojno izdanje, nije spremno za produkciju.** Nije postavljeno na tvrtke.com.hr; stvarna sinkronizacija nije provjerena bez tvojih OAuth2 pristupnih podataka i hostinga. Trenutačni uvoz sadrži pet odabranih skupova (`subjekti`, `tvrtke`, `sjedista`, `pravni_oblici`, `predmeti_poslovanja`) i može biti namjerno ograničen brojem redaka. Time baza nije potpuni Sudski registar.
 
 ## Komponente
 
@@ -61,15 +61,25 @@ MIT. Prije javne objave velike baze treba provjeriti uvjete korištenja služben
 
 Upute za nadogradnju i ograničenja: [`docs/RELEASE-0.2.md`](docs/RELEASE-0.2.md). **Ova grana nije produkcijsko izdanje.**
 
-## Izdavanje i Windows instalacija (v0.4.0)
+## Izdavanje i Windows instalacija (v0.5.0)
 
 - `windows/installer/Tvrtke.iss` — Inno Setup 6 skripta za instalaciju po korisniku.
 - `.github/workflows/release.yml` — Windows self-contained single-file x64 EXE, Setup EXE, WordPress ZIP, izvorni ZIP i SHA256SUMS.
-- Nakon što `release/v0.4.0` grana primi commit, workflow izrađuje [GitHub razvojno izdanje](https://github.com/bren-wp/Tvrtke/releases/tag/v0.4.0).
+- Nakon što `release/v0.5.0` grana primi commit, workflow izrađuje [GitHub razvojno izdanje](https://github.com/bren-wp/Tvrtke/releases/tag/v0.5.0).
 - Windows ima izvoz trenutačno prikazanih rezultata u CSV (ne cijelog registra).
-- Detalji i ograničenja: [`docs/RELEASE-0.4.md`](docs/RELEASE-0.3.md).
+- Detalji i ograničenja: [`docs/RELEASE-0.4.md`](docs/RELEASE-0.5.md).
 - Binarke **nisu digitalno potpisane**, stvarna Sudreg sinkronizacija i produkcijska instalacija nisu provjerene.
 
-## Pouzdanost prikaza u v0.4.0
+## Pouzdanost prikaza u v0.5.0
 
 Oznaka djelomičnog uvoza pripada **objavljenoj** snimci. Ako započne sinkronizacija sljedeće snimke, upozorenje ostaje vidljivo. Importer odbija objaviti nepotpune ili prazne osnovne skupove. Windows ispravlja pogreške paginacije i hvata nevaljan JSON bez rušenja sučelja.
+
+
+## Funkcije dodane u v0.5.0
+
+- **Windows:** postavke HTTPS API-ja, lokalno spremanje favorita i pristup favoritima bez mrežne pretrage.
+- **WordPress:** dinamički Gutenberg blok, filtar mjesta i obavezna izričita aktivacija povezivanja s vanjskom uslugom u *Postavke → TVRTKE*. Nakon nadogradnje administrator mora uključiti servis.
+- **WP.org:** službena Plugin Check provjera uključena je u CI. To nije potvrda odobrenja; prije slanja treba objaviti zasebnu politiku privatnosti i uvjete korištenja API-ja.
+- **Izdanje:** GitHub Actions izrađuje Portable EXE, Setup EXE, WordPress ZIP i ZIP izvornog projekta, s SHA-256 kontrolnim zbrojevima.
+
+Detalji: [`docs/RELEASE-0.5.md`](docs/RELEASE-0.5.md).

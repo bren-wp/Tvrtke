@@ -22,7 +22,7 @@ function reply(int $code, array $payload): never
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'GET') reply(405, ['error' => 'Metoda nije dopuštena']);
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $path = '/' . trim($path, '/');
-if ($path === '/v1/health') reply(200, ['status' => 'ok', 'service' => 'tvrtke', 'version' => '0.4.0']);
+if ($path === '/v1/health') reply(200, ['status' => 'ok', 'service' => 'tvrtke', 'version' => '0.5.0']);
 if (!in_array($path, ['/v1/subjects', '/v1/status'], true) && !preg_match('~^/v1/subjects/\d{1,9}$~D', $path)) {
     reply(404, ['error' => 'Ruta nije pronađena']);
 }
