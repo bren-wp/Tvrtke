@@ -35,7 +35,8 @@ TVRTKE okuplja pretraživanje poslovnih subjekata u jednostavno, moderno sučelj
 | 🏷️ **Podrijetlo podataka** | Jasno naznačen registar i dostupna informacija o ažurnosti. |
 | ⭐ **Favoriti na Windowsu** | Spremite subjekte koje najčešće provjeravate. |
 | 📁 **CSV izvoz** | Izvezite trenutačno prikazane rezultate iz Windows aplikacije. |
-| 📱 **Mobilni prikaz** | WordPress tražilica prilagođava se telefonu, tabletu i računalu. |
+| 📱 **Mobilni prikaz** | WordPress tražilica prilagođava se širini samoga bloka na mobitelu, tabletu i računalu. |
+| 🖥️ **Prilagodljiv Windows prozor** | Bočna navigacija, 4/2/1 filtri i profil subjekta prelamaju se na manjim zaslonima. |
 | 🔐 **Sigurna veza** | Windows i WordPress komuniciraju s centralnim API-jem putem HTTPS-a. |
 
 ## 🖼️ Jednostavno sučelje, jasni rezultati
@@ -81,6 +82,6 @@ TVRTKE je neovisna aplikacija koja objedinjuje informacije iz povezanih javnih i
 
 [tvrtke.com.hr](https://tvrtke.com.hr) · [Izdanja](https://github.com/bren-wp/Tvrtke/releases) · [Podrška](https://github.com/bren-wp/Tvrtke/issues)
 
-<sub>© Brendigo · MIT</sub>
+<sub>© **Brendigo** · WordPress.org contributor: **brendigo** · MIT</sub>
 
 </div>

@@ -15,6 +15,8 @@
 - Pet glavnih polja tražilice na širokim ekranima i pristupačna proširena polja putem `details/summary`.
 - CSS container queries omogućuju prilagodbu uskim sadržajnim stupcima WordPress tema; responzivne kartice, popis i profili.
 - Administracijske postavke imaju prilagodljiv raspored i jasno odobrenje korištenja vanjskog servisa.
+- Odvojeni administracijski podizbornici Pretraga, Uvoz/Izvoz (pregled stvarnih objavljenih izvora), Statistika (stvarna objavljena brojila, ne statistika korištenja) i Pomoć.
+- Revidirani zajednički vektorski TVRTKE znak za dodatak, dokumentaciju i WordPress.org SVG ikonu.
 - Header autora `Brendigo`, WordPress.org contributor `brendigo`.
 - Gutenberg blok i `[tvrtke_pretraga]` ostaju kompatibilni.
 

@@ -83,6 +83,7 @@ expires through standard transient expiration.
 * Rebuilt admin dashboard and layout settings with adaptive design for narrow WordPress screens.
 * Clearer category links, individual registry profiles and publicly sourced status information.
 * Updated plugin branding and release metadata: Author Brendigo, contributor brendigo.
+* WordPress administration submenus for search, official registry source publication details, real source-based statistics, and help.
 
 
 = 0.7.0 =
