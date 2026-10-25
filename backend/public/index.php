@@ -46,7 +46,9 @@ try {
         }
         $page = filter_var($_GET['page'] ?? 1, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 10000]]);
         $limit = filter_var($_GET['limit'] ?? 20, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 50]]);
-        if ($page === false || $limit === false) reply(422, ['error' => 'Neispravna paginacija']);
+        if ($page === false || $limit === false || ($path === '/v1/directory' && $page > 500)) {
+            reply(422, ['error' => 'Neispravna paginacija. Koristite preciznije filtre za udaljene rezultate.']);
+        }
         $filters = [];
         foreach (['county', 'settlement', 'activity', 'legal_form', 'status', 'type'] as $field) {
             $value = $_GET[$field] ?? '';
