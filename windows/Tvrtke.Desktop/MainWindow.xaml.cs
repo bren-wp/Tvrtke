@@ -61,7 +61,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             }
             var status = (StatusInput.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "";
             var pageToLoad = requestedPage ?? 1;
-            if (!Uri.TryCreate(_api, UriKind.Absolute, out var apiUrl) || apiUrl.Scheme != Uri.UriSchemeHttps)
+            if (!Uri.TryCreate(_api, UriKind.Absolute, out var apiUrl) || apiUrl.Scheme != Uri.UriSchemeHttps ||
+                !string.IsNullOrEmpty(apiUrl.UserInfo) || !string.IsNullOrEmpty(apiUrl.Query) ||
+                !string.IsNullOrEmpty(apiUrl.Fragment))
             {
                 StatusText.Text = "API mora koristiti valjanu HTTPS adresu (TVRTKE_API_URL).";
                 return;
@@ -116,7 +118,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private static string CsvCell(string? text)
     {
         var value = text ?? "";
-        if (value.Length > 0 && ("=+-@\t\r".Contains(value[0]))) value = "'" + value;
+        var leading = value.TrimStart(' ', '\t', '\r', '\n');
+        if (leading.Length > 0 && "=+-@".Contains(leading[0])) value = "'" + value;
         return "\"" + value.Replace("\"", "\"\"") + "\"";
     }
 
