@@ -2,6 +2,8 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text;
+using Microsoft.Win32;
 using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Controls;
@@ -95,6 +97,51 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         catch (Exception ex) when (ex is HttpRequestException or InvalidOperationException)
         {
             if (!token.IsCancellationRequested) StatusText.Text = "Detalji trenutačno nisu dostupni.";
+        }
+    }
+
+    // Export only the currently displayed page. Spreadsheet formula injection is neutralized.
+    private static string CsvCell(string? text)
+    {
+        var value = text ?? "";
+        if (value.Length > 0 && ("=+-@\t\r".Contains(value[0]))) value = "'" + value;
+        return "\"" + value.Replace("\"", "\"\"") + "\"";
+    }
+
+    private void Export_Click(object sender, RoutedEventArgs e)
+    {
+        if (_results.Count == 0)
+        {
+            StatusText.Text = "Nema prikazanih rezultata za izvoz.";
+            return;
+        }
+        var dialog = new SaveFileDialog
+        {
+            Filter = "CSV datoteka (*.csv)|*.csv",
+            FileName = $"TVRTKE-rezultati-stranica-{_page}.csv",
+            DefaultExt = ".csv",
+            AddExtension = true
+        };
+        if (dialog.ShowDialog(this) != true) return;
+        try
+        {
+            var content = new StringBuilder("Naziv;MBS;OIB;Status;Pravni oblik;Mjesto;Županija\r\n");
+            foreach (var item in _results)
+            {
+                content.AppendJoin(';', new[]
+                {
+                    CsvCell(item.Name), CsvCell(item.Mbs), CsvCell(item.Oib),
+                    CsvCell(item.StatusLabel), CsvCell(item.LegalForm),
+                    CsvCell(item.Settlement), CsvCell(item.County)
+                });
+                content.Append("\r\n");
+            }
+            System.IO.File.WriteAllText(dialog.FileName, content.ToString(), new UTF8Encoding(true));
+            StatusText.Text = $"Izvezeno {_results.Count} prikazanih subjekata.";
+        }
+        catch (Exception ex) when (ex is System.IO.IOException or UnauthorizedAccessException)
+        {
+            StatusText.Text = "Izvoz nije uspio. Provjerite dopuštenja i slobodni prostor.";
         }
     }
 
