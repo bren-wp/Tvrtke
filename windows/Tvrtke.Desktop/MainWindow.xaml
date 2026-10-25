@@ -2,7 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="TVRTKE — Poslovni imenik Hrvatske"
-        Width="1448" Height="960" MinWidth="540" MinHeight="560"
+        Width="1180" Height="780" MinWidth="520" MinHeight="460"
+        ResizeMode="CanResizeWithGrip"
         WindowStartupLocation="CenterScreen" Background="#EFF7FA"
         FontFamily="Segoe UI" Loaded="Window_Loaded" SizeChanged="Window_SizeChanged"
         UseLayoutRounding="True" SnapsToDevicePixels="True">

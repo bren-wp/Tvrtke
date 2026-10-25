@@ -120,7 +120,17 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private async void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        // Show only live authorized records; no fabricated counts or demo companies.
+        // Open as a NORMAL sized, centered window (never full-screen or maximized).
+        // Use the usable desktop area, excluding the Windows taskbar. WPF DIPs
+        // already account for display scaling, including 125% and 150%.
+        var workArea = SystemParameters.WorkArea;
+        WindowState = WindowState.Normal;
+        var targetWidth = Math.Min(1180d, workArea.Width * 0.84);
+        var targetHeight = Math.Min(780d, workArea.Height * 0.82);
+        Width = Math.Max(MinWidth, Math.Min(workArea.Width, targetWidth));
+        Height = Math.Max(MinHeight, Math.Min(workArea.Height, targetHeight));
+        Left = workArea.Left + Math.Max(0, (workArea.Width - Width) / 2);
+        Top = workArea.Top + Math.Max(0, (workArea.Height - Height) / 2);
         await SearchAsync(1);
     }
 
