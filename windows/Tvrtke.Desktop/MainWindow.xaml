@@ -276,7 +276,6 @@
                            VerticalAlignment="Center" TextWrapping="Wrap" FontSize="12"/>
             </DockPanel>
         </Grid>
-        </Grid>
     </ScrollViewer>
     </Grid>
 </Window>
