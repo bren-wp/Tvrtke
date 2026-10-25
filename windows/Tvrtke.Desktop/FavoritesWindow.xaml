@@ -1,0 +1,127 @@
+<Window x:Class="Tvrtke.Desktop.FavoritesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="TVRTKE — Favoriti, liste i izvoz" Width="940" Height="685"
+        MinWidth="520" MinHeight="470" WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResizeWithGrip" Background="#EFF7FA"
+        FontFamily="Segoe UI" Loaded="Window_Loaded"
+        SizeChanged="Window_SizeChanged" UseLayoutRounding="True" SnapsToDevicePixels="True">
+    <Window.Resources>
+        <Style x:Key="MainAction" TargetType="Button">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#00A9A6"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="MinHeight" Value="39"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="#00868E"/></Trigger>
+                <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value=".5"/></Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="OutlineAction" TargetType="Button">
+            <Setter Property="Foreground" Value="#0B3559"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#CCDBE8"/>
+            <Setter Property="MinHeight" Value="39"/>
+            <Setter Property="Padding" Value="13,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style TargetType="DataGridRow">
+            <Setter Property="Background" Value="White"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True"><Setter Property="Background" Value="#DDF8F5"/></Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <Grid Margin="17">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="105"/>
+            <RowDefinition Height="47"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0" Background="White" CornerRadius="12" Padding="22,16"
+                BorderBrush="#DBE8F1" BorderThickness="1" Margin="0,0,0,10">
+            <StackPanel>
+                <TextBlock Text="Favoriti, liste i izvoz" FontSize="26" FontWeight="Bold" Foreground="#0B2D4A"/>
+                <TextBlock Text="Spremite važne poslovne subjekte, organizirajte vlastite liste i izvezite dostupne podatke."
+                           Foreground="#5B7690" Margin="0,8,0,0" FontSize="13" TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
+        <Border Grid.Row="1" CornerRadius="10" Background="White" BorderBrush="#DBE8F1"
+                BorderThickness="1" Padding="17,10" Margin="0,0,0,10">
+            <DockPanel>
+                <TextBlock Text="♡  Favoriti" Foreground="#008D94" FontWeight="Bold" FontSize="15" DockPanel.Dock="Left"/>
+                <TextBlock Text="▦  Spremljene liste" Margin="30,0,0,0" Foreground="#315778" FontSize="15" DockPanel.Dock="Left"/>
+            </DockPanel>
+        </Border>
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <Grid x:Name="Panels">
+                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="0"/></Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.45*"/><ColumnDefinition Width="13"/><ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Border x:Name="FavoritesCard" Grid.Column="0" Background="White" BorderBrush="#DAE6F0"
+                        BorderThickness="1" CornerRadius="11" Padding="17">
+                    <StackPanel>
+                        <DockPanel Margin="0,0,0,13">
+                            <TextBlock Text="Moji favoriti" FontWeight="Bold" FontSize="19" Foreground="#0B2D4A"/>
+                            <TextBlock x:Name="FavoriteCount" Margin="12,5,0,0" Foreground="#64819A"/>
+                        </DockPanel>
+                        <TextBox x:Name="FilterText" Height="40" Padding="10,7" Margin="0,0,0,13"
+                                 TextChanged="Filter_TextChanged"
+                                 AutomationProperties.Name="Pretraži favorite"
+                                 ToolTip="Traži po nazivu, broju registra ili mjestu"/>
+                        <DataGrid x:Name="FavoritesGrid" AutoGenerateColumns="False" Height="315"
+                                  CanUserAddRows="False" IsReadOnly="True" RowHeight="43"
+                                  SelectionMode="Single" GridLinesVisibility="None" Background="White"
+                                  AlternatingRowBackground="#F8FCFD"
+                                  SelectionChanged="Favorites_SelectionChanged">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Poslovni subjekt" Binding="{Binding Name}" Width="2*"/>
+                                <DataGridTextColumn Header="Vrsta" Binding="{Binding SourceLabel}" Width="110"/>
+                                <DataGridTextColumn Header="Mjesto" Binding="{Binding Settlement}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <WrapPanel Margin="0,13,0,2">
+                            <Button x:Name="RemoveFavoriteButton" Content="Ukloni favorit" Margin="0,0,8,8"
+                                    IsEnabled="False" Style="{StaticResource OutlineAction}" Click="RemoveFavorite_Click"/>
+                            <Button x:Name="ExportButton" Content="⇩  Izvezi favorite (CSV)" Margin="0,0,8,8"
+                                    Style="{StaticResource MainAction}" Click="Export_Click"/>
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
+                <Border x:Name="ListsCard" Grid.Column="2" Background="White" BorderBrush="#DAE6F0"
+                        BorderThickness="1" CornerRadius="11" Padding="17">
+                    <StackPanel>
+                        <TextBlock Text="Spremljene liste" FontWeight="Bold" FontSize="19" Foreground="#0B2D4A"/>
+                        <TextBlock Margin="0,7,0,12" Foreground="#64819A" FontSize="12" TextWrapping="Wrap"
+                                   Text="Vlastite liste čuvaju samo registracijske identifikatore na ovom računalu."/>
+                        <TextBox x:Name="NewListName" Height="39" Padding="10,6" Margin="0,0,0,9"
+                                 AutomationProperties.Name="Naziv nove liste" ToolTip="Naziv nove liste (do 60 znakova)"/>
+                        <Button Content="+  Nova lista" Style="{StaticResource MainAction}" Click="CreateList_Click" Margin="0,0,0,13"/>
+                        <ListBox x:Name="SavedListsBox" DisplayMemberPath="Display" Height="185"
+                                 SelectionChanged="SavedLists_SelectionChanged"
+                                 AutomationProperties.Name="Spremljene liste"/>
+                        <WrapPanel Margin="0,12,0,0">
+                            <Button x:Name="AddToListButton" Content="Dodaj odabrani favorit" IsEnabled="False"
+                                    Click="AddToList_Click" Style="{StaticResource OutlineAction}" Margin="0,0,7,8"/>
+                            <Button x:Name="DeleteListButton" Content="Izbriši listu" IsEnabled="False"
+                                    Click="DeleteList_Click" Style="{StaticResource OutlineAction}" Margin="0,0,7,8"/>
+                        </WrapPanel>
+                        <TextBlock Text="Brisanje liste ne briše favorite." TextWrapping="Wrap"
+                                   FontSize="12" Foreground="#6B8199" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+        <DockPanel Grid.Row="3" Margin="4,10,4,0">
+            <TextBlock x:Name="StatusText" Text="Favoriti se pohranjuju lokalno."
+                       Foreground="#56728C" VerticalAlignment="Center" TextWrapping="Wrap"
+                       DockPanel.Dock="Left" FontSize="12"/>
+            <Button Content="Zatvori" DockPanel.Dock="Right" Style="{StaticResource OutlineAction}"
+                    Width="105" Click="Close_Click"/>
+        </DockPanel>
+    </Grid>
+</Window>
