@@ -1,22 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="TVRTKE">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"
+     role="img" aria-label="TVRTKE poslovni imenik Hrvatske">
+  <title>TVRTKE — poslovni imenik Hrvatske</title>
   <defs>
-    <linearGradient id="tv-mark-teal" x1="0" y1="0" x2="1" y2="1">
-      <stop stop-color="#27DECE"/><stop offset="1" stop-color="#009EAB"/>
+    <linearGradient id="tvrtke-turquoise" x1="0" y1="0" x2=".9" y2="1">
+      <stop offset="0" stop-color="#27decf"/>
+      <stop offset="1" stop-color="#00a6a5"/>
     </linearGradient>
-    <linearGradient id="tv-mark-blue" x1="0" y1="0" x2="1" y2="1">
-      <stop stop-color="#0B2D4A"/><stop offset="1" stop-color="#13597F"/>
+    <linearGradient id="tvrtke-navy" x1="0" y1="0" x2=".2" y2="1">
+      <stop offset="0" stop-color="#0b2d4a"/>
+      <stop offset="1" stop-color="#14587e"/>
     </linearGradient>
   </defs>
-  <path d="M9 117V81L33 64V117Z" fill="#008C9B"/>
-  <path d="M37 117V44L64 25V117Z" fill="url(#tv-mark-teal)"/>
-  <path d="M68 117V11L94 29V117Z" fill="url(#tv-mark-blue)"/>
-  <path d="M98 117V62L121 79V117Z" fill="#05B7B1"/>
-  <path d="M19 106L48 93L76 96L105 54" stroke="#FFFFFF" stroke-width="11" fill="none"
-    stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M19 106L48 93L76 96L105 54" stroke="#03A9AD" stroke-width="4" fill="none"
-    stroke-linecap="round" stroke-linejoin="round"/>
-  <g fill="#00ACAA" stroke="#FFFFFF" stroke-width="5">
-    <circle cx="19" cy="106" r="9"/><circle cx="48" cy="93" r="9"/>
-    <circle cx="76" cy="96" r="9"/><circle cx="105" cy="54" r="9"/>
+  <!-- Common 256-unit master geometry shared with the Windows .ico renderer. -->
+  <path d="M41 200V133L85 103V200Z" fill="#008f9e"/>
+  <path d="M91 200V94L141 54V200Z" fill="url(#tvrtke-turquoise)"/>
+  <path d="M147 200V53L191 88V200Z" fill="url(#tvrtke-navy)"/>
+  <path d="M196 200V135L221 153V200Z" fill="#00b8b1"/>
+  <path d="M51 179L101 154L142 160L199 108" fill="none"
+        stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="#00afa9" stroke="#fff" stroke-width="8">
+    <circle cx="51" cy="179" r="14"/><circle cx="101" cy="154" r="14"/>
+    <circle cx="142" cy="160" r="14"/><circle cx="199" cy="108" r="14"/>
   </g>
 </svg>
