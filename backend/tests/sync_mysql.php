@@ -62,7 +62,7 @@ $db=Database::connect();
 $db->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
 $root=dirname(__DIR__) . '/database/';
 foreach (['001_initial.sql','002_enrichment.sql','003_publication_state.sql',
-          '004_registry_sources.sql','005_sudreg_full_coverage.sql', '006_registry_lifecycle.sql'] as $migration) {
+          '004_registry_sources.sql','005_sudreg_full_coverage.sql', '006_registry_lifecycle.sql','007_registry_details.sql'] as $migration) {
     $raw = file_get_contents($root . $migration);
     if ($raw === false) throw new RuntimeException('Missing migration '.$migration);
     foreach (preg_split('/;\s*(?:\r?\n|$)/',$raw) as $part) {

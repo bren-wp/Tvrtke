@@ -302,6 +302,8 @@ public sealed class Subject
     [JsonPropertyName("legal_form_short")] public string? LegalFormShort { get; set; }
     [JsonPropertyName("datum_osnivanja")] public string? FoundedAt { get; set; }
     [JsonPropertyName("datum_brisanja")] public string? DeletedAt { get; set; }
+    [JsonPropertyName("datum_upisa")] public string? RegisteredAt { get; set; }
+    [JsonPropertyName("datum_statusa")] public string? StatusChangedAt { get; set; }
     [JsonPropertyName("status")] public int? Status { get; set; }
     [JsonPropertyName("partial")] public bool Partial { get; set; }
     [JsonPropertyName("activities")] public List<Activity> Activities { get; set; } = [];

@@ -10,7 +10,7 @@ namespace Tvrtke;
 final class RegistryCsv
 {
     public const TYPES = ['obrt', 'udruga', 'zaklada', 'ostalo'];
-    private const FIELDS = ['id', 'name', 'oib', 'status', 'county', 'settlement', 'address', 'activity', 'start_date', 'end_date'];
+    private const FIELDS = ['id', 'name', 'oib', 'status', 'county', 'settlement', 'address', 'activity', 'start_date', 'end_date', 'registration_date', 'status_date'];
 
     /**
      * Preserve original registry dates; do not infer dates from import time.
@@ -21,9 +21,12 @@ final class RegistryCsv
         $value = rtrim(trim($input), '.');
         if (preg_match('/^\d{4}-\d{2}-\d{2}$/D', $value)) $format = '!Y-m-d';
         elseif (preg_match('/^\d{1,2}\.\d{1,2}\.\d{4}$/D', $value)) $format = '!j.n.Y';
+        elseif (preg_match('/^\d{1,2}\/\d{1,2}\/\d{4} \d{2}:\d{2}:\d{2} (AM|PM)$/D', $value)) $format = '!n/j/Y h:i:s A';
         else throw new \InvalidArgumentException('Unsupported registry date format');
         $date = \DateTimeImmutable::createFromFormat($format, $value);
-        if (!$date || $date->format('Y-m-d') < '1800-01-01' || $date->format($format === '!Y-m-d' ? 'Y-m-d' : 'j.n.Y') !== $value) {
+        if (!$date || $date->format('Y-m-d') < '1800-01-01' ||
+            ($format === '!Y-m-d' && $date->format('Y-m-d') !== $value) ||
+            ($format === '!j.n.Y' && $date->format('j.n.Y') !== $value)) {
             throw new \InvalidArgumentException('Invalid registry date');
         }
         return $date->format('Y-m-d');
@@ -104,7 +107,7 @@ final class RegistryCsv
         $statusRaw = strtolower($get('status', 100) ?? '');
         $status = match ($statusRaw) {
             '1', 'active', 'aktivan', 'aktivna', 'u radu', 'djeluje' => 'active',
-            '0', 'inactive', 'neaktivan', 'neaktivna', 'brisan', 'brisana',
+            '0', 'inactive', 'neaktivan', 'neaktivna', 'brisan', 'brisana', 'prestanak djelovanja',
             'odjavljen', 'odjavljena', 'prestao s radom' => 'inactive',
             default => 'unknown',
         };
@@ -119,9 +122,11 @@ final class RegistryCsv
             'county' => $get('county', 128),
             'settlement' => $get('settlement', 128),
             'address' => $get('address', 255),
-            'activity' => $get('activity', 512),
-            'start_date' => self::date($get('start_date', 20)),
-            'end_date' => self::date($get('end_date', 20)),
+            'activity' => $get('activity', 100000),
+            'start_date' => self::date($get('start_date', 32)),
+            'end_date' => self::date($get('end_date', 32)),
+            'registration_date' => self::date($get('registration_date', 32)),
+            'status_date' => self::date($get('status_date', 32)),
         ];
     }
 }

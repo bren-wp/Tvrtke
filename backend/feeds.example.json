@@ -1,31 +1,44 @@
 {
   "_notice": "Administrator-only example. Copy outside public webroot to feeds.local.json, inspect CSV headers, supply exact official column mapping and explicitly enable approved sources.",
   "udruga": {
-    "enabled": false,
+    "enabled": true,
     "download_url": "https://data.gov.hr/ckan/dataset/b04f3da4-d2b6-4789-9e5f-dc4cc18ae6fe/resource/535a5b96-9f28-409a-ae99-e245964c16c9/download/data.csv",
     "source_url": "https://data.gov.hr/ckan/dataset/registar-udruga",
     "terms_url": "https://data.gov.hr/ckan/dataset/registar-udruga",
     "delimiter": ",",
     "columns": {
-      "id": "TOCNI_NAZIV_STUPCA_BROJA_UDRUGE",
-      "name": "TOCNI_NAZIV_STUPCA_NAZIVA_UDRUGE"
+      "id": "REGISTARSKI_BROJ",
+      "name": "NAZIV",
+      "oib": "OIB",
+      "status": "STATUS",
+      "county": "ZUPANIJA",
+      "address": "SJEDISTE",
+      "activity": "OPIS_DJELATNOSTI",
+      "start_date": "DATUM_OSNIVACKE_SKUPSTINE",
+      "registration_date": "DATUM_UPISA",
+      "status_date": "DATUM_STATUSA"
     },
     "coverage": "partial",
-    "max_bytes": 80000000,
+    "max_bytes": 200000000,
     "max_rows": 500000,
     "batch": 300,
     "pages_per_run": 6,
     "budget_seconds": 18
   },
   "zaklada": {
-    "enabled": false,
+    "enabled": true,
     "download_url": "https://data.gov.hr/ckan/dataset/5ed3fa2b-774f-4c4a-9332-80e8486614bd/resource/16429c50-062b-4381-b624-a849dbc80c12/download/data.csv",
     "source_url": "https://data.gov.hr/ckan/dataset/registar-zaklada-republike-hrvatske",
     "terms_url": "https://data.gov.hr/ckan/dataset/registar-zaklada-republike-hrvatske",
     "delimiter": ",",
     "columns": {
-      "id": "TOCNI_NAZIV_STUPCA_BROJA_ZAKLADE",
-      "name": "TOCNI_NAZIV_STUPCA_NAZIVA_ZAKLADE"
+      "id": "REGISTARSKI_BROJ",
+      "name": "NAZIV",
+      "oib": "OIB_ZAKLADE",
+      "status": "STATUS",
+      "address": "SJEDISTE",
+      "registration_date": "DATUM_UPISA",
+      "status_date": "DATUM_STATUSA"
     },
     "coverage": "partial",
     "max_bytes": 30000000,

@@ -101,6 +101,10 @@
                         <TextBlock Text="{Binding FoundedAt}" Margin="0,3,0,13"/>
                         <TextBlock Text="Datum brisanja" Foreground="#5C6C7C"/>
                         <TextBlock Text="{Binding DeletedAt}" Margin="0,3,0,13"/>
+                        <TextBlock Text="Datum upisa u registar" Foreground="#5C6C7C"/>
+                        <TextBlock Text="{Binding RegisteredAt}" Margin="0,3,0,13"/>
+                        <TextBlock Text="Datum promjene statusa" Foreground="#5C6C7C"/>
+                        <TextBlock Text="{Binding StatusChangedAt}" Margin="0,3,0,13"/>
                         <TextBlock Text="Županija i mjesto" Foreground="#5C6C7C"/>
                         <TextBlock Text="{Binding Location}" TextWrapping="Wrap" Margin="0,3,0,13"/>
                         <TextBlock Text="Adresa" Foreground="#5C6C7C"/>

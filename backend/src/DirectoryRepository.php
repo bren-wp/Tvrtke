@@ -74,7 +74,7 @@ final class DirectoryRepository
             $court = "SELECT CONCAT('sudreg:',s.mbs) AS registry_key,
                   'sudreg' AS source_type,s.mbs AS source_identifier,s.mbs,s.oib,
                   s.status AS status,IF(s.status=1,'Aktivan','Neaktivan / brisan') AS status_label,
-                  s.datum_osnivanja,s.datum_brisanja,n.name,a.county,a.settlement,a.street,a.house_number,a.postal_code,
+                  s.datum_osnivanja,s.datum_brisanja,NULL AS datum_upisa,NULL AS datum_statusa,n.name,a.county,a.settlement,a.street,a.house_number,a.postal_code,
                   l.form_name AS legal_form,l.form_abbreviation AS legal_form_short,
                   NULL AS activity,NULL AS source_url
                 FROM subjects s
@@ -103,9 +103,9 @@ final class DirectoryRepository
                      r.source_type,r.source_identifier,NULL AS mbs,r.oib,
                      CASE WHEN r.status='active' THEN 1 WHEN r.status='inactive' THEN 0 ELSE NULL END AS status,
                      CASE r.status WHEN 'active' THEN 'Aktivan' WHEN 'inactive' THEN 'Neaktivan' ELSE 'Nepoznat' END AS status_label,
-                     r.datum_osnivanja,r.datum_brisanja,r.name,r.county,r.settlement,r.address AS street,NULL AS house_number,
+                     r.datum_osnivanja,r.datum_brisanja,r.datum_upisa,r.datum_statusa,r.name,r.county,r.settlement,r.address AS street,NULL AS house_number,
                      NULL AS postal_code,NULL AS legal_form,NULL AS legal_form_short,
-                     r.activity,src.source_url
+                     LEFT(r.activity,512) AS activity,src.source_url
                 FROM registry_records r
                 INNER JOIN registry_sources src ON src.source_type=r.source_type
                      AND src.active_import_id=r.import_id
@@ -157,7 +157,7 @@ final class DirectoryRepository
         }
         $stmt = $this->db->prepare("SELECT r.source_type,r.record_hash,r.source_identifier,r.name,r.oib,
               r.status AS registry_status,r.county,r.settlement,r.address AS street,r.activity,
-              r.datum_osnivanja,r.datum_brisanja,
+              r.datum_osnivanja,r.datum_brisanja,r.datum_upisa,r.datum_statusa,
               src.source_url,src.coverage,src.published_at_utc
             FROM registry_records r INNER JOIN registry_sources src
                  ON src.source_type=r.source_type AND src.active_import_id=r.import_id
