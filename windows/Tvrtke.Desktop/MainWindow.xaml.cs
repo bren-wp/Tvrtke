@@ -168,7 +168,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         try
         {
             _favoritesMode = false;
-            FavoritesButton.Content = "☆   Moji favoriti";
+            FavoritesNavLabel.Text = "Moji favoriti";
             var query = QueryInput.Text.Trim();
             var county = CountyInput.Text.Trim();
             var activity = ActivityInput.Text.Trim();
@@ -322,7 +322,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void Favorites_Click(object sender, RoutedEventArgs e)
     {
         _favoritesMode = !_favoritesMode;
-        FavoritesButton.Content = _favoritesMode ? "←   Natrag na pretragu" : "☆   Moji favoriti";
+        FavoritesNavLabel.Text = _favoritesMode ? "Natrag na pretragu" : "Moji favoriti";
         _results.Clear();
         if (_favoritesMode)
         {
