@@ -4,7 +4,7 @@ Tags: business directory, company search, registry, croatia
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 0.6.0
+Stable tag: 0.7.0
 License: MIT
 License URI: https://opensource.org/license/mit
 
@@ -77,7 +77,13 @@ expires through standard transient expiration.
 
 == Changelog ==
 
-= 0.6.0 =
+= 0.7.0 =
+* Official registry lifecycle information, including status, start date and removal date when publicly supplied.
+* Multi-registry results enriched with registration provenance and source freshness.
+* More robust WordPress read-only input validation and administrator opt-out.
+* Compatible with a central backend that privately synchronizes official feeds; no API credentials bundled.
+
+= 0.7.0 =
 * Multi-registry category search for companies, crafts, associations and foundations.
 * Source-aware profiles and registration identifiers.
 * Updated accessibility, responsive user interface, and public service disclosures.

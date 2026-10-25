@@ -2,7 +2,7 @@
 /**
  * Plugin Name: TVRTKE – Poslovni registar
  * Description: Hrvatski poslovni imenik za pretraživanje tvrtki, obrta, udruga i zaklada iz povezanih javnih registara.
- * Version: 0.6.0
+ * Version: 0.7.0
  * Author: Brendigo
  * Plugin URI: https://tvrtke.com.hr
  * License URI: https://opensource.org/license/mit
@@ -47,7 +47,7 @@ final class Tvrtke_Registar
             'tvrtke-registar-editor',
             plugins_url('blocks/editor.js', __FILE__),
             ['wp-blocks', 'wp-element', 'wp-i18n'],
-            '0.6.0',
+            '0.7.0',
             true
         );
         register_block_type(__DIR__ . '/blocks', ['render_callback' => [self::class, 'shortcode']]);
@@ -132,7 +132,7 @@ final class Tvrtke_Registar
     /** @return string */
     public static function shortcode(): string
     {
-        wp_enqueue_style('tvrtke-registar', plugins_url('assets/search.css', __FILE__), [], '0.6.0');
+        wp_enqueue_style('tvrtke-registar', plugins_url('assets/search.css', __FILE__), [], '0.7.0');
         // These public GET filters are read-only: no database writes, accounts, or privileged actions.
         // A nonce is deliberately not required so search result links remain shareable.
         $get = static function (string $key, int $max = 100): string {
