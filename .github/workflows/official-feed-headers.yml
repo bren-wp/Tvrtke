@@ -1,0 +1,16 @@
+name: Official CSV header audit
+on:
+  push:
+    paths:
+      - 'backend/bin/inspect-public-feed-headers.py'
+      - '.github/workflows/official-feed-headers.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read only public CSV column names (no record values)
+        run: python3 backend/bin/inspect-public-feed-headers.py

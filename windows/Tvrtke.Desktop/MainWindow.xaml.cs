@@ -84,7 +84,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             NextButton.IsEnabled = _hasMore;
             PageText.Text = _page.ToString();
             StatusText.Text = $"Prikazano {_results.Count} zapisa · izvora: {data.Sources.Count + (data.SnapshotId is null ? 0 : 1)}" +
-                              (data.Partial ? " · baza nije potpuna" : "");
+                              (data.Partial ? " · baza nije potpuna" : "") +
+                              (string.IsNullOrWhiteSpace(data.PublishedAtUtc) ? "" : " · Sudreg ažuriran: " + data.PublishedAtUtc);
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or InvalidOperationException or JsonException)
         {
@@ -150,7 +151,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (dialog.ShowDialog(this) != true) return;
         try
         {
-            var content = new StringBuilder("Naziv;Izvor;Broj registra;MBS;OIB;Status;Pravni oblik;Mjesto;Županija\r\n");
+            var content = new StringBuilder("Naziv;Izvor;Broj registra;MBS;OIB;Status;Pravni oblik;Mjesto;Županija;Datum osnivanja;Datum brisanja\r\n");
             foreach (var item in _results)
             {
                 content.AppendJoin(';', new[]
@@ -158,7 +159,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     CsvCell(item.Name), CsvCell(item.SourceLabel), CsvCell(item.SourceIdentifier),
                     CsvCell(item.Mbs), CsvCell(item.Oib),
                     CsvCell(item.StatusLabel), CsvCell(item.LegalForm),
-                    CsvCell(item.Settlement), CsvCell(item.County)
+                    CsvCell(item.Settlement), CsvCell(item.County),
+                    CsvCell(item.FoundedAt), CsvCell(item.DeletedAt)
                 });
                 content.Append("\r\n");
             }
@@ -301,6 +303,8 @@ public sealed class Subject
     [JsonPropertyName("legal_form_short")] public string? LegalFormShort { get; set; }
     [JsonPropertyName("datum_osnivanja")] public string? FoundedAt { get; set; }
     [JsonPropertyName("datum_brisanja")] public string? DeletedAt { get; set; }
+    [JsonPropertyName("datum_upisa")] public string? RegisteredAt { get; set; }
+    [JsonPropertyName("datum_statusa")] public string? StatusChangedAt { get; set; }
     [JsonPropertyName("status")] public int? Status { get; set; }
     [JsonPropertyName("partial")] public bool Partial { get; set; }
     [JsonPropertyName("activities")] public List<Activity> Activities { get; set; } = [];
@@ -320,6 +324,7 @@ public sealed class SubjectPage
     [JsonPropertyName("items")] public List<Subject> Items { get; set; } = [];
     [JsonPropertyName("has_more")] public bool HasMore { get; set; }
     [JsonPropertyName("snapshot_id")] public string? SnapshotId { get; set; }
+    [JsonPropertyName("published_at_utc")] public string? PublishedAtUtc { get; set; }
     [JsonPropertyName("partial")] public bool Partial { get; set; }
     [JsonPropertyName("sources")] public List<JsonElement> Sources { get; set; } = [];
 }

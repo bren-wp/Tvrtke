@@ -2,7 +2,7 @@
 /**
  * Plugin Name: TVRTKE – Poslovni registar
  * Description: Hrvatski poslovni imenik za pretraživanje tvrtki, obrta, udruga i zaklada iz povezanih javnih registara.
- * Version: 0.6.0
+ * Version: 0.7.0
  * Author: Brendigo
  * Plugin URI: https://tvrtke.com.hr
  * License URI: https://opensource.org/license/mit
@@ -47,7 +47,7 @@ final class Tvrtke_Registar
             'tvrtke-registar-editor',
             plugins_url('blocks/editor.js', __FILE__),
             ['wp-blocks', 'wp-element', 'wp-i18n'],
-            '0.6.0',
+            '0.7.0',
             true
         );
         register_block_type(__DIR__ . '/blocks', ['render_callback' => [self::class, 'shortcode']]);
@@ -132,7 +132,7 @@ final class Tvrtke_Registar
     /** @return string */
     public static function shortcode(): string
     {
-        wp_enqueue_style('tvrtke-registar', plugins_url('assets/search.css', __FILE__), [], '0.6.0');
+        wp_enqueue_style('tvrtke-registar', plugins_url('assets/search.css', __FILE__), [], '0.7.0');
         // These public GET filters are read-only: no database writes, accounts, or privileged actions.
         // A nonce is deliberately not required so search result links remain shareable.
         $get = static function (string $key, int $max = 100): string {
@@ -197,7 +197,7 @@ final class Tvrtke_Registar
             $item = $detail['item'] ?? null;
             if (!is_array($item)) return $output . '<p role="alert">' . esc_html__('Podaci nisu dostupni.', 'tvrtke-registar') . '</p></section>';
             $output .= '<div class="tvrtke-detail"><h2>' . esc_html((string)($item['name'] ?? '')) . '</h2><dl>';
-            foreach (['source_type' => 'Registar', 'source_identifier' => 'Broj u registru', 'mbs' => 'MBS', 'oib' => 'OIB', 'status_label' => 'Status', 'legal_form' => 'Pravni oblik', 'county' => 'Županija', 'settlement' => 'Mjesto', 'street' => 'Ulica', 'house_number' => 'Kućni broj', 'datum_osnivanja' => 'Datum osnivanja'] as $field => $label) {
+            foreach (['source_type' => 'Registar', 'source_identifier' => 'Broj u registru', 'mbs' => 'MBS', 'oib' => 'OIB', 'status_label' => 'Status', 'legal_form' => 'Pravni oblik', 'county' => 'Županija', 'settlement' => 'Mjesto', 'street' => 'Ulica', 'house_number' => 'Kućni broj', 'datum_osnivanja' => 'Datum osnivanja', 'datum_brisanja' => 'Datum brisanja / prestanka', 'datum_upisa' => 'Datum upisa u registar', 'datum_statusa' => 'Datum promjene statusa'] as $field => $label) {
                 $output .= '<dt>' . esc_html($label) . '</dt><dd>' . esc_html((string)($item[$field] ?? '—')) . '</dd>';
             }
             $output .= '</dl><h3>' . esc_html__('Registrirane djelatnosti', 'tvrtke-registar') . '</h3><ul>';
@@ -219,6 +219,11 @@ final class Tvrtke_Registar
         if (is_wp_error($data)) return $output . '<p role="alert">' . esc_html($data->get_error_message()) . '</p></section>';
         if (!isset($data['items']) || !is_array($data['items'])) return $output . '<p role="alert">' . esc_html__('Neispravan odgovor API-ja.', 'tvrtke-registar') . '</p></section>';
         if (empty($data['snapshot_id']) && empty($data['sources'])) return $output . '<p role="status">' . esc_html__('Baza još nije sinkronizirana. Pretraga će biti dostupna nakon prvog uvoza.', 'tvrtke-registar') . '</p></section>';
+        if (!empty($data['published_at_utc'])) {
+            $output .= '<p class="tvrtke-source">' .
+                esc_html__('Sudski registar, zadnja objava u bazi (UTC):', 'tvrtke-registar') .
+                ' ' . esc_html((string)$data['published_at_utc']) . '</p>';
+        }
         $output .= '<div class="tvrtke-results" aria-live="polite">';
         $output .= '<p class="tvrtke-count">' . esc_html(sprintf(/* translators: %d: Number of results on the current page. */ __('Rezultati na stranici: %d', 'tvrtke-registar'), count($data['items']))) . '</p>';
         if (empty($data['items'])) $output .= '<p>' . esc_html__('Nema rezultata u dostupnom skupu.', 'tvrtke-registar') . '</p>';
@@ -230,7 +235,15 @@ final class Tvrtke_Registar
             $url = add_query_arg(['tvrtke_ref' => $key], remove_query_arg(['tvrtke_mbs', 'tvrtke_ref', 'tvrtke_page']));
             $output .= '<article class="tvrtke-result"><h3><a href="' . esc_url($url) . '">' . esc_html((string)($row['name'] ?? $itemMbs)) . '</a></h3>';
             $output .= '<p>' . esc_html((string)($types[(string)($row['source_type'] ?? '')] ?? __('Poslovni subjekt', 'tvrtke-registar'))) . ' · ' . esc_html((string)($row['settlement'] ?? '')) . '</p>';
-            $output .= '<p><strong>' . esc_html__('Registracijski broj:', 'tvrtke-registar') . '</strong> ' . esc_html((string)($row['source_identifier'] ?? $itemMbs)) . '</p></article>';
+            $output .= '<p><strong>' . esc_html__('Registracijski broj:', 'tvrtke-registar') . '</strong> ' . esc_html((string)($row['source_identifier'] ?? $itemMbs)) . '</p>';
+            $output .= '<p><strong>' . esc_html__('Status:', 'tvrtke-registar') . '</strong> ' . esc_html((string)($row['status_label'] ?? __('Nepoznato', 'tvrtke-registar'))) . '</p>';
+            if (!empty($row['datum_osnivanja'])) {
+                $output .= '<p><strong>' . esc_html__('Osnovano:', 'tvrtke-registar') . '</strong> ' . esc_html((string)$row['datum_osnivanja']) . '</p>';
+            }
+            if (!empty($row['datum_brisanja'])) {
+                $output .= '<p><strong>' . esc_html__('Brisano:', 'tvrtke-registar') . '</strong> ' . esc_html((string)$row['datum_brisanja']) . '</p>';
+            }
+            $output .= '</article>';
         }
         $output .= '</div><nav class="tvrtke-pages" aria-label="' . esc_attr__('Stranice rezultata', 'tvrtke-registar') . '">';
         if ($page > 1) $output .= '<a href="' . esc_url(add_query_arg('tvrtke_page', $page - 1, remove_query_arg('tvrtke_mbs'))) . '">' . esc_html__('Prethodna', 'tvrtke-registar') . '</a>';

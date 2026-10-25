@@ -109,6 +109,14 @@ final class Sync
                 throw $e;
             }
         }
+        // Resume a capped dataset when the operator raises the limit while
+        // the pinned snapshot is still available.
+        $configuredCap = SudregCoverage::rowLimit((int)Config::get('TVRTKE_IMPORT_ROW_LIMIT', '10000'));
+        $resume = $this->db->prepare('UPDATE sync_progress SET finished=0,truncated=0
+            WHERE snapshot_id=? AND finished=1 AND truncated=1
+              AND expected_rows IS NOT NULL AND imported_rows < expected_rows
+              AND imported_rows < ?');
+        $resume->execute([$ongoing,$configuredCap]);
         $stmt = $this->db->prepare('SELECT * FROM sync_progress WHERE finished=0 AND snapshot_id=? ORDER BY FIELD(dataset,\'subjekti\',\'tvrtke\',\'sjedista\',\'pravni_oblici\',\'predmeti_poslovanja\') LIMIT 1');
         $stmt->execute([$ongoing]);
         $job = $stmt->fetch();

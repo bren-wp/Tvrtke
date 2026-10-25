@@ -122,8 +122,8 @@ final class RegistryImporter
                 throw new \RuntimeException('Maximum record limit reached; no partial source published');
             }
             $insert = $this->db->prepare('INSERT INTO registry_records
-              (source_type,import_id,record_hash,source_identifier,name,oib,status,county,settlement,address,activity)
-              VALUES (?,?,?,?,?,?,?,?,?,?,?)');
+              (source_type,import_id,record_hash,source_identifier,name,oib,status,county,settlement,address,activity,datum_osnivanja,datum_brisanja,datum_upisa,datum_statusa)
+              VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
             $progress = $this->db->prepare('UPDATE registry_import_jobs
               SET next_byte_offset=?,imported_rows=? WHERE source_type=? AND import_id=?');
             $count = 0;
@@ -138,6 +138,7 @@ final class RegistryImporter
                     $insert->execute([
                         $type,$importId,$data['record_hash'],$data['source_identifier'],$data['name'],
                         $data['oib'],$data['status'],$data['county'],$data['settlement'],$data['address'],$data['activity'],
+                        $data['start_date'],$data['end_date'],$data['registration_date'],$data['status_date'],
                     ]);
                     ++$count;
                     ++$total;

@@ -6,7 +6,7 @@ TVRTKE razlikuje **mogućnost povezivanja izvora** od **stvarno preuzetih i obja
 | --- | --- | --- | --- |
 | Sudski registar | https://sudreg-data.gov.hr/ | OAuth2 + API v3.0.4 | Podržan importer, potreban API račun i završeni uvoz |
 | Registar udruga | https://data.gov.hr/ckan/dataset/registar-udruga | Objavljeni CSV/JSON/XML resursi, uz provjeru sadržaja | CSV importer pripremljen; nema spremljene potpune baze |
-| Registar zaklada | https://data.gov.hr/ckan/dataset/registar-zaklada | Otvoreni podatkovni resursi ako sadrže prikladan pregled zaklada | CSV importer pripremljen; izvor treba provjeriti |
+| Registar zaklada | https://data.gov.hr/ckan/dataset/registar-zaklada-republike-hrvatske | Otvoreni podatkovni resursi ako sadrže prikladan pregled zaklada | CSV importer pripremljen; izvor treba provjeriti |
 | Obrtni registar | https://pretrazivac-obrta.gov.hr/ | Javni preglednik pretrage | Nije potvrđen nacionalni službeni bulk CSV/API; ne zaobilaziti zaštite |
 | Ostali izvori | Svaki ovjereni javni registar uz zakonitu ponovnu uporabu | Izvoz datoteke s potpunim metapodacima o izvornom registru | Importer podržava tip ostalo |
 
@@ -27,3 +27,18 @@ TVRTKE razlikuje **mogućnost povezivanja izvora** od **stvarno preuzetih i obja
 Svaki vanjski izvor ima `coverage` stanje `partial` ili `complete`, broj objavljenih zapisa, datum i URL izvora. `complete` zahtijeva *izvana verificiran očekivani broj redaka* i uvoz točno toliko redaka. To nije samo po sebi dokaz potpunosti državnog registra: potrebno je neovisno potvrditi obuhvat izvornog skupa.
 
 Endpoint `GET /v1/sources` vraća samo **uspješno objavljene vanjske izvore**. Sadržaj koji je još u uvozu nije javno vidljiv. `GET /v1/directory` vraća zajedničke zapise i oznaku `partial`.
+
+## Službeni izravni resursi za automatizaciju (provjereni kataloški URL-ovi)
+
+- **Udruge, glavna evidencija CTS CSV:** `https://data.gov.hr/ckan/dataset/b04f3da4-d2b6-4789-9e5f-dc4cc18ae6fe/resource/535a5b96-9f28-409a-ae99-e245964c16c9/download/data.csv`
+- **Zaklade, glavna evidencija CTS CSV:** `https://data.gov.hr/ckan/dataset/5ed3fa2b-774f-4c4a-9332-80e8486614bd/resource/16429c50-062b-4381-b624-a849dbc80c12/download/data.csv`
+
+Izravne URL-ove i javnu otvorenu dozvolu potvrđuje katalog. Zaglavlja oba službena izvoza **provjerena su 25.10.2026.** u zasebnoj GitHub Actions provjeri. Datoteka udruga tada je imala 71 333 zapisa, među njima aktivne, brisane i prestale udruge. Format datuma je lokalizirani američki `M/D/YYYY hh:mm:ss AM/PM`. Izvoz zaklada povremeno je vraćao HTTP 500 te potpuni broj nije potvrđen. Primjer manifesta ima `enabled=true`, ali se izvršava isključivo nakon što administrator privatno postavi konfiguraciju i cron; izvorna datoteka i stvarna prava uporabe i dalje se moraju provjeriti. Podaci iz resursa "Osobe" nisu obuhvaćeni automatiziranim uvozom.
+
+Za obrte službeni javni pretraživač prikazuje i aktivne i odjavljene obrte, ali preglednik nije isto što i potvrđeni bulk CSV/API. Bez dopuštenog masovnog izvoza nacionalna potpuna baza obrta nije osigurana.
+
+## Datumi osnivanja i prestanka
+
+Mogu se prikazati samo ako službeni registar za konkretan zapis izričito daje `start_date` ili `end_date`; kod Sudreg zapisa koriste se stvarni `datum_osnivanja` i `datum_brisanja`. `published_at_utc` je vrijeme objave u TVRTKE i ne znači datum osnivanja poslovnog subjekta. Javni Sudreg API ne pruža potpunu povijest svih upisa iz prošlosti; za to su predviđeni prošireni službeni servisi.
+
+Mapirane su samo kolone pravnog subjekta. Izvorni opisi aktivnosti pohranjuju se u `MEDIUMTEXT`, ne skraćuju se prilikom uvoza. Dodani su odvojeni `datum_upisa` i `datum_statusa`, da se promjena statusa ne pogrešno predstavi kao osnivanje ili brisanje.
