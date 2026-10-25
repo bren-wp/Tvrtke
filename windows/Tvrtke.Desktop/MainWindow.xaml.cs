@@ -150,7 +150,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (dialog.ShowDialog(this) != true) return;
         try
         {
-            var content = new StringBuilder("Naziv;Izvor;Broj registra;MBS;OIB;Status;Pravni oblik;Mjesto;Županija\r\n");
+            var content = new StringBuilder("Naziv;Izvor;Broj registra;MBS;OIB;Status;Pravni oblik;Mjesto;Županija;Datum osnivanja;Datum brisanja\r\n");
             foreach (var item in _results)
             {
                 content.AppendJoin(';', new[]
@@ -158,7 +158,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     CsvCell(item.Name), CsvCell(item.SourceLabel), CsvCell(item.SourceIdentifier),
                     CsvCell(item.Mbs), CsvCell(item.Oib),
                     CsvCell(item.StatusLabel), CsvCell(item.LegalForm),
-                    CsvCell(item.Settlement), CsvCell(item.County)
+                    CsvCell(item.Settlement), CsvCell(item.County),
+                    CsvCell(item.FoundedAt), CsvCell(item.DeletedAt)
                 });
                 content.Append("\r\n");
             }

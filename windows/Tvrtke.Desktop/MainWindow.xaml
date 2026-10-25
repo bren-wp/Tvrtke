@@ -78,6 +78,7 @@
                         <DataGridTextColumn Header="OIB" Binding="{Binding Oib}" Width="118"/>
                         <DataGridTextColumn Header="Mjesto" Binding="{Binding Settlement}" Width="*"/>
                         <DataGridTextColumn Header="Oblik" Binding="{Binding LegalFormShort}" Width="80"/>
+                        <DataGridTextColumn Header="Status" Binding="{Binding StatusLabel}" Width="105"/>
                     </DataGrid.Columns>
                 </DataGrid>
                 <GridSplitter Grid.Column="1" Width="6" HorizontalAlignment="Stretch" Background="#E9EFF5"/>

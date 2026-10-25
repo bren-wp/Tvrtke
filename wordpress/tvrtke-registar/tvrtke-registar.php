@@ -230,7 +230,15 @@ final class Tvrtke_Registar
             $url = add_query_arg(['tvrtke_ref' => $key], remove_query_arg(['tvrtke_mbs', 'tvrtke_ref', 'tvrtke_page']));
             $output .= '<article class="tvrtke-result"><h3><a href="' . esc_url($url) . '">' . esc_html((string)($row['name'] ?? $itemMbs)) . '</a></h3>';
             $output .= '<p>' . esc_html((string)($types[(string)($row['source_type'] ?? '')] ?? __('Poslovni subjekt', 'tvrtke-registar'))) . ' · ' . esc_html((string)($row['settlement'] ?? '')) . '</p>';
-            $output .= '<p><strong>' . esc_html__('Registracijski broj:', 'tvrtke-registar') . '</strong> ' . esc_html((string)($row['source_identifier'] ?? $itemMbs)) . '</p></article>';
+            $output .= '<p><strong>' . esc_html__('Registracijski broj:', 'tvrtke-registar') . '</strong> ' . esc_html((string)($row['source_identifier'] ?? $itemMbs)) . '</p>';
+            $output .= '<p><strong>' . esc_html__('Status:', 'tvrtke-registar') . '</strong> ' . esc_html((string)($row['status_label'] ?? __('Nepoznato', 'tvrtke-registar'))) . '</p>';
+            if (!empty($row['datum_osnivanja'])) {
+                $output .= '<p><strong>' . esc_html__('Osnovano:', 'tvrtke-registar') . '</strong> ' . esc_html((string)$row['datum_osnivanja']) . '</p>';
+            }
+            if (!empty($row['datum_brisanja'])) {
+                $output .= '<p><strong>' . esc_html__('Brisano:', 'tvrtke-registar') . '</strong> ' . esc_html((string)$row['datum_brisanja']) . '</p>';
+            }
+            $output .= '</article>';
         }
         $output .= '</div><nav class="tvrtke-pages" aria-label="' . esc_attr__('Stranice rezultata', 'tvrtke-registar') . '">';
         if ($page > 1) $output .= '<a href="' . esc_url(add_query_arg('tvrtke_page', $page - 1, remove_query_arg('tvrtke_mbs'))) . '">' . esc_html__('Prethodna', 'tvrtke-registar') . '</a>';
