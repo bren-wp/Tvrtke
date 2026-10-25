@@ -1,9 +1,9 @@
 <Window x:Class="Tvrtke.Desktop.ApiSettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="TVRTKE — API i sigurnost" Width="735" Height="545" MinWidth="620"
+        Title="TVRTKE — API i sigurnost" Width="700" Height="520" MinWidth="480"
         WindowStartupLocation="CenterOwner" ResizeMode="CanResize"
-        MinHeight="465" Background="#F0F8FB" FontFamily="Segoe UI"
+        MinHeight="395" Background="#F0F8FB" Loaded="Window_Loaded" FontFamily="Segoe UI"
         UseLayoutRounding="True" SnapsToDevicePixels="True">
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -13,7 +13,7 @@
             <StackPanel VerticalAlignment="Center">
                 <TextBlock Text="API veza i sigurnost" Foreground="White" FontSize="23" FontWeight="Bold"/>
                 <TextBlock Text="Centralni javni servis · bez lokalnog pohranjivanja pristupnih tajni"
-                           Foreground="#ACDEE4" Margin="0,6,0,0" FontSize="13"/>
+                           Foreground="#ACDEE4" Margin="0,6,0,0" FontSize="13" TextWrapping="Wrap"/>
             </StackPanel>
         </Border>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">

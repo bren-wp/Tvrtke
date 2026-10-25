@@ -169,3 +169,74 @@
  .tvrtke-hero{padding:18px}
  .tvrtke-hero h2{font-size:1.55rem}
 }
+
+/* v0.9 vector identity and pixel-aligned reference components. The visual
+   rules use container width: WordPress themes can embed this in narrow areas. */
+.tvrtke-registar .tvrtke-public-brand{display:inline-flex;align-items:center;gap:11px;
+  max-width:100%;margin-bottom:15px;color:#0b2d4a}
+.tvrtke-registar .tvrtke-public-brand img{width:53px;height:53px;flex:none;object-fit:contain}
+.tvrtke-registar .tvrtke-public-brand strong{display:block;font-size:1.58rem;
+  letter-spacing:-.045em;line-height:1.15;font-weight:850}
+.tvrtke-registar .tvrtke-public-brand small{display:block;color:#47647f;
+  letter-spacing:.1em;font-size:.6rem;font-weight:700;margin-top:3px}
+.tvrtke-registar .tvrtke-icon{display:block;flex:none;width:25px;height:25px;color:inherit;overflow:visible}
+.tvrtke-registar .tvrtke-quick-links a{min-height:65px}
+.tvrtke-registar .tvrtke-quick-links .tvrtke-quick-icon{display:inline-flex;
+  align-items:center;justify-content:center;color:#11598d}
+.tvrtke-registar .tvrtke-quick-links a:nth-child(2) .tvrtke-icon,
+.tvrtke-registar .tvrtke-quick-links a:nth-child(4) .tvrtke-icon{color:#00a393}
+.tvrtke-registar .tvrtke-result-icon .tvrtke-icon{height:30px;width:30px}
+.tvrtke-registar .tvrtke-result-activity{font-size:.79rem;line-height:1.4;
+  color:#68809b;margin:6px 0 0;max-height:3em;overflow:hidden;overflow-wrap:anywhere}
+.tvrtke-registar .tvrtke-submit{display:flex;gap:9px;justify-content:center;
+  align-items:center}
+.tvrtke-registar .tvrtke-submit .tvrtke-icon{color:#fff;width:19px;height:19px}
+.tvrtke-registar .tvrtke-results>.tvrtke-count{grid-column:1/-1}
+.tvrtke-registar .tvrtke-advanced-grid{min-width:0}
+.tvrtke-registar .tvrtke-form input[type=search]{-webkit-appearance:none;appearance:none}
+.tvrtke-registar .tvrtke-detail h3{overflow-wrap:anywhere}
+.tvrtke-registar .tvrtke-source a{overflow-wrap:anywhere}
+@container (max-width:800px){
+  .tvrtke-registar .tvrtke-results{grid-template-columns:minmax(0,1fr)}
+}
+@container (max-width:570px){
+  .tvrtke-registar .tvrtke-result{grid-template-columns:44px minmax(0,1fr)}
+  .tvrtke-registar .tvrtke-hero h2{font-size:clamp(1.5rem,5cqw,2rem)}
+  .tvrtke-registar .tvrtke-quick-links a{min-height:52px;gap:7px}
+  .tvrtke-registar .tvrtke-result-icon .tvrtke-icon{width:25px;height:25px}
+}
+@container (max-width:390px){
+  .tvrtke-registar .tvrtke-public-brand strong{font-size:1.35rem}
+  .tvrtke-registar .tvrtke-public-brand img{width:42px;height:42px}
+  .tvrtke-registar .tvrtke-quick-links .tvrtke-icon{width:21px;height:21px}
+  .tvrtke-registar .tvrtke-result h3{font-size:.99rem}
+}
+
+/* Reference-inspired detail layout with no invented map tiles or company imagery. */
+.tvrtke-registar .tvrtke-detail-body{display:block;background:#f5fafc}
+.tvrtke-registar .tvrtke-detail-layout{display:grid;grid-template-columns:minmax(0,1.58fr) minmax(250px,.85fr);
+ gap:15px;align-items:start}
+.tvrtke-registar .tvrtke-detail-facts,.tvrtke-registar .tvrtke-detail-aside,
+.tvrtke-registar .tvrtke-detail-activities{border:1px solid #e0eaf2;background:#fff;
+ border-radius:11px;padding:20px;box-shadow:0 3px 10px #0b335609;min-width:0}
+.tvrtke-registar .tvrtke-detail-facts h3,.tvrtke-registar .tvrtke-detail-aside h3,
+.tvrtke-registar .tvrtke-detail-activities h3{margin:0 0 12px;font-size:1.05rem;
+ color:#0b2d4a;line-height:1.3;font-weight:800}
+.tvrtke-registar .tvrtke-detail-aside .tvrtke-detail-address{padding:12px 14px;
+ background:#f0f9fc;border-radius:9px;font-size:.91rem;color:#3e637e;line-height:1.55}
+.tvrtke-registar .tvrtke-detail-aside .tvrtke-source a{display:inline-block;
+ text-decoration:none;color:#086dd2;font-weight:700;border:1px solid #cfe3f3;
+ border-radius:7px;padding:9px 12px;background:#fff}
+.tvrtke-registar .tvrtke-detail-aside .tvrtke-source a:hover{background:#ebf8fe}
+.tvrtke-registar .tvrtke-detail-activities{margin-top:15px}
+.tvrtke-registar .tvrtke-detail-activities ul{margin:8px 0 0 17px;padding:0}
+.tvrtke-registar .tvrtke-detail-activities li{padding:9px 0;border-bottom:1px solid #ebf2f7}
+.tvrtke-registar .tvrtke-detail-activities li:last-child{border-bottom:0}
+@container (max-width:850px){
+ .tvrtke-registar .tvrtke-detail-layout{grid-template-columns:minmax(0,1fr)}
+}
+@container (max-width:500px){
+ .tvrtke-registar .tvrtke-detail-body{padding:11px}
+ .tvrtke-registar .tvrtke-detail-facts,.tvrtke-registar .tvrtke-detail-aside,
+ .tvrtke-registar .tvrtke-detail-activities{padding:15px}
+}

@@ -2,7 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="TVRTKE — Poslovni imenik Hrvatske"
-        Width="1448" Height="960" MinWidth="540" MinHeight="560"
+        Width="1180" Height="780" MinWidth="520" MinHeight="460"
+        ResizeMode="CanResizeWithGrip"
         WindowStartupLocation="CenterScreen" Background="#EFF7FA"
         FontFamily="Segoe UI" Loaded="Window_Loaded" SizeChanged="Window_SizeChanged"
         UseLayoutRounding="True" SnapsToDevicePixels="True">
@@ -66,7 +67,7 @@
     </Window.Resources>
 
     <Grid x:Name="ShellGrid">
-        <Grid.ColumnDefinitions><ColumnDefinition x:Name="SidebarColumn" Width="252"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+        <Grid.ColumnDefinitions><ColumnDefinition x:Name="SidebarColumn" Width="270"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
         <!-- Reference: compact left rail, real navigation and no dummy statistics -->
         <Border x:Name="Sidebar" Grid.Column="0" Background="White" BorderBrush="#E0EDF3" BorderThickness="0,0,1,0">
             <DockPanel>
@@ -91,17 +92,98 @@
                 </StackPanel>
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
-                        <Button Style="{StaticResource NavButton}" Tag="all" Click="Category_Click" Background="#DBF6F6" Foreground="#007D83" Content="⌕   Pretraživanje"/>
-                        <Button Style="{StaticResource NavButton}" Tag="sudreg" Click="Category_Click" Content="▥   Tvrtke"/>
-                        <Button Style="{StaticResource NavButton}" Tag="obrt" Click="Category_Click" Content="▣   Obrti"/>
-                        <Button Style="{StaticResource NavButton}" Tag="udruga" Click="Category_Click" Content="♧   Udruge"/>
-                        <Button Style="{StaticResource NavButton}" Tag="zaklada" Click="Category_Click" Content="♡   Zaklade"/>
+                        <Button Tag="all" Style="{StaticResource NavButton}" Click="Category_Click" Background="#DBF6F6" Foreground="#007D83" AutomationProperties.Name="Pretraživanje">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Viewbox Width="22" Height="22" Margin="0,0,13,0">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Data="M21 21 L16.8 16.8 M19 10.5 A8.5 8.5 0 1 1 2 10.5 A8.5 8.5 0 1 1 19 10.5" Stroke="#008D91" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"/>
+                                    </Canvas>
+                                </Viewbox>
+                                <TextBlock Text="Pretraživanje" VerticalAlignment="Center" FontSize="14"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Tag="sudreg" Style="{StaticResource NavButton}" Click="Category_Click" AutomationProperties.Name="Tvrtke">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Viewbox Width="22" Height="22" Margin="0,0,13,0">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Data="M4 21 V6 L12 2 L20 6 V21 M8 9 V10 M12 9 V10 M16 9 V10 M8 14 V15 M12 14 V15 M16 14 V15 M2 21 H22" Stroke="#0B3559" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"/>
+                                    </Canvas>
+                                </Viewbox>
+                                <TextBlock Text="Tvrtke" VerticalAlignment="Center" FontSize="14"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Tag="obrt" Style="{StaticResource NavButton}" Click="Category_Click" AutomationProperties.Name="Obrti">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Viewbox Width="22" Height="22" Margin="0,0,13,0">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Data="M3 9 L5 3 H19 L21 9 V12 C19 14 17 14 15 12 C13 14 11 14 9 12 C7 14 5 14 3 12 Z M5 13 V21 H19 V13 M9 21 V16 H15 V21" Stroke="#0B3559" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"/>
+                                    </Canvas>
+                                </Viewbox>
+                                <TextBlock Text="Obrti" VerticalAlignment="Center" FontSize="14"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Tag="udruga" Style="{StaticResource NavButton}" Click="Category_Click" AutomationProperties.Name="Udruge">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Viewbox Width="22" Height="22" Margin="0,0,13,0">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Data="M12 12 A3 3 0 1 0 12 6 A3 3 0 1 0 12 12 M4 21 V18 C4 13 20 13 20 18 V21 M4 11 A2 2 0 1 1 4 7 M20 11 A2 2 0 1 0 20 7 M1 20 V17 C1 15 3 14 5 14 M23 20 V17 C23 15 21 14 19 14" Stroke="#0B3559" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"/>
+                                    </Canvas>
+                                </Viewbox>
+                                <TextBlock Text="Udruge" VerticalAlignment="Center" FontSize="14"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Tag="zaklada" Style="{StaticResource NavButton}" Click="Category_Click" AutomationProperties.Name="Zaklade">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Viewbox Width="22" Height="22" Margin="0,0,13,0">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Data="M12 21 C10 19 2 13 2 8 A5 5 0 0 1 12 6 A5 5 0 0 1 22 8 C22 13 14 19 12 21 Z" Stroke="#0B3559" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"/>
+                                    </Canvas>
+                                </Viewbox>
+                                <TextBlock Text="Zaklade" VerticalAlignment="Center" FontSize="14"/>
+                            </StackPanel>
+                        </Button>
                         <Border Height="1" Background="#E1EAF1" Margin="19,17"/>
-                        <Button x:Name="FavoritesButton" Style="{StaticResource NavButton}" Click="Favorites_Click" Content="☆   Moji favoriti"/>
-                        <Button Style="{StaticResource NavButton}" Click="Export_Click" Content="⇩   Uvoz / Izvoz"/>
+                        <Button x:Name="FavoritesButton" Style="{StaticResource NavButton}" Click="Favorites_Click" AutomationProperties.Name="Moji favoriti">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Viewbox Width="22" Height="22" Margin="0,0,13,0">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Data="M12 2 L15.3 8.8 L22.7 9.9 L17.3 15.2 L18.6 22.5 L12 19 L5.4 22.5 L6.7 15.2 L1.3 9.9 L8.7 8.8 Z" Stroke="#0B3559" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"/>
+                                    </Canvas>
+                                </Viewbox>
+                                <TextBlock x:Name="FavoritesNavLabel" Text="Moji favoriti" VerticalAlignment="Center" FontSize="14"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource NavButton}" Click="Export_Click" AutomationProperties.Name="Izvoz (CSV)">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Viewbox Width="22" Height="22" Margin="0,0,13,0">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Data="M12 2 V16 M7 11 L12 16 L17 11 M4 17 V21 H20 V17" Stroke="#0B3559" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"/>
+                                    </Canvas>
+                                </Viewbox>
+                                <TextBlock Text="Izvoz (CSV)" VerticalAlignment="Center" FontSize="14"/>
+                            </StackPanel>
+                        </Button>
                         <Border Height="1" Background="#E1EAF1" Margin="19,17"/>
-                        <Button Style="{StaticResource NavButton}" Click="Settings_Click" Content="⚙   Postavke API-ja"/>
-                        <Button Style="{StaticResource NavButton}" Click="Help_Click" Content="?   Pomoć"/>
+                        <Button Style="{StaticResource NavButton}" Click="Settings_Click" AutomationProperties.Name="Postavke">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Viewbox Width="22" Height="22" Margin="0,0,13,0">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Data="M12 3 V1 M12 23 V21 M3 12 H1 M23 12 H21 M5 5 L3.5 3.5 M20.5 20.5 L19 19 M19 5 L20.5 3.5 M3.5 20.5 L5 19 M12 18 A6 6 0 1 0 12 6 A6 6 0 1 0 12 18 M12 14 A2 2 0 1 0 12 10 A2 2 0 1 0 12 14" Stroke="#0B3559" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"/>
+                                    </Canvas>
+                                </Viewbox>
+                                <TextBlock Text="Postavke" VerticalAlignment="Center" FontSize="14"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource NavButton}" Click="Help_Click" AutomationProperties.Name="Pomoć">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Viewbox Width="22" Height="22" Margin="0,0,13,0">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Data="M12 22 A10 10 0 1 0 12 2 A10 10 0 1 0 12 22 M9.5 9 A3 3 0 0 1 15 11 C15 13 12 13 12 16 M12 19 L12 19.1" Stroke="#0B3559" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"/>
+                                    </Canvas>
+                                </Viewbox>
+                                <TextBlock Text="Pomoć" VerticalAlignment="Center" FontSize="14"/>
+                            </StackPanel>
+                        </Button>
                     </StackPanel>
                 </ScrollViewer>
             </DockPanel>

@@ -69,6 +69,21 @@ public partial class ApiSettingsWindow : Window
         finally { TestButton.IsEnabled = true; }
     }
 
+    private void Window_Loaded(object sender, RoutedEventArgs e)
+    {
+        // This dialog must also fit laptop screens and scaled displays.
+        var available = DisplaySizing.WorkArea(this);
+        Width = Math.Max(MinWidth, Math.Min(700d, available.Width * 0.88));
+        Height = Math.Max(MinHeight, Math.Min(520d, available.Height * 0.82));
+        if (Owner is not null)
+        {
+            Left = Math.Max(available.Left, Owner.Left + (Owner.ActualWidth - Width) / 2);
+            Top = Math.Max(available.Top, Owner.Top + (Owner.ActualHeight - Height) / 2);
+            Left = Math.Min(Left, available.Right - Width);
+            Top = Math.Min(Top, available.Bottom - Height);
+        }
+    }
+
     private void Cancel_Click(object sender, RoutedEventArgs e) => DialogResult = false;
 
     private void Save_Click(object sender, RoutedEventArgs e)

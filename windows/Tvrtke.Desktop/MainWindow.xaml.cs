@@ -23,7 +23,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private Subject? _selected;
     private readonly TvrtkePreferences _preferences = TvrtkePreferences.Load();
     private string _api = "https://api.tvrtke.com.hr";
-    private bool _favoritesMode;
     private int? _filterColumns;
     private bool? _stackedResults;
 
@@ -42,7 +41,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var filterColumns = ActualWidth < 790 ? 1 : ActualWidth < 1230 ? 2 : 4;
         var stackProfile = ActualWidth < 995;
 
-        SidebarColumn.Width = new GridLength(compactNavigation ? 0 : ActualWidth < 1330 ? 210 : 252);
+        SidebarColumn.Width = new GridLength(compactNavigation ? 0 : ActualWidth < 1330 ? 210 : 270);
         Sidebar.Visibility = compactNavigation ? Visibility.Collapsed : Visibility.Visible;
         CompactNavigation.Visibility = compactNavigation ? Visibility.Visible : Visibility.Collapsed;
         SourceBadge.Visibility = ActualWidth < 930 ? Visibility.Collapsed : Visibility.Visible;
@@ -85,7 +84,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             _stackedResults = stackProfile;
             ResultsLayout.ColumnDefinitions[0].Width = new GridLength(
-                stackProfile ? 1 : 1.65, GridUnitType.Star);
+                stackProfile ? 1 : 1.48, GridUnitType.Star);
             ResultsLayout.ColumnDefinitions[1].Width = new GridLength(stackProfile ? 0 : 13);
             ResultsLayout.ColumnDefinitions[2].Width = stackProfile
                 ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
@@ -120,7 +119,17 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private async void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        // Show only live authorized records; no fabricated counts or demo companies.
+        // Open as a NORMAL sized, centered window (never full-screen or maximized).
+        // Use the usable desktop area, excluding the Windows taskbar. WPF DIPs
+        // already account for display scaling, including 125% and 150%.
+        var workArea = DisplaySizing.WorkArea(this);
+        WindowState = WindowState.Normal;
+        var targetWidth = Math.Min(1180d, workArea.Width * 0.84);
+        var targetHeight = Math.Min(780d, workArea.Height * 0.82);
+        Width = Math.Max(MinWidth, Math.Min(workArea.Width, targetWidth));
+        Height = Math.Max(MinHeight, Math.Min(workArea.Height, targetHeight));
+        Left = workArea.Left + Math.Max(0, (workArea.Width - Width) / 2);
+        Top = workArea.Top + Math.Max(0, (workArea.Height - Height) / 2);
         await SearchAsync(1);
     }
 
@@ -157,8 +166,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         StatusText.Text = "Dohvaćanje podataka…";
         try
         {
-            _favoritesMode = false;
-            FavoritesButton.Content = "☆   Moji favoriti";
             var query = QueryInput.Text.Trim();
             var county = CountyInput.Text.Trim();
             var activity = ActivityInput.Text.Trim();
@@ -311,27 +318,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void Favorites_Click(object sender, RoutedEventArgs e)
     {
-        _favoritesMode = !_favoritesMode;
-        FavoritesButton.Content = _favoritesMode ? "←   Natrag na pretragu" : "☆   Moji favoriti";
-        _results.Clear();
-        if (_favoritesMode)
-        {
-            foreach (var item in _preferences.Favorites.OrderBy(x => x.Name)) _results.Add(item);
-            StatusText.Text = $"Spremljenih favorita: {_results.Count} (lokalno na ovom računalu).";
-            ResultCountText.Text = $"{_results.Count} favorita";
-        }
-        else
-        {
-            StatusText.Text = "Za povratak na rezultate pokrenite novu pretragu.";
-            ResultCountText.Text = "—";
-        }
-        SelectedSubject = null;
-        FavoriteButton.IsEnabled = false;
-        _page = 1;
-        _hasMore = false;
-        PreviousButton.IsEnabled = false;
-        NextButton.IsEnabled = false;
-        PageText.Text = "1";
+        var window = new FavoritesWindow(_preferences) { Owner = this };
+        window.ShowDialog();
+        var selected = SelectedSubject;
+        FavoriteButton.Content = selected is not null &&
+            _preferences.Favorites.Any(x => x.UniqueKey == selected.UniqueKey)
+            ? "Ukloni iz favorita" : "Dodaj u favorite";
+        StatusText.Text = "Favoriti i spremljene liste mogu se uređivati u zasebnom prozoru.";
     }
 
     private void ToggleFavorite_Click(object sender, RoutedEventArgs e)
@@ -343,7 +336,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             _preferences.Favorites.Remove(previous);
             FavoriteButton.Content = "Dodaj u favorite";
-            if (_favoritesMode)  _results.Remove(_results.FirstOrDefault(x => x.UniqueKey == selected.UniqueKey)!);
         }
         else
         {

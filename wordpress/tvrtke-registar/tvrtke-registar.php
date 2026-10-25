@@ -36,7 +36,7 @@ final class Tvrtke_Registar
             return;
         }
         $description = __(
-            'Kada administrator uključi TVRTKE uslugu, kriteriji pretraživanja poslovnih subjekata šalju se s WordPress poslužitelja na konfigurirani TVRTKE API putem HTTPS-a. API može obrađivati standardne HTTP metapodatke, uključujući IP adresu poslužitelja. Plugin privremeno sprema odgovore putem WordPress transienta najviše pet minuta. Plugin ne postavlja kolačiće niti izravno šalje posjetiteljev IP kao parametar.',
+            'Kada administrator uključi TVRTKE uslugu, kriteriji pretraživanja poslovnih subjekata šalju se s WordPress poslužitelja na konfigurirani TVRTKE API putem HTTPS-a. API može obrađivati standardne HTTP metapodatke, uključujući IP adresu poslužitelja. Plugin privremeno sprema odgovore putem WordPress transienta do 24 sata, prema postavkama administratora. Plugin ne postavlja kolačiće niti izravno šalje posjetiteljev IP kao parametar.',
             'tvrtke-registar'
         );
         wp_add_privacy_policy_content('TVRTKE – Poslovni registar', wp_kses_post(wpautop($description)));
@@ -74,6 +74,19 @@ final class Tvrtke_Registar
             'type' => 'integer', 'default' => 20,
             'sanitize_callback' => static fn($value): int =>
                 min(50, max(5, (int)$value)),
+        ]);
+        register_setting('tvrtke_registar', 'tvrtke_registar_cache_minutes', [
+            'type' => 'integer', 'default' => 5,
+            'sanitize_callback' => static fn($value): int =>
+                min(1440, max(1, (int)$value)),
+        ]);
+        register_setting('tvrtke_registar', 'tvrtke_registar_fields', [
+            'type' => 'array', 'default' => ['settlement', 'activity'],
+            'sanitize_callback' => static fn($value): array =>
+                array_values(array_intersect(
+                    ['settlement', 'activity', 'oib'],
+                    is_array($value) ? array_filter($value, 'is_string') : []
+                )),
         ]);
     }
 
@@ -136,6 +149,31 @@ final class Tvrtke_Registar
             '</small></div></div><div class="tvrtke-hero-copy"><h1>' .
             esc_html($title) . '</h1><p>' . esc_html($description) .
             '</p></div></header>';
+        self::admin_navigation();
+    }
+
+    /** Shared navigation on all administrator screens, backed by real pages. */
+    private static function admin_navigation(): void
+    {
+        $active = isset($GLOBALS['plugin_page']) && is_string($GLOBALS['plugin_page'])
+            ? sanitize_key($GLOBALS['plugin_page']) : 'tvrtke-registar';
+        $tabs = [
+            'tvrtke-registar' => __('Postavke', 'tvrtke-registar'),
+            'tvrtke-pretraga' => __('Pretraga', 'tvrtke-registar'),
+            'tvrtke-izvori' => __('Uvoz / Izvoz', 'tvrtke-registar'),
+            'tvrtke-statistika' => __('Statistika', 'tvrtke-registar'),
+            'tvrtke-pomoc' => __('Pomoć', 'tvrtke-registar'),
+        ];
+        echo '<nav class="tvrtke-tabs tvrtke-page-tabs" aria-label="' .
+            esc_attr__('TVRTKE administracijske stranice', 'tvrtke-registar') . '">';
+        foreach ($tabs as $slug => $label) {
+            $href = menu_page_url($slug, false);
+            if (!$href) continue;
+            echo '<a href="' . esc_url($href) . '"' .
+                ($active === $slug ? ' class="is-current" aria-current="page"' : '') .
+                '>' . esc_html($label) . '</a>';
+        }
+        echo '</nav>';
     }
 
     public static function admin_search_page(): void
@@ -259,6 +297,9 @@ final class Tvrtke_Registar
         $enabled = (bool)get_option(self::CONSENT, false);
         $view = (string)get_option('tvrtke_registar_view', 'list');
         $perPage = min(50, max(5, (int)get_option('tvrtke_registar_per_page', 20)));
+        $cacheMinutes = min(1440, max(1, (int)get_option('tvrtke_registar_cache_minutes', 5)));
+        $enabledFields = get_option('tvrtke_registar_fields', ['settlement', 'activity']);
+        if (!is_array($enabledFields)) $enabledFields = ['settlement', 'activity'];
         $logo = plugins_url('assets/logo-mark.svg', __FILE__);
 
         echo '<div class="wrap tvrtke-admin">';
@@ -301,6 +342,12 @@ final class Tvrtke_Registar
             '" value="1" ' . checked($enabled, true, false) . ' />';
         echo '<label for="tvrtke-external">' .
             esc_html__('Dopuštam vezu s konfiguriranim servisom', 'tvrtke-registar') . '</label></div></div>';
+        echo '<div class="tvrtke-row"><div><label for="tvrtke-cache-minutes">' .
+            esc_html__('Trajanje predmemorije', 'tvrtke-registar') . '</label>';
+        echo '<p class="description">' .
+            esc_html__('Koliko minuta javna tražilica čuva rezultat na WordPress poslužitelju.', 'tvrtke-registar') . '</p></div>';
+        echo '<div class="tvrtke-duration"><input type="number" min="1" max="1440" step="1" id="tvrtke-cache-minutes" name="tvrtke_registar_cache_minutes" value="' .
+            esc_attr((string)$cacheMinutes) . '" /> <span>' . esc_html__('minuta (1–1440)', 'tvrtke-registar') . '</span></div></div>';
         echo '<div class="tvrtke-hint">' .
             esc_html__('Sudreg OAuth2 Client ID, Client Secret i MySQL lozinke smiju biti pohranjeni samo na privatnom backend poslužitelju. WordPress dodatak ne zahtijeva te ključeve.', 'tvrtke-registar') .
             '</div></section>';
@@ -319,7 +366,22 @@ final class Tvrtke_Registar
         echo '<div class="tvrtke-row"><div><label for="tvrtke-page-size">' .
             esc_html__('Rezultata po stranici', 'tvrtke-registar') . '</label></div>';
         echo '<input id="tvrtke-page-size" type="number" min="5" max="50" step="1" name="tvrtke_registar_per_page" value="' .
-            esc_attr((string)$perPage) . '" /></div></section>';
+            esc_attr((string)$perPage) . '" /></div>';
+        echo '<div class="tvrtke-row"><div><strong>' . esc_html__('Istaknuti podaci', 'tvrtke-registar') .
+            '</strong><p class="description">' .
+            esc_html__('Naziv i status uvijek su vidljivi. Odaberite dodatne podatke u popisu.', 'tvrtke-registar') . '</p></div>';
+        echo '<div class="tvrtke-field-choices">';
+        echo '<input type="hidden" name="tvrtke_registar_fields[]" value="">';
+        foreach ([
+            'settlement' => __('Sjedište', 'tvrtke-registar'),
+            'activity' => __('Djelatnost', 'tvrtke-registar'),
+            'oib' => __('OIB pravnog subjekta', 'tvrtke-registar'),
+        ] as $field => $label) {
+            echo '<label><input type="checkbox" name="tvrtke_registar_fields[]" value="' .
+                esc_attr($field) . '"' . checked(in_array($field, $enabledFields, true), true, false) .
+                ' /> ' . esc_html($label) . '</label>';
+        }
+        echo '</div></div></section>';
 
         echo '<section id="tvrtke-privatnost" class="tvrtke-card"><h2>' .
             esc_html__('Privatnost i podaci', 'tvrtke-registar') . '</h2>';
@@ -338,11 +400,25 @@ final class Tvrtke_Registar
         echo '<div class="tvrtke-preview-search"><span>' .
             esc_html__('Pretraži naziv ili registracijski broj…', 'tvrtke-registar') .
             '</span><b>' . esc_html__('Pretraži', 'tvrtke-registar') . '</b></div>';
-        echo '<div class="tvrtke-preview-cats"><span>▥ ' . esc_html__('Tvrtke', 'tvrtke-registar') .
-            '</span><span>▣ ' . esc_html__('Obrti', 'tvrtke-registar') .
-            '</span><span>♧ ' . esc_html__('Udruge', 'tvrtke-registar') .
-            '</span><span>♡ ' . esc_html__('Zaklade', 'tvrtke-registar') .
-            '</span></div></div></section>';
+        echo '<div class="tvrtke-preview-cats">';
+        foreach ([
+            'sudreg' => __('Tvrtke', 'tvrtke-registar'),
+            'obrt' => __('Obrti', 'tvrtke-registar'),
+            'udruga' => __('Udruge', 'tvrtke-registar'),
+            'zaklada' => __('Zaklade', 'tvrtke-registar'),
+        ] as $kind => $label) {
+            echo '<span>' . wp_kses(self::icon($kind), [
+                'svg' => [
+                    'class' => true, 'viewbox' => true, 'width' => true, 'height' => true,
+                    'aria-hidden' => true, 'focusable' => true, 'xmlns' => true,
+                ],
+                'path' => [
+                    'd' => true, 'fill' => true, 'stroke' => true,
+                    'stroke-width' => true, 'stroke-linecap' => true, 'stroke-linejoin' => true,
+                ],
+            ]) . esc_html($label) . '</span>';
+        }
+        echo '</div></div></section>';
 
         echo '<section id="tvrtke-kod" class="tvrtke-card"><h2>' .
             esc_html__('Kratki kod / Gutenberg blok', 'tvrtke-registar') . '</h2><p>' .
@@ -381,11 +457,32 @@ final class Tvrtke_Registar
         }
         $body = json_decode(wp_remote_retrieve_body($response), true);
         if (!is_array($body)) return new WP_Error('tvrtke_invalid', __('Neispravan odgovor API-ja.', 'tvrtke-registar'));
-        set_transient($key, $body, 5 * MINUTE_IN_SECONDS);
+        $cacheMinutes = min(1440, max(1, (int)get_option('tvrtke_registar_cache_minutes', 5)));
+        set_transient($key, $body, $cacheMinutes * MINUTE_IN_SECONDS);
         return $body;
     }
 
-    /** @return string */
+    /**
+     * Branded, fixed vector pictograms, shared by every frontend category,
+     * result and admin preview. No client-controlled data enters SVG markup.
+     */
+    private static function icon(string $kind): string
+    {
+        $paths = [
+            'sudreg' => 'M4 21 V6 L12 2 L20 6 V21 M8 9 V10 M12 9 V10 M16 9 V10 M8 14 V15 M12 14 V15 M16 14 V15 M2 21 H22',
+            'obrt' => 'M3 9 L5 3 H19 L21 9 V12 C19 14 17 14 15 12 C13 14 11 14 9 12 C7 14 5 14 3 12 Z M5 13 V21 H19 V13 M9 21 V16 H15 V21',
+            'udruga' => 'M12 12 A3 3 0 1 0 12 6 A3 3 0 1 0 12 12 M4 21 V18 C4 13 20 13 20 18 V21 M4 11 A2 2 0 1 1 4 7 M20 11 A2 2 0 1 0 20 7 M1 20 V17 C1 15 3 14 5 14 M23 20 V17 C23 15 21 14 19 14',
+            'zaklada' => 'M12 21 C10 19 2 13 2 8 A5 5 0 0 1 12 6 A5 5 0 0 1 22 8 C22 13 14 19 12 21 Z',
+            'search' => 'M21 21 L16.8 16.8 M19 10.5 A8.5 8.5 0 1 1 2 10.5 A8.5 8.5 0 1 1 19 10.5',
+        ];
+        $path = $paths[$kind] ?? $paths['sudreg'];
+        return '<svg class="tvrtke-icon" viewBox="0 0 24 24" width="24" height="24" ' .
+            'aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">' .
+            '<path d="' . $path . '" fill="none" stroke="currentColor" stroke-width="1.85" ' .
+            'stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    }
+
+    /** @return string Fully escaped public read-only search markup. */
     public static function shortcode(): string
     {
         wp_enqueue_style('tvrtke-registar', plugins_url('assets/search.css', __FILE__), [], '0.8.0');
@@ -424,8 +521,15 @@ final class Tvrtke_Registar
         $layout = (string) get_option('tvrtke_registar_view', 'list');
         if (!in_array($layout, ['list', 'cards'], true)) $layout = 'list';
         $perPage = min(50, max(5, (int)get_option('tvrtke_registar_per_page', 20)));
+        $enabledFields = get_option('tvrtke_registar_fields', ['settlement', 'activity']);
+        if (!is_array($enabledFields)) $enabledFields = ['settlement', 'activity'];
         $output = '<section class="tvrtke-registar" data-view="' . esc_attr($layout) . '" aria-label="' . esc_attr__('Pretraživanje poslovnih subjekata', 'tvrtke-registar') . '">';
-        $output .= '<header class="tvrtke-hero"><p class="tvrtke-hero-eyebrow">' . esc_html__('POSLOVNI IMENIK HRVATSKE', 'tvrtke-registar') . '</p>';
+        $output .= '<header class="tvrtke-hero"><div class="tvrtke-public-brand">';
+        $output .= '<img src="' . esc_url(plugins_url('assets/logo-mark.svg', __FILE__)) .
+            '" width="56" height="56" alt="" loading="lazy" />';
+        $output .= '<span><strong>TVRTKE</strong><small>' .
+            esc_html__('POSLOVNI IMENIK HRVATSKE', 'tvrtke-registar') .
+            '</small></span></div>';
         $output .= '<h2>' . esc_html__('Pronađite prave poslovne informacije', 'tvrtke-registar') . '</h2>';
         $output .= '<p>' . esc_html__('Tvrtke, obrti, udruge i zaklade iz dostupnih službenih izvora — na jednom mjestu.', 'tvrtke-registar') . '</p></header>';
         $output .= '<form method="get" class="tvrtke-form" role="search">';
@@ -454,7 +558,7 @@ final class Tvrtke_Registar
             esc_attr($activity) . '" maxlength="100" placeholder="' .
             esc_attr__('Sve djelatnosti', 'tvrtke-registar') . '"></div>';
         $output .= '<button class="tvrtke-submit" type="submit">' .
-            esc_html__('⌕ Pretraži', 'tvrtke-registar') . '</button></div>';
+            self::icon('search') . '<span>' . esc_html__('Pretraži', 'tvrtke-registar') . '</span></button></div>';
         $advancedActive = $settlement !== '' || $legalForm !== '' || $status !== '';
         $output .= '<details class="tvrtke-advanced"' . ($advancedActive ? ' open' : '') .
             '><summary>' . esc_html__('Više filtara', 'tvrtke-registar') . '</summary><div class="tvrtke-advanced-grid">';
@@ -478,18 +582,18 @@ final class Tvrtke_Registar
         $output .= '</select></div></div></details></form>';
         $output .= '<nav class="tvrtke-quick-links" aria-label="' . esc_attr__('Vrste poslovnih subjekata', 'tvrtke-registar') . '">';
         foreach ([
-            'sudreg' => ['▥', __('Tvrtke', 'tvrtke-registar')],
-            'obrt' => ['▣', __('Obrti', 'tvrtke-registar')],
-            'udruga' => ['♧', __('Udruge', 'tvrtke-registar')],
-            'zaklada' => ['♡', __('Zaklade', 'tvrtke-registar')],
-        ] as $kind => $meta) {
+            'sudreg' => __('Tvrtke', 'tvrtke-registar'),
+            'obrt' => __('Obrti', 'tvrtke-registar'),
+            'udruga' => __('Udruge', 'tvrtke-registar'),
+            'zaklada' => __('Zaklade', 'tvrtke-registar'),
+        ] as $kind => $categoryLabel) {
             $href = add_query_arg(
                 ['tvrtke_type' => $kind, 'tvrtke_page' => 1],
                 remove_query_arg(['tvrtke_ref', 'tvrtke_mbs', 'tvrtke_page'])
             );
             $output .= '<a href="' . esc_url($href) . '"' .
-                ($registryType === $kind ? ' aria-current="true"' : '') . '><span class="tvrtke-quick-icon" aria-hidden="true">' .
-                esc_html($meta[0]) . '</span><span>' . esc_html($meta[1]) . '</span></a>';
+                ($registryType === $kind ? ' aria-current="true"' : '') . '><span class="tvrtke-quick-icon">' .
+                self::icon($kind) . '</span><span>' . esc_html($categoryLabel) . '</span></a>';
         }
         $output .= '</nav>';
 
@@ -513,11 +617,15 @@ final class Tvrtke_Registar
             $output .= '<div class="tvrtke-detail"><div class="tvrtke-detail-heading"><h2>' . esc_html((string)($item['name'] ?? '')) . '</h2>';
             $output .= '<p>' . esc_html((string)($types[(string)($item['source_type'] ?? '')] ?? __('Poslovni subjekt', 'tvrtke-registar'))) . ' · ' .
                 esc_html((string)($item['status_label'] ?? __('Nepoznat status', 'tvrtke-registar'))) . '</p></div>';
-            $output .= '<div class="tvrtke-detail-body"><h3>' . esc_html__('Osnovni podaci', 'tvrtke-registar') . '</h3><dl>';
+            $output .= '<div class="tvrtke-detail-body"><div class="tvrtke-detail-layout">' .
+                '<section class="tvrtke-detail-facts"><h3>' .
+                esc_html__('Osnovni podaci', 'tvrtke-registar') . '</h3><dl>';
             foreach (['source_type' => 'Registar', 'source_identifier' => 'Broj u registru', 'mbs' => 'MBS', 'oib' => 'OIB', 'status_label' => 'Status', 'legal_form' => 'Pravni oblik', 'county' => 'Županija', 'settlement' => 'Mjesto', 'street' => 'Ulica', 'house_number' => 'Kućni broj', 'datum_osnivanja' => 'Datum osnivanja', 'datum_brisanja' => 'Datum brisanja / prestanka', 'datum_upisa' => 'Datum upisa u registar', 'datum_statusa' => 'Datum promjene statusa'] as $field => $label) {
                 $output .= '<dt>' . esc_html($label) . '</dt><dd>' . esc_html((string)($item[$field] ?? '—')) . '</dd>';
             }
-            $output .= '</dl>';
+            $output .= '</dl></section>';
+            $output .= '<aside class="tvrtke-detail-aside"><h3>' .
+                esc_html__('Lokacija i službeni izvori', 'tvrtke-registar') . '</h3>';
             $sourceUrl = isset($item['source_url']) && is_string($item['source_url']) ? $item['source_url'] : '';
             if ($sourceUrl !== '' && wp_parse_url($sourceUrl, PHP_URL_SCHEME) === 'https') {
                 $output .= '<p class="tvrtke-source"><a href="' . esc_url($sourceUrl) .
@@ -531,17 +639,20 @@ final class Tvrtke_Registar
             ])));
             if ($fullAddress !== '') {
                 $mapUrl = 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($fullAddress . ', Hrvatska');
+                $output .= '<p class="tvrtke-detail-address">' .
+                    esc_html($fullAddress) . '</p>';
                 $output .= '<p class="tvrtke-source"><a href="' . esc_url($mapUrl) .
                     '" target="_blank" rel="noopener noreferrer">' .
                     esc_html__('Prikaži adresu na karti ↗', 'tvrtke-registar') .
                     '</a></p>';
             }
-            $output .= '<h3>' . esc_html__('Registrirane djelatnosti', 'tvrtke-registar') . '</h3><ul>';
+            $output .= '</aside></div><section class="tvrtke-detail-activities"><h3>' .
+                esc_html__('Registrirane djelatnosti', 'tvrtke-registar') . '</h3><ul>';
             foreach (array_slice((array)($item['activities'] ?? []), 0, 100) as $row) {
                 if (!is_array($row)) continue;
                 $output .= '<li>' . esc_html((string)(($row['activity_text'] ?? null) ?: (($row['nkd_name'] ?? null) ?: (($row['nkd_code'] ?? null) ?: '—')))) . '</li>';
             }
-            $output .= '</ul></div></div>';
+            $output .= '</ul></section></div></div>';
             if (!empty($item['partial'])) $output .= self::partialNotice();
             return $output . '</section>';
         }
@@ -572,17 +683,28 @@ final class Tvrtke_Registar
             $typeLabel = $types[$kind] ?? __('Poslovni subjekt', 'tvrtke-registar');
             $statusNumber = $row['status'] ?? null;
             $statusClass = $statusNumber === null ? 'unknown' : ((string)$statusNumber === '1' ? 'active' : 'inactive');
-            $icon = ['sudreg'=>'▥', 'obrt'=>'▣', 'udruga'=>'♧', 'zaklada'=>'♡'][$kind] ?? '◇';
+            $icon = self::icon($kind);
             $url = add_query_arg(['tvrtke_ref' => $key], remove_query_arg(['tvrtke_mbs', 'tvrtke_ref', 'tvrtke_page']));
             $output .= '<article class="tvrtke-result" data-source="' . esc_attr($kind) . '">';
-            $output .= '<span class="tvrtke-result-icon" aria-hidden="true">' . esc_html($icon) . '</span><div class="tvrtke-result-main">';
+            $output .= '<span class="tvrtke-result-icon">' . $icon . '</span><div class="tvrtke-result-main">';
             $output .= '<h3><a href="' . esc_url($url) . '">' . esc_html((string)($row['name'] ?? $itemMbs)) . '</a></h3>';
             $output .= '<p class="tvrtke-result-meta"><span class="tvrtke-status tvrtke-status--' . esc_attr($statusClass) . '">' .
                 esc_html((string)($row['status_label'] ?? __('Nepoznat', 'tvrtke-registar'))) . '</span>';
-            if (!empty($row['settlement'])) $output .= '<span>' . esc_html((string)$row['settlement']) . '</span>';
+            if (in_array('settlement', $enabledFields, true) && !empty($row['settlement'])) {
+                $output .= '<span>' . esc_html((string)$row['settlement']) . '</span>';
+            }
             $output .= '</p><p class="tvrtke-result-numbers">' .
                 esc_html__('Registracijski broj:', 'tvrtke-registar') . ' ' .
-                esc_html((string)($row['source_identifier'] ?? $itemMbs)) . '</p></div>';
+                esc_html((string)($row['source_identifier'] ?? $itemMbs)) . '</p>';
+            if (in_array('oib', $enabledFields, true) && !empty($row['oib'])) {
+                $output .= '<p class="tvrtke-result-numbers">' .
+                    esc_html__('OIB:', 'tvrtke-registar') . ' ' . esc_html((string)$row['oib']) . '</p>';
+            }
+            if (in_array('activity', $enabledFields, true) && !empty($row['activity'])) {
+                $output .= '<p class="tvrtke-result-activity">' .
+                    esc_html((string)$row['activity']) . '</p>';
+            }
+            $output .= '</div>';
             $output .= '<div class="tvrtke-result-aside"><span class="tvrtke-result-type">' . esc_html($typeLabel) . '</span>';
             if (!empty($row['datum_osnivanja'])) $output .= '<p>' . esc_html__('Osnovano:', 'tvrtke-registar') . ' ' . esc_html((string)$row['datum_osnivanja']) . '</p>';
             if (!empty($row['datum_brisanja'])) $output .= '<p>' . esc_html__('Brisano:', 'tvrtke-registar') . ' ' . esc_html((string)$row['datum_brisanja']) . '</p>';

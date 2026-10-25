@@ -8,3 +8,6 @@ delete_option('tvrtke_registar_enabled');
 
 delete_option('tvrtke_registar_view');
 delete_option('tvrtke_registar_per_page');
+
+delete_option('tvrtke_registar_cache_minutes');
+delete_option('tvrtke_registar_fields');
