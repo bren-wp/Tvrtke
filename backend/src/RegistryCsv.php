@@ -91,8 +91,7 @@ final class RegistryCsv
             'odjavljen', 'odjavljena', 'prestao s radom' => 'inactive',
             default => 'unknown',
         };
-        $oib = $get('oib', 11);
-        if ($type === 'obrt' && !$allowCraftOib) $oib = null;
+        $oib = $type === 'obrt' && !$allowCraftOib ? null : $get('oib', 11);
         if ($oib !== null) $oib = Identity::oib($oib);
         return [
             'record_hash' => hash('sha256', $identifier),
