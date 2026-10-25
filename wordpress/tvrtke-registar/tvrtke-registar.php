@@ -389,9 +389,10 @@ final class Tvrtke_Registar
             if (!empty($row['datum_osnivanja'])) $output .= '<p>' . esc_html__('Osnovano:', 'tvrtke-registar') . ' ' . esc_html((string)$row['datum_osnivanja']) . '</p>';
             if (!empty($row['datum_brisanja'])) $output .= '<p>' . esc_html__('Brisano:', 'tvrtke-registar') . ' ' . esc_html((string)$row['datum_brisanja']) . '</p>';
             if (!empty($row['datum_upisa'])) $output .= '<p>' . esc_html__('Upis:', 'tvrtke-registar') . ' ' . esc_html((string)$row['datum_upisa']) . '</p>';
+            /* translators: %s: Name of the business or registered organization. */
+            $detailAria = sprintf(__('Detalji: %s', 'tvrtke-registar'), (string)($row['name'] ?? ''));
             $output .= '</div><a class="tvrtke-detail-link" href="' . esc_url($url) . '" aria-label="' .
-                esc_attr(sprintf(__('Detalji: %s', 'tvrtke-registar'), (string)($row['name'] ?? ''))) . '">' .
-                esc_html__('Detalji →', 'tvrtke-registar') . '</a></article>';
+                esc_attr($detailAria) . '">' . esc_html__('Detalji →', 'tvrtke-registar') . '</a></article>';
         }
         $output .= '</div><nav class="tvrtke-pages" aria-label="' . esc_attr__('Stranice rezultata', 'tvrtke-registar') . '">';
         if ($page > 1) $output .= '<a href="' . esc_url(add_query_arg('tvrtke_page', $page - 1, remove_query_arg('tvrtke_mbs'))) . '">' . esc_html__('Prethodna', 'tvrtke-registar') . '</a>';
