@@ -93,7 +93,6 @@ final class Sync
         if ($ongoing !== $fresh && $unfinished === []) $ongoing = $fresh;
         // Set up staging for a snapshot only when it differs from the saved progress.
         $stagedId = $progress !== [] ? (int) $progress[0]['snapshot_id'] : 0;
-        $alreadyFinished = $progress !== [] && $unfinished === [];
         // A fully staged snapshot must first reach the atomic publication
         // branch below. Never restart it merely because all datasets finished.
         if ($stagedId !== $ongoing || $progress === [] || $progressHasWrongScope) {
