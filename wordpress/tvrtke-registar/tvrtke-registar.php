@@ -219,6 +219,11 @@ final class Tvrtke_Registar
         if (is_wp_error($data)) return $output . '<p role="alert">' . esc_html($data->get_error_message()) . '</p></section>';
         if (!isset($data['items']) || !is_array($data['items'])) return $output . '<p role="alert">' . esc_html__('Neispravan odgovor API-ja.', 'tvrtke-registar') . '</p></section>';
         if (empty($data['snapshot_id']) && empty($data['sources'])) return $output . '<p role="status">' . esc_html__('Baza još nije sinkronizirana. Pretraga će biti dostupna nakon prvog uvoza.', 'tvrtke-registar') . '</p></section>';
+        if (!empty($data['published_at_utc'])) {
+            $output .= '<p class="tvrtke-source">' .
+                esc_html__('Sudski registar, zadnja objava u bazi (UTC):', 'tvrtke-registar') .
+                ' ' . esc_html((string)$data['published_at_utc']) . '</p>';
+        }
         $output .= '<div class="tvrtke-results" aria-live="polite">';
         $output .= '<p class="tvrtke-count">' . esc_html(sprintf(/* translators: %d: Number of results on the current page. */ __('Rezultati na stranici: %d', 'tvrtke-registar'), count($data['items']))) . '</p>';
         if (empty($data['items'])) $output .= '<p>' . esc_html__('Nema rezultata u dostupnom skupu.', 'tvrtke-registar') . '</p>';

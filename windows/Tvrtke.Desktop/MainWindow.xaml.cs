@@ -84,7 +84,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             NextButton.IsEnabled = _hasMore;
             PageText.Text = _page.ToString();
             StatusText.Text = $"Prikazano {_results.Count} zapisa · izvora: {data.Sources.Count + (data.SnapshotId is null ? 0 : 1)}" +
-                              (data.Partial ? " · baza nije potpuna" : "");
+                              (data.Partial ? " · baza nije potpuna" : "") +
+                              (string.IsNullOrWhiteSpace(data.PublishedAtUtc) ? "" : " · Sudreg ažuriran: " + data.PublishedAtUtc);
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or InvalidOperationException or JsonException)
         {
@@ -323,6 +324,7 @@ public sealed class SubjectPage
     [JsonPropertyName("items")] public List<Subject> Items { get; set; } = [];
     [JsonPropertyName("has_more")] public bool HasMore { get; set; }
     [JsonPropertyName("snapshot_id")] public string? SnapshotId { get; set; }
+    [JsonPropertyName("published_at_utc")] public string? PublishedAtUtc { get; set; }
     [JsonPropertyName("partial")] public bool Partial { get; set; }
     [JsonPropertyName("sources")] public List<JsonElement> Sources { get; set; } = [];
 }

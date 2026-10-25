@@ -122,7 +122,7 @@ final class DirectoryRepository
             $segments[] = 'SELECT * FROM (' . $external . ' ORDER BY r.name,r.source_type,r.record_hash LIMIT ' . (int)$candidateCap . ') AS external_slice';
         }
         if ($segments === []) return ['items'=>[], 'page'=>$page, 'limit'=>$limit, 'has_more'=>false,
-            'partial'=>$partial,'snapshot_id'=>$snapshot,'sources'=>$registered];
+            'partial'=>$partial,'snapshot_id'=>$snapshot,'sources'=>$registered,'published_at_utc'=>$publication['published_at'] ?? null];
         $sql = 'SELECT * FROM (' . implode(' UNION ALL ', $segments) . ') AS records ORDER BY name,registry_key LIMIT ? OFFSET ?';
         $params[] = $limit + 1;
         $params[] = ($page - 1) * $limit;
@@ -136,7 +136,7 @@ final class DirectoryRepository
         $more = count($items) > $limit && $page < 500;
         if ($more) array_pop($items);
         return ['items'=>$items, 'page'=>$page, 'limit'=>$limit, 'has_more'=>$more,
-            'partial'=>$partial, 'snapshot_id'=>$snapshot, 'sources'=>$registered];
+            'partial'=>$partial, 'snapshot_id'=>$snapshot, 'sources'=>$registered, 'published_at_utc'=>$publication['published_at'] ?? null];
     }
 
     /** @return array<string,mixed>|null */
