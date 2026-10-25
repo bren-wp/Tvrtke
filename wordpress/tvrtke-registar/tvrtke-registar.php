@@ -24,8 +24,21 @@ final class Tvrtke_Registar
     {
         add_action('admin_init', [self::class, 'register_settings']);
         add_action('admin_menu', [self::class, 'menu']);
+        add_action('admin_init', [self::class, 'privacy_information']);
         add_shortcode('tvrtke_pretraga', [self::class, 'shortcode']);
         add_action('init', [self::class, 'register_block']);
+    }
+
+    public static function privacy_information(): void
+    {
+        if (!function_exists('wp_add_privacy_policy_content')) {
+            return;
+        }
+        $description = __(
+            'Kada administrator uključi TVRTKE uslugu, kriteriji pretraživanja poslovnih subjekata šalju se s WordPress poslužitelja na konfigurirani TVRTKE API putem HTTPS-a. API može obrađivati standardne HTTP metapodatke, uključujući IP adresu poslužitelja. Plugin privremeno sprema odgovore putem WordPress transienta najviše pet minuta. Plugin ne postavlja kolačiće niti izravno šalje posjetiteljev IP kao parametar.',
+            'tvrtke-registar'
+        );
+        wp_add_privacy_policy_content('TVRTKE – Poslovni registar', wp_kses_post(wpautop($description)));
     }
 
     public static function register_block(): void
