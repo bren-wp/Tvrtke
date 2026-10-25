@@ -100,12 +100,157 @@ final class Tvrtke_Registar
             'dashicons-chart-area',
             28
         );
+        add_submenu_page('tvrtke-registar', __('Postavke', 'tvrtke-registar'),
+            __('Postavke', 'tvrtke-registar'), 'manage_options', 'tvrtke-registar',
+            [self::class, 'settings_page']);
+        add_submenu_page('tvrtke-registar', __('Pretraga', 'tvrtke-registar'),
+            __('Pretraga', 'tvrtke-registar'), 'manage_options', 'tvrtke-pretraga',
+            [self::class, 'admin_search_page']);
+        add_submenu_page('tvrtke-registar', __('Uvoz / Izvoz', 'tvrtke-registar'),
+            __('Uvoz / Izvoz', 'tvrtke-registar'), 'manage_options', 'tvrtke-izvori',
+            [self::class, 'admin_sources_page']);
+        add_submenu_page('tvrtke-registar', __('Statistika', 'tvrtke-registar'),
+            __('Statistika', 'tvrtke-registar'), 'manage_options', 'tvrtke-statistika',
+            [self::class, 'admin_statistics_page']);
+        add_submenu_page('tvrtke-registar', __('Pomoć', 'tvrtke-registar'),
+            __('Pomoć', 'tvrtke-registar'), 'manage_options', 'tvrtke-pomoc',
+            [self::class, 'admin_help_page']);
     }
 
     public static function admin_assets(string $hook): void
     {
-        if ($hook !== 'toplevel_page_tvrtke-registar') return;
+        if (!in_array($hook, ['toplevel_page_tvrtke-registar',
+            'tvrtke_page_tvrtke-pretraga', 'tvrtke_page_tvrtke-izvori',
+            'tvrtke_page_tvrtke-statistika', 'tvrtke_page_tvrtke-pomoc'], true)) return;
         wp_enqueue_style('tvrtke-admin', plugins_url('assets/admin.css', __FILE__), [], '0.8.0');
+    }
+
+    private static function admin_page_header(string $title, string $description): void
+    {
+        echo '<div class="wrap tvrtke-admin"><header class="tvrtke-admin-hero">';
+        echo '<div class="tvrtke-brand"><img src="' .
+            esc_url(plugins_url('assets/logo-mark.svg', __FILE__)) .
+            '" width="73" height="73" alt="" />';
+        echo '<div><strong>TVRTKE</strong><small>' .
+            esc_html__('POSLOVNI IMENIK HRVATSKE', 'tvrtke-registar') .
+            '</small></div></div><div class="tvrtke-hero-copy"><h1>' .
+            esc_html($title) . '</h1><p>' . esc_html($description) .
+            '</p></div></header>';
+    }
+
+    public static function admin_search_page(): void
+    {
+        if (!current_user_can('manage_options')) return;
+        self::admin_page_header(
+            __('Pretraživanje poslovnih subjekata', 'tvrtke-registar'),
+            __('Provjerite izgled stvarne tražilice i rezultate iz objavljenih izvora.', 'tvrtke-registar')
+        );
+        echo '<section class="tvrtke-card">';
+        // Public shortcode sanitizes its own read-only GET filters.
+        echo self::shortcode(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo '</section></div>';
+    }
+
+    private static function admin_sources(): array|WP_Error
+    {
+        $response = self::request('/v1/sources');
+        if (is_wp_error($response)) return $response;
+        return isset($response['sources']) && is_array($response['sources'])
+            ? $response['sources'] : new WP_Error('tvrtke_invalid_sources',
+                __('Neispravni podaci o službenim izvorima.', 'tvrtke-registar'));
+    }
+
+    private static function render_sources_table(array $sources): void
+    {
+        if ($sources === []) {
+            echo '<p class="tvrtke-warning">' .
+                esc_html__('Još nema objavljenih vanjskih registara. Podaci se uvoze isključivo na privatnom poslužitelju.', 'tvrtke-registar') .
+                '</p>';
+            return;
+        }
+        echo '<div class="tvrtke-admin-table-scroll"><table class="widefat striped"><thead><tr>';
+        foreach ([
+            __('Registar', 'tvrtke-registar'),
+            __('Objavljenih zapisa', 'tvrtke-registar'),
+            __('Pokrivenost', 'tvrtke-registar'),
+            __('Zadnja objava (UTC)', 'tvrtke-registar'),
+        ] as $label) echo '<th scope="col">' . esc_html($label) . '</th>';
+        echo '</tr></thead><tbody>';
+        foreach (array_slice($sources, 0, 20) as $row) {
+            if (!is_array($row)) continue;
+            echo '<tr><th scope="row">' . esc_html((string)($row['source_type'] ?? '—')) .
+                '</th><td>' . esc_html((string)($row['record_count'] ?? '—')) .
+                '</td><td>' . esc_html((string)($row['coverage'] ?? '—')) .
+                '</td><td>' . esc_html((string)($row['published_at_utc'] ?? '—')) .
+                '</td></tr>';
+        }
+        echo '</tbody></table></div>';
+    }
+
+    public static function admin_sources_page(): void
+    {
+        if (!current_user_can('manage_options')) return;
+        self::admin_page_header(
+            __('Službeni izvori i ažuriranje', 'tvrtke-registar'),
+            __('Uvid u objavljene registre. Sinkronizaciju i prava pristupa kontrolira privatni backend.', 'tvrtke-registar')
+        );
+        echo '<section class="tvrtke-card"><h2>' .
+            esc_html__('Izvori podataka', 'tvrtke-registar') . '</h2>';
+        $sources = self::admin_sources();
+        if (is_wp_error($sources)) {
+            echo '<p class="tvrtke-warning">' . esc_html($sources->get_error_message()) . '</p>';
+        } else {
+            self::render_sources_table($sources);
+        }
+        echo '<div class="tvrtke-hint">' .
+            esc_html__('Uvoz i izvoz službenih izvora ne izvode se iz WordPress administracije. Zaštita Sudreg i MySQL vjerodajnica zahtijeva privatni CLI i cron na vašem poslužitelju.', 'tvrtke-registar') .
+            '</div></section></div>';
+    }
+
+    public static function admin_statistics_page(): void
+    {
+        if (!current_user_can('manage_options')) return;
+        self::admin_page_header(
+            __('Statistika objavljenih registara', 'tvrtke-registar'),
+            __('Samo stvarno objavljeni podaci; bez izmišljenih brojača, korisnika ili pretraga.', 'tvrtke-registar')
+        );
+        echo '<section class="tvrtke-card"><h2>' .
+            esc_html__('Pokrivenost i broj zapisa', 'tvrtke-registar') . '</h2>';
+        $sources = self::admin_sources();
+        if (is_wp_error($sources)) {
+            echo '<p class="tvrtke-warning">' . esc_html($sources->get_error_message()) . '</p>';
+        } else {
+            $total = 0;
+            foreach ($sources as $source) {
+                if (!is_array($source)) continue;
+                $value = $source['record_count'] ?? null;
+                if (is_numeric($value) && (float)$value >= 0) $total += (int)$value;
+            }
+            echo '<p class="tvrtke-stats-value">' . esc_html(number_format_i18n($total)) .
+                '</p><p>' .
+                esc_html__('Zapisa iz trenutno objavljenih vanjskih CSV izvora; Sudski registar se prikazuje zasebno i nije uključen u taj zbroj.', 'tvrtke-registar') .
+                '</p>';
+            self::render_sources_table($sources);
+        }
+        echo '</section></div>';
+    }
+
+    public static function admin_help_page(): void
+    {
+        if (!current_user_can('manage_options')) return;
+        self::admin_page_header(
+            __('TVRTKE — Pomoć', 'tvrtke-registar'),
+            __('Upute za korištenje dodatka i odgovoran rad sa službenim podacima.', 'tvrtke-registar')
+        );
+        echo '<section class="tvrtke-card"><h2>' .
+            esc_html__('Postavljanje', 'tvrtke-registar') . '</h2>';
+        echo '<p>' .
+            esc_html__('U postavkama upišite adresu centralnog HTTPS API-ja i izričito uključite vanjsku uslugu. Pretraživanje koristi samo javno objavljene zapise.', 'tvrtke-registar') .
+            '</p><p><code>[tvrtke_pretraga]</code></p><p>' .
+            esc_html__('U uređivaču blokova možete koristiti dinamički blok TVRTKE pretraga.', 'tvrtke-registar') .
+            '</p><a href="https://github.com/bren-wp/Tvrtke" target="_blank" rel="noopener noreferrer">' .
+            esc_html__('Dokumentacija i podrška', 'tvrtke-registar') .
+            '</a></section></div>';
     }
 
     public static function settings_page(): void
