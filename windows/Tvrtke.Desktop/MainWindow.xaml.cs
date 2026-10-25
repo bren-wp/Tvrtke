@@ -23,7 +23,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private Subject? _selected;
     private readonly TvrtkePreferences _preferences = TvrtkePreferences.Load();
     private string _api = "https://api.tvrtke.com.hr";
-    private bool _favoritesMode;
     private int? _filterColumns;
     private bool? _stackedResults;
 
@@ -167,8 +166,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         StatusText.Text = "Dohvaćanje podataka…";
         try
         {
-            _favoritesMode = false;
-            FavoritesNavLabel.Text = "Moji favoriti";
             var query = QueryInput.Text.Trim();
             var county = CountyInput.Text.Trim();
             var activity = ActivityInput.Text.Trim();
@@ -321,27 +318,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void Favorites_Click(object sender, RoutedEventArgs e)
     {
-        _favoritesMode = !_favoritesMode;
-        FavoritesNavLabel.Text = _favoritesMode ? "Natrag na pretragu" : "Moji favoriti";
-        _results.Clear();
-        if (_favoritesMode)
-        {
-            foreach (var item in _preferences.Favorites.OrderBy(x => x.Name)) _results.Add(item);
-            StatusText.Text = $"Spremljenih favorita: {_results.Count} (lokalno na ovom računalu).";
-            ResultCountText.Text = $"{_results.Count} favorita";
-        }
-        else
-        {
-            StatusText.Text = "Za povratak na rezultate pokrenite novu pretragu.";
-            ResultCountText.Text = "—";
-        }
-        SelectedSubject = null;
-        FavoriteButton.IsEnabled = false;
-        _page = 1;
-        _hasMore = false;
-        PreviousButton.IsEnabled = false;
-        NextButton.IsEnabled = false;
-        PageText.Text = "1";
+        var window = new FavoritesWindow(_preferences) { Owner = this };
+        window.ShowDialog();
+        var selected = SelectedSubject;
+        FavoriteButton.Content = selected is not null &&
+            _preferences.Favorites.Any(x => x.UniqueKey == selected.UniqueKey)
+            ? "Ukloni iz favorita" : "Dodaj u favorite";
+        StatusText.Text = "Favoriti i spremljene liste mogu se uređivati u zasebnom prozoru.";
     }
 
     private void ToggleFavorite_Click(object sender, RoutedEventArgs e)
@@ -353,7 +336,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             _preferences.Favorites.Remove(previous);
             FavoriteButton.Content = "Dodaj u favorite";
-            if (_favoritesMode)  _results.Remove(_results.FirstOrDefault(x => x.UniqueKey == selected.UniqueKey)!);
         }
         else
         {
