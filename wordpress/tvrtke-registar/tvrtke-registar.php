@@ -136,6 +136,31 @@ final class Tvrtke_Registar
             '</small></div></div><div class="tvrtke-hero-copy"><h1>' .
             esc_html($title) . '</h1><p>' . esc_html($description) .
             '</p></div></header>';
+        self::admin_navigation();
+    }
+
+    /** Shared navigation on all administrator screens, backed by real pages. */
+    private static function admin_navigation(): void
+    {
+        $active = isset($_GET['page']) && is_string($_GET['page'])
+            ? sanitize_key(wp_unslash($_GET['page'])) : 'tvrtke-registar';
+        $tabs = [
+            'tvrtke-registar' => __('Postavke', 'tvrtke-registar'),
+            'tvrtke-pretraga' => __('Pretraga', 'tvrtke-registar'),
+            'tvrtke-izvori' => __('Uvoz / Izvoz', 'tvrtke-registar'),
+            'tvrtke-statistika' => __('Statistika', 'tvrtke-registar'),
+            'tvrtke-pomoc' => __('Pomoć', 'tvrtke-registar'),
+        ];
+        echo '<nav class="tvrtke-tabs tvrtke-page-tabs" aria-label="' .
+            esc_attr__('TVRTKE administracijske stranice', 'tvrtke-registar') . '">';
+        foreach ($tabs as $slug => $label) {
+            $href = menu_page_url($slug, false);
+            if (!$href) continue;
+            echo '<a href="' . esc_url($href) . '"' .
+                ($active === $slug ? ' class="is-current" aria-current="page"' : '') .
+                '>' . esc_html($label) . '</a>';
+        }
+        echo '</nav>';
     }
 
     public static function admin_search_page(): void
@@ -386,6 +411,26 @@ final class Tvrtke_Registar
     }
 
     /** @return string */
+    /**
+     * Branded, fixed vector pictograms, shared by every frontend category,
+     * result and admin preview. No client-controlled data enters SVG markup.
+     */
+    private static function icon(string $kind): string
+    {
+        $paths = [
+            'sudreg' => 'M4 21 V6 L12 2 L20 6 V21 M8 9 V10 M12 9 V10 M16 9 V10 M8 14 V15 M12 14 V15 M16 14 V15 M2 21 H22',
+            'obrt' => 'M3 9 L5 3 H19 L21 9 V12 C19 14 17 14 15 12 C13 14 11 14 9 12 C7 14 5 14 3 12 Z M5 13 V21 H19 V13 M9 21 V16 H15 V21',
+            'udruga' => 'M12 12 A3 3 0 1 0 12 6 A3 3 0 1 0 12 12 M4 21 V18 C4 13 20 13 20 18 V21 M4 11 A2 2 0 1 1 4 7 M20 11 A2 2 0 1 0 20 7 M1 20 V17 C1 15 3 14 5 14 M23 20 V17 C23 15 21 14 19 14',
+            'zaklada' => 'M12 21 C10 19 2 13 2 8 A5 5 0 0 1 12 6 A5 5 0 0 1 22 8 C22 13 14 19 12 21 Z',
+            'search' => 'M21 21 L16.8 16.8 M19 10.5 A8.5 8.5 0 1 1 2 10.5 A8.5 8.5 0 1 1 19 10.5',
+        ];
+        $path = $paths[$kind] ?? $paths['sudreg'];
+        return '<svg class="tvrtke-icon" viewBox="0 0 24 24" width="24" height="24" ' .
+            'aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">' .
+            '<path d="' . $path . '" fill="none" stroke="currentColor" stroke-width="1.85" ' .
+            'stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    }
+
     public static function shortcode(): string
     {
         wp_enqueue_style('tvrtke-registar', plugins_url('assets/search.css', __FILE__), [], '0.8.0');
@@ -454,7 +499,7 @@ final class Tvrtke_Registar
             esc_attr($activity) . '" maxlength="100" placeholder="' .
             esc_attr__('Sve djelatnosti', 'tvrtke-registar') . '"></div>';
         $output .= '<button class="tvrtke-submit" type="submit">' .
-            esc_html__('⌕ Pretraži', 'tvrtke-registar') . '</button></div>';
+            self::icon('search') . '<span>' . esc_html__('Pretraži', 'tvrtke-registar') . '</span></button></div>';
         $advancedActive = $settlement !== '' || $legalForm !== '' || $status !== '';
         $output .= '<details class="tvrtke-advanced"' . ($advancedActive ? ' open' : '') .
             '><summary>' . esc_html__('Više filtara', 'tvrtke-registar') . '</summary><div class="tvrtke-advanced-grid">';
@@ -478,18 +523,18 @@ final class Tvrtke_Registar
         $output .= '</select></div></div></details></form>';
         $output .= '<nav class="tvrtke-quick-links" aria-label="' . esc_attr__('Vrste poslovnih subjekata', 'tvrtke-registar') . '">';
         foreach ([
-            'sudreg' => ['▥', __('Tvrtke', 'tvrtke-registar')],
-            'obrt' => ['▣', __('Obrti', 'tvrtke-registar')],
-            'udruga' => ['♧', __('Udruge', 'tvrtke-registar')],
-            'zaklada' => ['♡', __('Zaklade', 'tvrtke-registar')],
-        ] as $kind => $meta) {
+            'sudreg' => __('Tvrtke', 'tvrtke-registar'),
+            'obrt' => __('Obrti', 'tvrtke-registar'),
+            'udruga' => __('Udruge', 'tvrtke-registar'),
+            'zaklada' => __('Zaklade', 'tvrtke-registar'),
+        ] as $kind => $categoryLabel) {
             $href = add_query_arg(
                 ['tvrtke_type' => $kind, 'tvrtke_page' => 1],
                 remove_query_arg(['tvrtke_ref', 'tvrtke_mbs', 'tvrtke_page'])
             );
             $output .= '<a href="' . esc_url($href) . '"' .
-                ($registryType === $kind ? ' aria-current="true"' : '') . '><span class="tvrtke-quick-icon" aria-hidden="true">' .
-                esc_html($meta[0]) . '</span><span>' . esc_html($meta[1]) . '</span></a>';
+                ($registryType === $kind ? ' aria-current="true"' : '') . '><span class="tvrtke-quick-icon">' .
+                self::icon($kind) . '</span><span>' . esc_html($categoryLabel) . '</span></a>';
         }
         $output .= '</nav>';
 
@@ -572,10 +617,10 @@ final class Tvrtke_Registar
             $typeLabel = $types[$kind] ?? __('Poslovni subjekt', 'tvrtke-registar');
             $statusNumber = $row['status'] ?? null;
             $statusClass = $statusNumber === null ? 'unknown' : ((string)$statusNumber === '1' ? 'active' : 'inactive');
-            $icon = ['sudreg'=>'▥', 'obrt'=>'▣', 'udruga'=>'♧', 'zaklada'=>'♡'][$kind] ?? '◇';
+            $icon = self::icon($kind);
             $url = add_query_arg(['tvrtke_ref' => $key], remove_query_arg(['tvrtke_mbs', 'tvrtke_ref', 'tvrtke_page']));
             $output .= '<article class="tvrtke-result" data-source="' . esc_attr($kind) . '">';
-            $output .= '<span class="tvrtke-result-icon" aria-hidden="true">' . esc_html($icon) . '</span><div class="tvrtke-result-main">';
+            $output .= '<span class="tvrtke-result-icon">' . $icon . '</span><div class="tvrtke-result-main">';
             $output .= '<h3><a href="' . esc_url($url) . '">' . esc_html((string)($row['name'] ?? $itemMbs)) . '</a></h3>';
             $output .= '<p class="tvrtke-result-meta"><span class="tvrtke-status tvrtke-status--' . esc_attr($statusClass) . '">' .
                 esc_html((string)($row['status_label'] ?? __('Nepoznat', 'tvrtke-registar'))) . '</span>';
