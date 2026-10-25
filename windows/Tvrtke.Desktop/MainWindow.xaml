@@ -78,12 +78,25 @@
                     </StackPanel>
                 </Border>
                 <StackPanel DockPanel.Dock="Top" Margin="18,22,10,22" Orientation="Horizontal">
-                    <Border Width="53" Height="53" Background="#0B2D4A" CornerRadius="12" Margin="0,0,12,0">
-                        <Grid>
-                            <Path Data="M 8,40 L 8,31 L 17,24 L 17,40 Z M 20,40 L 20,15 L 30,9 L 30,40 Z M 33,40 L 33,22 L 43,31 L 43,40 Z"
-                                  Fill="#15C9BD" Stretch="Uniform" Margin="10"/>
-                            <Path Data="M 10,33 L 21,28 L 30,32 L 40,18" Stroke="White" StrokeThickness="2.4" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stretch="Fill" Margin="9,10,9,10"/>
-                        </Grid>
+                    <Border Width="53" Height="53" Background="#0B2D4A" CornerRadius="12" Margin="0,0,12,0"
+                            AutomationProperties.Name="TVRTKE simbol poslovnog rasta">
+                        <Viewbox Margin="6">
+                            <Canvas Width="256" Height="256">
+                                <Path Data="M41 200 V133 L85 103 V200 Z M91 200 V94 L141 54 V200 Z M196 200 V135 L221 153 V200 Z"
+                                      Fill="#08BDB6"/>
+                                <Path Data="M147 200 V53 L191 88 V200 Z" Fill="#17678F"/>
+                                <Path Data="M51 179 L101 154 L142 160 L199 108" Stroke="White"
+                                      StrokeThickness="14" StrokeLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"/>
+                                <Ellipse Canvas.Left="37" Canvas.Top="165" Width="28" Height="28"
+                                         Stroke="White" StrokeThickness="7" Fill="#00AFA9"/>
+                                <Ellipse Canvas.Left="87" Canvas.Top="140" Width="28" Height="28"
+                                         Stroke="White" StrokeThickness="7" Fill="#00AFA9"/>
+                                <Ellipse Canvas.Left="128" Canvas.Top="146" Width="28" Height="28"
+                                         Stroke="White" StrokeThickness="7" Fill="#00AFA9"/>
+                                <Ellipse Canvas.Left="185" Canvas.Top="94" Width="28" Height="28"
+                                         Stroke="White" StrokeThickness="7" Fill="#00AFA9"/>
+                            </Canvas>
+                        </Viewbox>
                     </Border>
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock Text="TVRTKE" FontWeight="ExtraBold" FontSize="24" Foreground="#0B2D4A"/>
