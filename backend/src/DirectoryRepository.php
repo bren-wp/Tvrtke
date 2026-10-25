@@ -103,7 +103,7 @@ final class DirectoryRepository
                      r.source_type,r.source_identifier,NULL AS mbs,r.oib,
                      CASE WHEN r.status='active' THEN 1 WHEN r.status='inactive' THEN 0 ELSE NULL END AS status,
                      CASE r.status WHEN 'active' THEN 'Aktivan' WHEN 'inactive' THEN 'Neaktivan' ELSE 'Nepoznat' END AS status_label,
-                     r.name,r.county,r.settlement,r.address AS street,NULL AS house_number,
+                     NULL AS datum_osnivanja,NULL AS datum_brisanja,r.name,r.county,r.settlement,r.address AS street,NULL AS house_number,
                      NULL AS postal_code,NULL AS legal_form,NULL AS legal_form_short,
                      r.activity,src.source_url
                 FROM registry_records r
