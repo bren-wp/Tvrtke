@@ -65,3 +65,6 @@ jobs:
         run: ./windows/Tvrtke.Desktop/Assets/Generate-TVRTKEIcon.ps1
       - name: Build WPF application
         run: dotnet build windows/Tvrtke.Desktop/Tvrtke.Desktop.csproj --configuration Release
+      - name: Responsive UI and exact Brendigo identity contracts
+        shell: pwsh
+        run: ./scripts/check-ui-contract.ps1
