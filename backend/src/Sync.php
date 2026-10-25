@@ -151,7 +151,8 @@ final class Sync
         $pageSize = SudregCoverage::batchSize((int)Config::get('TVRTKE_IMPORT_BATCH', '200'));
         $remaining = $maxRows - $offset;
         if ($remaining <= 0) {
-            $this->db->prepare('UPDATE sync_progress SET finished=1,truncated=1 WHERE dataset=?')->execute([$dataset]);
+            $this->db->prepare('UPDATE sync_progress SET finished=1,truncated=1
+                    WHERE dataset=? AND snapshot_id=?')->execute([$dataset, $ongoing]);
             return $dataset . ': dosegnuto ograničenje ' . $maxRows;
         }
         $limit = min($pageSize, $remaining);
