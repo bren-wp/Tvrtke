@@ -8,6 +8,7 @@ public sealed class TvrtkePreferences
 {
     public string ApiUrl { get; set; } = "https://api.tvrtke.com.hr";
     public List<Subject> Favorites { get; set; } = [];
+    public List<TvrtkeSavedList> SavedLists { get; set; } = [];
 
     private static string FilePath
     {
@@ -26,6 +27,8 @@ public sealed class TvrtkePreferences
             var data = JsonSerializer.Deserialize<TvrtkePreferences>(File.ReadAllText(FilePath));
             if (data is null) return new TvrtkePreferences();
             data.Favorites ??= [];
+            data.SavedLists ??= [];
+            data.SavedLists.RemoveAll(item => string.IsNullOrWhiteSpace(item.Name));
             if (!Uri.TryCreate(data.ApiUrl, UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps ||
                 !string.IsNullOrEmpty(uri.UserInfo) || !string.IsNullOrEmpty(uri.Query) ||
                 !string.IsNullOrEmpty(uri.Fragment)) data.ApiUrl = "https://api.tvrtke.com.hr";
@@ -52,4 +55,12 @@ public sealed class TvrtkePreferences
             if (File.Exists(temporary)) File.Delete(temporary);
         }
     }
+}
+
+public sealed class TvrtkeSavedList
+{
+    public string Name { get; set; } = "";
+    public List<string> RegistryKeys { get; set; } = [];
+    public int Count => RegistryKeys?.Count ?? 0;
+    public string Display => $"{Name} ({Count})";
 }
