@@ -407,7 +407,16 @@ final class Tvrtke_Registar
             'udruga' => __('Udruge', 'tvrtke-registar'),
             'zaklada' => __('Zaklade', 'tvrtke-registar'),
         ] as $kind => $label) {
-            echo '<span>' . self::icon($kind) . esc_html($label) . '</span>';
+            echo '<span>' . wp_kses(self::icon($kind), [
+                'svg' => [
+                    'class' => true, 'viewbox' => true, 'width' => true, 'height' => true,
+                    'aria-hidden' => true, 'focusable' => true, 'xmlns' => true,
+                ],
+                'path' => [
+                    'd' => true, 'fill' => true, 'stroke' => true,
+                    'stroke-width' => true, 'stroke-linecap' => true, 'stroke-linejoin' => true,
+                ],
+            ]) . esc_html($label) . '</span>';
         }
         echo '</div></div></section>';
 
