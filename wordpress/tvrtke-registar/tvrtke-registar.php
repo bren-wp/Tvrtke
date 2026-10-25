@@ -93,6 +93,7 @@ final class Tvrtke_Registar
         echo '<table class="form-table"><tr><th scope="row"><label for="tvrtke-api">' . esc_html__('HTTPS adresa API-ja', 'tvrtke-registar') . '</label></th><td>';
         echo '<input class="regular-text" id="tvrtke-api" name="' . esc_attr(self::OPTION) . '" value="' . esc_attr((string) get_option(self::OPTION, self::DEFAULT_API)) . '" type="url" required />';
         echo '</td></tr><tr><th scope="row">' . esc_html__('Vanjska API usluga', 'tvrtke-registar') . '</th><td>';
+        echo '<input type="hidden" name="' . esc_attr(self::CONSENT) . '" value="0">';
         echo '<label><input type="checkbox" name="' . esc_attr(self::CONSENT) . '" value="1" ' . checked((bool) get_option(self::CONSENT, false), true, false) . '> ';
         echo esc_html__('Dopuštam povezivanje s konfiguriranim TVRTKE API-jem i aktiviram pretragu.', 'tvrtke-registar') . '</label>';
         echo '<p class="description">' . esc_html__('Prije omogućavanja objavite vlastitu politiku privatnosti i uvjete korištenja usluge.', 'tvrtke-registar') . '</p>';
@@ -135,7 +136,9 @@ final class Tvrtke_Registar
         // These public GET filters are read-only: no database writes, accounts, or privileged actions.
         // A nonce is deliberately not required so search result links remain shareable.
         $get = static function (string $key, int $max = 100): string {
-            $raw = isset($_GET[$key]) ? sanitize_text_field(wp_unslash($_GET[$key])) : '';
+            // Reject array input rather than passing it to WordPress text sanitizers.
+            $raw = isset($_GET[$key]) && is_string($_GET[$key])
+                ? sanitize_text_field(wp_unslash($_GET[$key])) : '';
             $clean = trim($raw);
             return function_exists('mb_substr') ? mb_substr($clean, 0, $max) : substr($clean, 0, $max);
         };

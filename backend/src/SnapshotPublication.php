@@ -35,9 +35,25 @@ final class SnapshotPublication
                 throw new \RuntimeException('Cannot publish empty registry dataset: ' . $required);
             }
         }
+        $partial = false;
         foreach ($rows as $row) {
-            if ((int)($row['truncated'] ?? 0) === 1) return true;
+            $imported = (int)($row['imported_rows'] ?? 0);
+            $expected = $row['expected_rows'] ?? null;
+            $truncated = (int)($row['truncated'] ?? 0) === 1;
+            // A new v0.7 full import must explicitly request inactive rows.
+            // Older imports without this metadata remain marked partial.
+            if ((int)($row['include_inactive'] ?? 0) !== 1) $partial = true;
+            if ($expected === null) {
+                $partial = true; // Missing official count cannot establish completeness.
+            } elseif (!is_numeric($expected) || (int)$expected < 0 || $imported > (int)$expected) {
+                throw new \RuntimeException('Invalid official dataset count');
+            } elseif ($imported !== (int)$expected && !$truncated) {
+                throw new \RuntimeException('Unverified dataset size; publication refused');
+            } elseif ($imported !== (int)$expected) {
+                $partial = true;
+            }
+            if ($truncated) $partial = true;
         }
-        return false;
+        return $partial;
     }
 }

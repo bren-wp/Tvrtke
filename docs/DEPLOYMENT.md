@@ -68,3 +68,39 @@ Ako cPanel ne dopušta Document Root unutar `tvrtke-backend/public`, **ne objavl
 - Putanja `TVRTKE_PUBLIC_ROOT` u konfiguraciji definira javni direktorij: importer odbija čitanje osjetljivih CSV izvoza iz njega.
 - Nova javna ruta `GET /v1/directory` koristi odobrene i objavljene izvore; `GET /v1/sources` vraća njihovo podrijetlo, vrijeme i status pokrivenosti.
 - KNOX L ne može biti unaprijed proglašen dostatnim za **kompletnu nacionalnu bazu svih registara**. Mjerite veličinu indeksa, prostor diska i trajanje uvoza nakon testnih serija.
+
+## Sudreg v0.7 — cjelovit uvoz sudskih subjekata
+
+**Važno:** Sudreg je izvor sudskih subjekata; **nije izvor svih hrvatskih obrta, udruga i drugih kategorija**. Za te izvore pogledajte REGISTRY-SOURCES.md.
+
+### Prije pokretanja
+
+1. Učinite provjerenu sigurnosnu kopiju baze i izmjerite raspoloživ prostor.
+2. Izvršite novu migraciju `backend/database/005_sudreg_full_coverage.sql` nakon migracija 001–004. Ne pokretati migraciju dvaput.
+3. U privatnoj datoteci `backend/config.local.php` postavite:
+   - `TVRTKE_SYNC_INCLUDE_INACTIVE=1` — obavezno za aktivne i neaktivne sudske subjekte.
+   - `TVRTKE_IMPORT_BATCH=200` — broj redaka po API zahtjevu (50–1000).
+   - `TVRTKE_IMPORT_ROW_LIMIT=10000` — sigurnosna granica po datasetu, nije potpuna baza; za stvarni potpuni uvoz povećati tek prema službenom broju redaka i kvoti hostinga, maksimalno 5 000 000 po datasetu.
+   - `TVRTKE_SUDREG_ARCHIVE_RAW=0` — opcionalna arhiva izvornih JSON redaka, koja može višestruko povećati zauzeće baze.
+   - `TVRTKE_SYNC_PAGES_PER_RUN=3`, `TVRTKE_SYNC_BUDGET_SECONDS=15` — kratke serije prilagođene KNOX L.
+4. Provjerite autentikaciju, snapshot i izvorne brojeve redaka **bez ispisa vjerodajnica**:
+   ```sh
+   php backend/bin/sudreg-preflight.php --online
+   ```
+5. Nakon potvrde da prostor i službeni broj redaka odgovaraju, pokrenite:
+   ```sh
+   php backend/bin/sync.php
+   ```
+   Ponavljajte kroz dopušteni cPanel cron dok se svi skupovi ne dovrše. **Nije predviđeno učitavanje cijelog registra u jednom PHP zahtjevu.**
+
+### Kontrola potpunosti
+
+- `only_active=false` se izričito šalje na svaki podržani dataset endpoint.
+- `snapshot_id` ostaje fiksiran dok traje uvoz. `X-Total-Count` se pamti za svaki dataset i provjerava na svakoj stranici.
+- Nedostajući ukupni broj, prekoračena granica ili uvoz samo aktivnih zapisa uvijek rezultiraju oznakom `partial=true`.
+- Kratka stranica prije očekivanog broja redaka prekida uvoz; već objavljeni snapshot ostaje aktivan.
+- `TVRTKE_SUDREG_ARCHIVE_RAW=1` čuva svaki vraćeni izvorni redak po `snapshot_id,dataset,row_index`. To nije preporučljivo uključiti na KNOX L bez prethodnog mjerenja prostora i provjere pravne osnove za sve podatke u izvornom API-ju.
+- Povijesni zapisi i tablice koje TVRTKE još ne mapira ne mogu se predstavljati kao javno dostupni u aplikaciji samo zato što je osnovnih pet skupova potpuno uvezeno.
+- Uspješan test na CI MariaDB ne dokazuje uspješnost produkcijskog uvoza, dostupnost API vjerodajnica ili dovoljnu kvotu hostinga.
+
+**Ne stavljajte Sudreg Client ID/Secret u GitHub, WordPress plugin, snimke zaslona ili chat.** Ako su tajne već javno podijeljene, rotirajte ih.
