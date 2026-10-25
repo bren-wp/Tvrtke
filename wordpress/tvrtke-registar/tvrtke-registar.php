@@ -617,11 +617,15 @@ final class Tvrtke_Registar
             $output .= '<div class="tvrtke-detail"><div class="tvrtke-detail-heading"><h2>' . esc_html((string)($item['name'] ?? '')) . '</h2>';
             $output .= '<p>' . esc_html((string)($types[(string)($item['source_type'] ?? '')] ?? __('Poslovni subjekt', 'tvrtke-registar'))) . ' · ' .
                 esc_html((string)($item['status_label'] ?? __('Nepoznat status', 'tvrtke-registar'))) . '</p></div>';
-            $output .= '<div class="tvrtke-detail-body"><h3>' . esc_html__('Osnovni podaci', 'tvrtke-registar') . '</h3><dl>';
+            $output .= '<div class="tvrtke-detail-body"><div class="tvrtke-detail-layout">' .
+                '<section class="tvrtke-detail-facts"><h3>' .
+                esc_html__('Osnovni podaci', 'tvrtke-registar') . '</h3><dl>';
             foreach (['source_type' => 'Registar', 'source_identifier' => 'Broj u registru', 'mbs' => 'MBS', 'oib' => 'OIB', 'status_label' => 'Status', 'legal_form' => 'Pravni oblik', 'county' => 'Županija', 'settlement' => 'Mjesto', 'street' => 'Ulica', 'house_number' => 'Kućni broj', 'datum_osnivanja' => 'Datum osnivanja', 'datum_brisanja' => 'Datum brisanja / prestanka', 'datum_upisa' => 'Datum upisa u registar', 'datum_statusa' => 'Datum promjene statusa'] as $field => $label) {
                 $output .= '<dt>' . esc_html($label) . '</dt><dd>' . esc_html((string)($item[$field] ?? '—')) . '</dd>';
             }
-            $output .= '</dl>';
+            $output .= '</dl></section>';
+            $output .= '<aside class="tvrtke-detail-aside"><h3>' .
+                esc_html__('Lokacija i službeni izvori', 'tvrtke-registar') . '</h3>';
             $sourceUrl = isset($item['source_url']) && is_string($item['source_url']) ? $item['source_url'] : '';
             if ($sourceUrl !== '' && wp_parse_url($sourceUrl, PHP_URL_SCHEME) === 'https') {
                 $output .= '<p class="tvrtke-source"><a href="' . esc_url($sourceUrl) .
@@ -635,17 +639,20 @@ final class Tvrtke_Registar
             ])));
             if ($fullAddress !== '') {
                 $mapUrl = 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($fullAddress . ', Hrvatska');
+                $output .= '<p class="tvrtke-detail-address">' .
+                    esc_html($fullAddress) . '</p>';
                 $output .= '<p class="tvrtke-source"><a href="' . esc_url($mapUrl) .
                     '" target="_blank" rel="noopener noreferrer">' .
                     esc_html__('Prikaži adresu na karti ↗', 'tvrtke-registar') .
                     '</a></p>';
             }
-            $output .= '<h3>' . esc_html__('Registrirane djelatnosti', 'tvrtke-registar') . '</h3><ul>';
+            $output .= '</aside></div><section class="tvrtke-detail-activities"><h3>' .
+                esc_html__('Registrirane djelatnosti', 'tvrtke-registar') . '</h3><ul>';
             foreach (array_slice((array)($item['activities'] ?? []), 0, 100) as $row) {
                 if (!is_array($row)) continue;
                 $output .= '<li>' . esc_html((string)(($row['activity_text'] ?? null) ?: (($row['nkd_name'] ?? null) ?: (($row['nkd_code'] ?? null) ?: '—')))) . '</li>';
             }
-            $output .= '</ul></div></div>';
+            $output .= '</ul></section></div></div>';
             if (!empty($item['partial'])) $output .= self::partialNotice();
             return $output . '</section>';
         }
