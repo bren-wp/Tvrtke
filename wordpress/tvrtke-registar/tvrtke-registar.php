@@ -338,7 +338,26 @@ final class Tvrtke_Registar
             foreach (['source_type' => 'Registar', 'source_identifier' => 'Broj u registru', 'mbs' => 'MBS', 'oib' => 'OIB', 'status_label' => 'Status', 'legal_form' => 'Pravni oblik', 'county' => 'Županija', 'settlement' => 'Mjesto', 'street' => 'Ulica', 'house_number' => 'Kućni broj', 'datum_osnivanja' => 'Datum osnivanja', 'datum_brisanja' => 'Datum brisanja / prestanka', 'datum_upisa' => 'Datum upisa u registar', 'datum_statusa' => 'Datum promjene statusa'] as $field => $label) {
                 $output .= '<dt>' . esc_html($label) . '</dt><dd>' . esc_html((string)($item[$field] ?? '—')) . '</dd>';
             }
-            $output .= '</dl><h3>' . esc_html__('Registrirane djelatnosti', 'tvrtke-registar') . '</h3><ul>';
+            $output .= '</dl>';
+            $sourceUrl = isset($item['source_url']) && is_string($item['source_url']) ? $item['source_url'] : '';
+            if ($sourceUrl !== '' && wp_parse_url($sourceUrl, PHP_URL_SCHEME) === 'https') {
+                $output .= '<p class="tvrtke-source"><a href="' . esc_url($sourceUrl) .
+                    '" target="_blank" rel="noopener noreferrer">' .
+                    esc_html__('Službeni izvor podataka ↗', 'tvrtke-registar') . '</a></p>';
+            }
+            $fullAddress = trim(implode(' ', array_filter([
+                (string)($item['street'] ?? ''),
+                (string)($item['house_number'] ?? ''),
+                (string)($item['settlement'] ?? ''),
+            ])));
+            if ($fullAddress !== '') {
+                $mapUrl = 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($fullAddress . ', Hrvatska');
+                $output .= '<p class="tvrtke-source"><a href="' . esc_url($mapUrl) .
+                    '" target="_blank" rel="noopener noreferrer">' .
+                    esc_html__('Prikaži adresu na karti ↗', 'tvrtke-registar') .
+                    '</a></p>';
+            }
+            $output .= '<h3>' . esc_html__('Registrirane djelatnosti', 'tvrtke-registar') . '</h3><ul>';
             foreach (array_slice((array)($item['activities'] ?? []), 0, 100) as $row) {
                 if (!is_array($row)) continue;
                 $output .= '<li>' . esc_html((string)(($row['activity_text'] ?? null) ?: (($row['nkd_name'] ?? null) ?: (($row['nkd_code'] ?? null) ?: '—')))) . '</li>';
