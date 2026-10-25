@@ -60,6 +60,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 return;
             }
             var status = (StatusInput.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "";
+            var type = (CategoryInput.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "all";
             var pageToLoad = requestedPage ?? 1;
             if (!Uri.TryCreate(_api, UriKind.Absolute, out var apiUrl) || apiUrl.Scheme != Uri.UriSchemeHttps ||
                 !string.IsNullOrEmpty(apiUrl.UserInfo) || !string.IsNullOrEmpty(apiUrl.Query) ||
@@ -68,7 +69,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 StatusText.Text = "API mora koristiti valjanu HTTPS adresu (TVRTKE_API_URL).";
                 return;
             }
-            var uri = $"{_api}/v1/subjects?q={Param(query)}&county={Param(county)}&activity={Param(activity)}&status={Param(status)}&page={pageToLoad}&limit=20";
+            var uri = $"{_api}/v1/directory?q={Param(query)}&type={Param(type)}&county={Param(county)}&activity={Param(activity)}&status={Param(status)}&page={pageToLoad}&limit=20";
             using var response = await Client.GetAsync(uri);
             response.EnsureSuccessStatusCode();
             var data = await response.Content.ReadFromJsonAsync<SubjectPage>();
@@ -82,8 +83,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             PreviousButton.IsEnabled = _page > 1;
             NextButton.IsEnabled = _hasMore;
             PageText.Text = _page.ToString();
-            StatusText.Text = $"Prikazano {_results.Count} · snimka {data.SnapshotId ?? "nije dostupna"}" +
-                              (data.Partial ? " · djelomični uvoz" : "");
+            StatusText.Text = $"Prikazano {_results.Count} zapisa · izvora: {data.Sources.Count + (data.SnapshotId is null ? 0 : 1)}" +
+                              (data.Partial ? " · baza nije potpuna" : "");
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or InvalidOperationException or JsonException)
         {
@@ -100,7 +101,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var token = _detailRequest.Token;
         try
         {
-            var uri = $"{_api}/v1/subjects/{Param(selected.Mbs)}";
+            var key = selected.RegistryKey;
+            if (string.IsNullOrWhiteSpace(key) && selected.Mbs.Length == 9) key = "sudreg:" + selected.Mbs;
+            var parts = key.Split(':', 2);
+            if (parts.Length != 2 || !new[] { "sudreg", "obrt", "udruga", "zaklada", "ostalo" }.Contains(parts[0]) ||
+                !System.Text.RegularExpressions.Regex.IsMatch(parts[1], @"^([a-f0-9]{64}|[0-9]{9})$"))
+            {
+                StatusText.Text = "Za ovaj subjekt nije dostupan valjan identifikator.";
+                return;
+            }
+            var uri = $"{_api}/v1/directory/{Param(parts[0])}/{Param(parts[1])}";
             using var response = await Client.GetAsync(uri, token);
             response.EnsureSuccessStatusCode();
             var details = await response.Content.ReadFromJsonAsync<SubjectDetail>(cancellationToken: token);
@@ -140,12 +150,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (dialog.ShowDialog(this) != true) return;
         try
         {
-            var content = new StringBuilder("Naziv;MBS;OIB;Status;Pravni oblik;Mjesto;Županija\r\n");
+            var content = new StringBuilder("Naziv;Izvor;Broj registra;MBS;OIB;Status;Pravni oblik;Mjesto;Županija\r\n");
             foreach (var item in _results)
             {
                 content.AppendJoin(';', new[]
                 {
-                    CsvCell(item.Name), CsvCell(item.Mbs), CsvCell(item.Oib),
+                    CsvCell(item.Name), CsvCell(item.SourceLabel), CsvCell(item.SourceIdentifier),
+                    CsvCell(item.Mbs), CsvCell(item.Oib),
                     CsvCell(item.StatusLabel), CsvCell(item.LegalForm),
                     CsvCell(item.Settlement), CsvCell(item.County)
                 });
@@ -211,13 +222,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void ToggleFavorite_Click(object sender, RoutedEventArgs e)
     {
         var selected = SelectedSubject;
-        if (selected is null || string.IsNullOrWhiteSpace(selected.Mbs)) return;
-        var previous = _preferences.Favorites.FirstOrDefault(x => x.Mbs == selected.Mbs);
+        if (selected is null || string.IsNullOrWhiteSpace(selected.UniqueKey)) return;
+        var previous = _preferences.Favorites.FirstOrDefault(x => x.UniqueKey == selected.UniqueKey);
         if (previous is not null)
         {
             _preferences.Favorites.Remove(previous);
             FavoriteButton.Content = "Dodaj u favorite";
-            if (_favoritesMode) _results.Remove(_results.FirstOrDefault(x => x.Mbs == selected.Mbs)!);
+            if (_favoritesMode)  _results.Remove(_results.FirstOrDefault(x => x.UniqueKey == selected.UniqueKey)!);
         }
         else
         {
@@ -250,7 +261,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         _detailRequest?.Cancel();
         SelectedSubject = selected;
         FavoriteButton.IsEnabled = selected is not null;
-        FavoriteButton.Content = selected is not null && _preferences.Favorites.Any(x => x.Mbs == selected.Mbs) ? "Ukloni iz favorita" : "Dodaj u favorite";
+        FavoriteButton.Content = selected is not null && _preferences.Favorites.Any(x => x.UniqueKey == selected.UniqueKey) ? "Ukloni iz favorita" : "Dodaj u favorite";
         if (selected is not null) await LoadDetailsAsync(selected);
     }
 }
@@ -266,6 +277,20 @@ public sealed class Activity
 public sealed class Subject
 {
     [JsonPropertyName("mbs")] public string Mbs { get; set; } = "";
+    [JsonPropertyName("registry_key")] public string RegistryKey { get; set; } = "";
+    [JsonPropertyName("source_type")] public string SourceType { get; set; } = "sudreg";
+    [JsonPropertyName("source_identifier")] public string? SourceIdentifier { get; set; }
+    [JsonPropertyName("status_label")] public string? ApiStatusLabel { get; set; }
+    public string UniqueKey => !string.IsNullOrWhiteSpace(RegistryKey) ? RegistryKey : (Mbs.Length == 9 ? "sudreg:" + Mbs : "");
+    public string SourceLabel => SourceType switch
+    {
+        "sudreg" => "Sudski registar",
+        "obrt" => "Obrt",
+        "udruga" => "Udruga",
+        "zaklada" => "Zaklada",
+        "ostalo" => "Ostalo",
+        _ => "Nepoznato"
+    };
     [JsonPropertyName("oib")] public string? Oib { get; set; }
     [JsonPropertyName("name")] public string? Name { get; set; }
     [JsonPropertyName("county")] public string? County { get; set; }
@@ -274,12 +299,12 @@ public sealed class Subject
     [JsonPropertyName("house_number")] public string? HouseNumber { get; set; }
     [JsonPropertyName("legal_form")] public string? LegalForm { get; set; }
     [JsonPropertyName("legal_form_short")] public string? LegalFormShort { get; set; }
-    [JsonPropertyName("status")] public int Status { get; set; }
+    [JsonPropertyName("status")] public int? Status { get; set; }
     [JsonPropertyName("partial")] public bool Partial { get; set; }
     [JsonPropertyName("activities")] public List<Activity> Activities { get; set; } = [];
     public string Address => string.Join(" ", new[] { Street, HouseNumber }.Where(v => !string.IsNullOrWhiteSpace(v)));
     public string Location => string.Join(", ", new[] { Settlement, County }.Where(v => !string.IsNullOrWhiteSpace(v)));
-    public string StatusLabel => Status == 1 ? "Aktivan" : "Neaktivan / brisan";
+    public string StatusLabel => ApiStatusLabel ?? (Status == 1 ? "Aktivan" : Status == 0 ? "Neaktivan / brisan" : "Nepoznat");
     public Visibility PartialVisibility => Partial ? Visibility.Visible : Visibility.Collapsed;
 }
 
@@ -294,4 +319,5 @@ public sealed class SubjectPage
     [JsonPropertyName("has_more")] public bool HasMore { get; set; }
     [JsonPropertyName("snapshot_id")] public string? SnapshotId { get; set; }
     [JsonPropertyName("partial")] public bool Partial { get; set; }
+    [JsonPropertyName("sources")] public List<JsonElement> Sources { get; set; } = [];
 }
