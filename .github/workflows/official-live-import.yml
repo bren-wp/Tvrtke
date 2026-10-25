@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - 'backend/tests/live_feed_mysql.php'
+      - 'backend/src/RegistryFeedSync.php'
       - '.github/workflows/official-live-import.yml'
   workflow_dispatch:
 permissions:
