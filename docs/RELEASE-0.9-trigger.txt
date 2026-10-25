@@ -1,0 +1,4 @@
+TVRTKE v0.9.0 Windows, WordPress plugin and source packages.
+Author Brendigo; Contributors brendigo.
+Includes responsive normal-sized WPF windows, local favorite collections, SVG icons and WordPress responsive admin/frontend.
+No credentials or private registry exports may be packaged.
