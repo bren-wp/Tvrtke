@@ -22,14 +22,17 @@ final class RegistryCsv
         if (preg_match('/^\d{4}-\d{2}-\d{2}$/D', $value)) $format = '!Y-m-d';
         elseif (preg_match('/^\d{1,2}\.\d{1,2}\.\d{4}$/D', $value)) $format = '!j.n.Y';
         elseif (preg_match('/^\d{1,2}\/\d{1,2}\/\d{4} \d{2}:\d{2}:\d{2} (AM|PM)$/D', $value)) $format = '!n/j/Y h:i:s A';
-        else throw new \InvalidArgumentException('Unsupported registry date format');
+        else return null; // Corrupt/unknown source dates are explicitly unknown, not fabricated.
         $date = \DateTimeImmutable::createFromFormat($format, $value);
         $issues = \DateTimeImmutable::getLastErrors();
         if (!$date || ($issues !== false && ($issues['warning_count'] > 0 || $issues['error_count'] > 0)) ||
             $date->format('Y-m-d') < '1800-01-01' ||
             ($format === '!Y-m-d' && $date->format('Y-m-d') !== $value) ||
             ($format === '!j.n.Y' && $date->format('j.n.Y') !== $value)) {
-            throw new \InvalidArgumentException('Invalid registry date');
+            // Official CSV exports can contain sentinel or invalid historical
+            // dates. Preserve the organization record and leave the unsupported
+            // date unknown instead of dropping the entire national snapshot.
+            return null;
         }
         return $date->format('Y-m-d');
     }

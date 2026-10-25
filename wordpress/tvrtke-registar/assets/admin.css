@@ -1,0 +1,74 @@
+/* TVRTKE administration — standalone, WordPress-native page, 0.7 */
+.tvrtke-admin{--tv-navy:#0b2d4a;--tv-teal:#00ada8;--tv-muted:#55718f;--tv-line:#deeaf3;
+  margin:20px 20px 0 0;color:var(--tv-navy);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.tvrtke-admin *{box-sizing:border-box}
+.tvrtke-admin .tvrtke-admin-hero{display:flex;align-items:center;gap:30px;padding:25px 32px;
+  border:1px solid #e3edf3;border-radius:12px;background:linear-gradient(115deg,#fff 62%,#eaf9fc);
+  margin-bottom:14px;min-height:136px;box-shadow:0 3px 12px #16375406}
+.tvrtke-admin .tvrtke-brand{display:flex;gap:13px;align-items:center;min-width:265px}
+.tvrtke-admin .tvrtke-brand img{width:73px;height:73px}
+.tvrtke-admin .tvrtke-brand strong{font-size:40px;letter-spacing:-1.5px;line-height:1;font-weight:800}
+.tvrtke-admin .tvrtke-brand small{display:block;font-size:11px;letter-spacing:.15em;margin-top:7px;color:#376383}
+.tvrtke-admin .tvrtke-hero-copy{border-left:1px solid #dce8f0;padding-left:29px;flex:1}
+.tvrtke-admin .tvrtke-hero-copy h1{color:#0b2d4a;font-size:23px;line-height:1.3;margin:0 0 8px;font-weight:800}
+.tvrtke-admin .tvrtke-hero-copy p{font-size:13px;line-height:1.5;color:#5f7795;margin:0;max-width:650px}
+.tvrtke-admin .tvrtke-server-badge{padding:17px;background:#f0fafb;border-radius:11px;
+  flex:0 0 185px;text-align:center}
+.tvrtke-admin .tvrtke-server-badge span{font-size:12px;color:#55728f;display:block;margin-bottom:5px}
+.tvrtke-admin .tvrtke-server-badge strong{color:#008e98;font-size:16px}
+.tvrtke-admin .tvrtke-tabs{display:flex;gap:2px;align-items:center;overflow-x:auto;
+  background:white;border:1px solid #e3edf4;border-radius:11px;padding:0 12px;margin-bottom:15px}
+.tvrtke-admin .tvrtke-tabs a{padding:16px 21px;display:inline-flex;gap:8px;align-items:center;white-space:nowrap;
+  text-decoration:none;color:#234a73;font-size:14px;border-bottom:3px solid transparent;font-weight:550}
+.tvrtke-admin .tvrtke-tabs a:hover,.tvrtke-admin .tvrtke-tabs a:focus{color:#008e98}
+.tvrtke-admin .tvrtke-tabs a.is-current{color:#008e98;border-color:#00aca7;font-weight:750}
+.tvrtke-admin .tvrtke-admin-layout{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(320px,.88fr);gap:15px}
+.tvrtke-admin .tvrtke-card{background:white;border:1px solid #e0eaf2;border-radius:12px;
+  padding:21px 23px;box-shadow:0 2px 10px rgba(12,46,83,.025);margin-bottom:14px}
+.tvrtke-admin .tvrtke-card h2{margin:0 0 5px;font-size:20px;line-height:1.3;color:#0b2d4a;font-weight:800}
+.tvrtke-admin .tvrtke-card>p{color:#65809d;font-size:13px;margin:0 0 17px}
+.tvrtke-admin .tvrtke-row{display:grid;grid-template-columns: minmax(165px,.95fr) minmax(0,1.3fr);
+  gap:16px;align-items:center;border-top:1px solid #f0f3f7;padding:15px 0}
+.tvrtke-admin .tvrtke-row label{color:#153a60;font-weight:750;font-size:13px}
+.tvrtke-admin .tvrtke-row .description{font-size:12px;font-weight:400;color:#71839a;margin-top:6px;line-height:1.35}
+.tvrtke-admin .tvrtke-row input[type=url],
+.tvrtke-admin .tvrtke-row input[type=number],
+.tvrtke-admin .tvrtke-row select{width:100%;max-width:none;min-height:41px;border-radius:7px;border:1px solid #cfddea;
+  padding:7px 10px;background:white;color:#183657}
+.tvrtke-admin .tvrtke-row input[type=checkbox]{accent-color:#00a6a1;width:19px;height:19px;vertical-align:middle}
+.tvrtke-admin .tvrtke-inline-switch{display:flex;align-items:center;gap:10px;font-size:13px;color:#59738f}
+.tvrtke-admin .tvrtke-hint{background:#eaf5fd;color:#23577d;border-radius:8px;padding:13px 15px;
+  font-size:13px;line-height:1.5;margin-top:12px}
+.tvrtke-admin .tvrtke-warning{background:#fff8e9;border-left:3px solid #ce9b43;padding:12px;color:#765a26;border-radius:7px}
+.tvrtke-admin .tvrtke-admin-preview{border:1px solid #e4edf3;border-radius:11px;padding:21px;margin-top:12px;
+  background:linear-gradient(135deg,#fbfeff,#eaf8f9)}
+.tvrtke-admin .tvrtke-preview-head{display:flex;align-items:center;gap:12px;color:#0b2d4a;font-weight:800;font-size:21px;margin-bottom:15px}
+.tvrtke-admin .tvrtke-preview-head img{width:52px;height:52px}
+.tvrtke-admin .tvrtke-preview-search{display:flex;gap:7px}
+.tvrtke-admin .tvrtke-preview-search span{flex:1;border:1px solid #d5e1ed;background:white;
+ border-radius:7px;padding:10px;color:#8195ac}
+.tvrtke-admin .tvrtke-preview-search b{background:#00aaa7;color:white;border-radius:7px;padding:11px 18px}
+.tvrtke-admin .tvrtke-preview-cats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.tvrtke-admin .tvrtke-preview-cats span{padding:13px 3px;text-align:center;color:#13527c;font-size:12px;
+ border-radius:8px;border:1px solid #dcebf4;background:white;font-weight:700}
+.tvrtke-admin .tvrtke-shortcode{display:flex;gap:12px;align-items:center;padding:15px;
+  background:#f0f5fa;border:1px solid #dfe9f3;border-radius:8px;overflow-wrap:anywhere}
+.tvrtke-admin .tvrtke-shortcode code{font-size:15px;color:#123c66;background:none}
+.tvrtke-admin .tvrtke-note{font-size:12px;color:#6f879f;line-height:1.5;margin-top:10px}
+.tvrtke-admin input:focus-visible,.tvrtke-admin a:focus-visible,
+.tvrtke-admin select:focus-visible{outline:3px solid #76c5e8;outline-offset:2px}
+.tvrtke-admin .submit{margin:6px 0 10px}
+.tvrtke-admin .button-primary{background:#009d9d;border-color:#008d8c;padding:4px 20px;min-height:40px}
+.tvrtke-admin .button-primary:hover{background:#007f87;border-color:#007b83}
+@media(max-width:1180px){.tvrtke-admin .tvrtke-admin-layout{grid-template-columns:1fr}.tvrtke-admin .tvrtke-admin-hero{flex-wrap:wrap}}
+@media(max-width:782px){
+ .tvrtke-admin{margin:12px 10px 0 0}
+ .tvrtke-admin .tvrtke-admin-hero{padding:18px;gap:15px}
+ .tvrtke-admin .tvrtke-hero-copy{border-left:0;padding-left:0}
+ .tvrtke-admin .tvrtke-row{grid-template-columns:1fr;gap:6px}
+ .tvrtke-admin .tvrtke-card{padding:17px}
+ .tvrtke-admin .tvrtke-server-badge{flex:1 1 100%}
+ .tvrtke-admin .tvrtke-brand strong{font-size:31px}
+}
+@media(max-width:460px){.tvrtke-admin .tvrtke-preview-cats{grid-template-columns:repeat(2,1fr)}}
+@media(prefers-reduced-motion:reduce){.tvrtke-admin *{transition:none!important;animation:none!important}}

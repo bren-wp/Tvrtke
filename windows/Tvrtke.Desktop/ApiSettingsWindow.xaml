@@ -1,16 +1,58 @@
 <Window x:Class="Tvrtke.Desktop.ApiSettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="TVRTKE – API postavke" Width="540" Height="230"
-        WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
-    <StackPanel Margin="22">
-        <TextBlock Text="Adresa centralnog API-ja (HTTPS)" FontWeight="SemiBold" Margin="0,0,0,8"/>
-        <TextBox x:Name="AddressInput" MinHeight="34" Padding="8" AutomationProperties.Name="HTTPS adresa centralnog API-ja"/>
-        <TextBlock Text="Unesite samo pouzdanu HTTPS adresu. Nema potrebe za unosom tajnih ključeva."
-                   Margin="0,10,0,18" Foreground="#526173" TextWrapping="Wrap"/>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Odustani" Width="110" Margin="0,0,8,0" Click="Cancel_Click"/>
-            <Button Content="Spremi" Width="110" Click="Save_Click"/>
-        </StackPanel>
-    </StackPanel>
+        Title="TVRTKE — API i sigurnost" Width="735" Height="545" MinWidth="620"
+        WindowStartupLocation="CenterOwner" ResizeMode="CanResize"
+        MinHeight="465" Background="#F0F8FB" FontFamily="Segoe UI"
+        UseLayoutRounding="True" SnapsToDevicePixels="True">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/><RowDefinition Height="*"/><RowDefinition Height="64"/>
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0" CornerRadius="12" Background="#0B2D4A" Padding="22" Margin="0,0,0,12">
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="API veza i sigurnost" Foreground="White" FontSize="23" FontWeight="Bold"/>
+                <TextBlock Text="Centralni javni servis · bez lokalnog pohranjivanja pristupnih tajni"
+                           Foreground="#ACDEE4" Margin="0,6,0,0" FontSize="13"/>
+            </StackPanel>
+        </Border>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <Border Background="White" CornerRadius="12" Padding="20" BorderBrush="#E1EDF3" BorderThickness="1" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="HTTPS adresa javnog API-ja" Foreground="#0B2D4A" FontWeight="Bold" FontSize="17"/>
+                        <TextBlock Text="Aplikacija čita dopuštene podatke; sinkronizaciju službenih registara provodi privatni poslužitelj."
+                                   Foreground="#5A7591" TextWrapping="Wrap" Margin="0,7,0,14"/>
+                        <TextBox x:Name="AddressInput" Height="42" Padding="11,8"
+                                 AutomationProperties.Name="HTTPS adresa javnog TVRTKE API-ja"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,15,0,5">
+                            <Button x:Name="TestButton" Content="◉  Provjeri vezu" Click="Test_Click"
+                                    Padding="17,9" Height="39" Foreground="White" Background="#00AFA9"
+                                    BorderThickness="0" Cursor="Hand"/>
+                        </StackPanel>
+                        <TextBlock x:Name="ConnectionStatus" Text="Veza još nije provjerena."
+                                   FontSize="13" Foreground="#50728D" TextWrapping="Wrap" Margin="0,8,0,0"/>
+                    </StackPanel>
+                </Border>
+                <Border Background="White" CornerRadius="12" BorderBrush="#E1EDF3" BorderThickness="1" Padding="20">
+                    <StackPanel>
+                        <TextBlock Text="Zaštita pristupnih podataka" FontSize="17" FontWeight="Bold" Foreground="#0B2D4A"/>
+                        <TextBlock Margin="0,10,0,5" Text="✓  Sudreg Client ID i Secret ostaju na backendu." Foreground="#19795F"/>
+                        <TextBlock Margin="0,4,0,5" Text="✓  MySQL pristup nije ugrađen u Windows aplikaciju." Foreground="#19795F"/>
+                        <TextBlock Margin="0,4,0,5" Text="✓  Prikazuju se samo objavljeni javno dopušteni podaci." Foreground="#19795F" TextWrapping="Wrap"/>
+                        <TextBlock Margin="0,12,0,0" Text="Status i potpunost baze ovise o stvarnoj sinkronizaciji poslužitelja; ova aplikacija ne upravlja tajnim ključevima."
+                                   TextWrapping="Wrap" Foreground="#687D95"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+        <Border Grid.Row="2" Background="Transparent" Padding="0,15,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Odustani" Width="117" Height="39" Margin="0,0,12,0"
+                        Background="White" Foreground="#0B2D4A" BorderBrush="#C9DCE9" Click="Cancel_Click"/>
+                <Button Content="Spremi postavke" Width="150" Height="39" Background="#0B2D4A"
+                        Foreground="White" BorderThickness="0" Click="Save_Click"/>
+            </StackPanel>
+        </Border>
+    </Grid>
 </Window>
