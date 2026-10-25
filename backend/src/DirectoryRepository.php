@@ -59,6 +59,9 @@ final class DirectoryRepository
         $query = trim($query);
         $segments = [];
         $params = [];
+        // At most the first K candidates from each source can contribute to the
+        // global top K; cap each branch before UNION to reduce MySQL temp tables.
+        $candidateCap = ($page * $limit) + 1;
         $county = trim((string)($filters['county'] ?? ''));
         $settlement = trim((string)($filters['settlement'] ?? ''));
         $activity = trim((string)($filters['activity'] ?? ''));
@@ -93,7 +96,7 @@ final class DirectoryRepository
                       AND d.mbs=s.mbs AND (d.activity_text LIKE ? ESCAPE '!' OR d.nkd_name LIKE ? ESCAPE '!' OR d.nkd_code=?))";
                 array_push($params,self::prefix($activity),self::prefix($activity),$activity);
             }
-            $segments[] = $court;
+            $segments[] = 'SELECT * FROM (' . $court . ' ORDER BY n.name,s.mbs LIMIT ' . (int)$candidateCap . ') AS court_slice';
         }
         if ($type !== 'sudreg' && $legal === '') {
             $external = "SELECT CONCAT(r.source_type,':',r.record_hash) AS registry_key,
@@ -116,7 +119,7 @@ final class DirectoryRepository
             if ($settlement !== '') { $external .= " AND r.settlement LIKE ? ESCAPE '!'"; $params[] = self::prefix($settlement); }
             if ($status !== '') { $external .= " AND r.status=?"; $params[] = $status === '1' ? 'active' : 'inactive'; }
             if ($activity !== '') { $external .= " AND r.activity LIKE ? ESCAPE '!'"; $params[] = self::prefix($activity); }
-            $segments[] = $external;
+            $segments[] = 'SELECT * FROM (' . $external . ' ORDER BY r.name,r.source_type,r.record_hash LIMIT ' . (int)$candidateCap . ') AS external_slice';
         }
         if ($segments === []) return ['items'=>[], 'page'=>$page, 'limit'=>$limit, 'has_more'=>false,
             'partial'=>$partial,'snapshot_id'=>$snapshot,'sources'=>$registered];
