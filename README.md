@@ -1,85 +1,86 @@
-# TVRTKE — Poslovni registar Hrvatske
+<div align="center">
 
-Razvojna verzija zajedničkog sustava za **tvrtke.com.hr**: centralni PHP/MySQL API, WordPress plugin i Windows desktop klijent. Izvor podataka je javni API Sudskog registra RH **v3.0.4**. Ciljana platforma je **MyDataKnox KNOX L**, uz ograničen kapacitet shared hostinga.
+<img src="docs/assets/tvrtke-hero.svg" alt="TVRTKE — Hrvatski poslovni imenik" width="100%"/>
 
-> **Status: v0.5.0 – razvojno izdanje, nije spremno za produkciju.** Nije postavljeno na tvrtke.com.hr; stvarna sinkronizacija nije provjerena bez tvojih OAuth2 pristupnih podataka i hostinga. Trenutačni uvoz sadrži pet odabranih skupova (`subjekti`, `tvrtke`, `sjedista`, `pravni_oblici`, `predmeti_poslovanja`) i može biti namjerno ograničen brojem redaka. Time baza nije potpuni Sudski registar.
+<br/>
 
-## Komponente
+### 🇭🇷 Hrvatski poslovni imenik. Jednostavno, pregledno i na jednom mjestu.
 
-- [`backend/`](backend/) — PHP 8.2+, PDO MySQL, OAuth2 Sudreg klijent, verzionirana baza, cron importer i javni JSON API.
-- [`wordpress/tvrtke-registar/`](wordpress/tvrtke-registar/) — dodatak za WordPress s postavkom API adrese i shortcodeom `[tvrtke_pretraga]`.
-- [`windows/Tvrtke.Desktop/`](windows/Tvrtke.Desktop/) — početni nativni WPF desktop klijent za Windows (.NET 10).
-- [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) — točni koraci instalacije na cPanel shared hosting i sigurnosna pravila.
-- [`docs/ROADMAP.md`](docs/ROADMAP.md) — poznata ograničenja i sljedeće razvojne faze.
+**Pronađite informacije o poslovnim subjektima kroz više javnih registara Hrvatske.**
 
-## Kako radi
+[🌐 Posjetite tvrtke.com.hr](https://tvrtke.com.hr) · [🪟 Windows aplikacija](https://github.com/bren-wp/Tvrtke/releases) · [🧩 WordPress dodatak](https://github.com/bren-wp/Tvrtke/releases)
 
-1. Cron pokreće `backend/bin/sync.php` (jedna ograničena API stranica po izvođenju).
-2. Importer dohvaća najnoviji dostupni Sudreg `snapshot_id` i drži ga konstantnim tijekom uvoza.
-3. Podaci se pohranjuju u MySQL s ključem `(snapshot_id, MBS)`. Napredak se atomarno sprema sa svakom serijom.
-4. Tek nakon uvoza svih pet skupova objavljuje se nova aktivna snimka u `app_state`.
-5. Windows i WordPress čitaju **isti** skup s API-ja, bez izravne veze na MySQL iz Windows aplikacije.
-6. Zasebni cron `backend/bin/prune.php` postupno briše stare snimke radi kontrole prostora.
+</div>
 
-## Brzi pregled API-ja
+---
 
-| Ruta | Pristup | Namjena |
-| --- | --- | --- |
-| `GET /v1/health` | Javno | Status PHP servisa (ne provjerava bazu) |
-| `GET /v1/subjects?q=...&page=1&limit=20` | Javno | Pretraživanje naziva prefiksom, OIB-a ili MBS-a |
-| `GET /v1/subjects/{mbs}` | Javno | Lokalni osnovni podaci subjekta |
-| `GET /v1/status` | Admin Bearer token | Interni status importera |
+## 🔎 Jedna tražilica. Više mogućnosti.
 
-### Lokalna provjera
+TVRTKE okuplja pretraživanje poslovnih subjekata u jednostavno, moderno sučelje. Bez nepotrebnih koraka pronađite naziv, registracijski broj, mjesto, djelatnost i ostale javno dostupne podatke iz **povezanih registara**.
 
-```sh
-php -l backend/public/index.php
-php backend/tests/identity.php
-php -S 127.0.0.1:8080 -t backend/public backend/public/router.php
-# u drugoj konzoli: curl http://127.0.0.1:8080/v1/health
-```
+| 🏢 Tvrtke | 🛍️ Obrti | 🤝 Udruge | 🌱 Zaklade |
+|:--:|:--:|:--:|:--:|
+| Subjekti Sudskog registra | Obrtni registar | Registar udruga | Registar zaklada |
+| Naziv, OIB i MBS | Registracijski podaci | Osnovni podaci | Osnovni podaci |
 
-Za stvarnu pretragu potrebna je MySQL baza s instaliranom shemom i objavljena snimka.
+*Dostupnost i obuhvat pojedine kategorije ovise o uspješno povezanim i uvezenim službenim izvorima. Nisu svi registri unaprijed uključeni u preuzimanje.*
 
-## Izvori
+## ✨ Sve što vam je potrebno za brže pretraživanje
 
-- [Sudreg – službeni changelog](https://sudreg-data.gov.hr/api/javni/dokumentacija/changelog)
-- [Sudreg – SwaggerHub v3.0.4](https://app.swaggerhub.com/apis/mpu.gov.hr/sudreg_javni/v3.0.4)
-- Dokumentacija korisnika *Upute za razvojne inženjere, v3.0.0* i OpenAPI v3.0.4 dostavljeni za projekt.
+| | |
+| --- | --- |
+| 🔍 **Pametna pretraga** | Pretražite naziv ili identifikator subjekta na jednom mjestu. |
+| 🎛️ **Napredni filtri** | Suzite prikaz prema vrsti subjekta, županiji, djelatnosti i statusu. |
+| 📋 **Pregledni profili** | Registracijski podaci, lokacija i raspoložive informacije iz izvora. |
+| 🏷️ **Podrijetlo podataka** | Jasno naznačen registar i dostupna informacija o ažurnosti. |
+| ⭐ **Favoriti na Windowsu** | Spremite subjekte koje najčešće provjeravate. |
+| 📁 **CSV izvoz** | Izvezite trenutačno prikazane rezultate iz Windows aplikacije. |
+| 📱 **Mobilni prikaz** | WordPress tražilica prilagođava se telefonu, tabletu i računalu. |
+| 🔐 **Sigurna veza** | Windows i WordPress komuniciraju s centralnim API-jem putem HTTPS-a. |
 
-## Licenca
+## 🖼️ Jednostavno sučelje, jasni rezultati
 
-MIT. Prije javne objave velike baze treba provjeriti uvjete korištenja službenih podataka, osobne podatke i GDPR te odgovarajuće obveze informiranja korisnika.
+<img src="docs/assets/tvrtke-preview.svg" alt="Ilustracija korisničkog sučelja TVRTKE s filtrima i karticama poslovnih subjekata" width="100%"/>
 
-## Novosti v0.2.0 (razvojna grana)
+<sub>Vizualna ilustracija korisničkog iskustva; nazivi i kartice nisu stvarni zapisi iz registara.</sub>
 
-- Dodatna migracija [`002_enrichment.sql`](backend/database/002_enrichment.sql) za pravne oblike i registrirane djelatnosti.
-- `Sync` sada preuzima i `pravni_oblici` i `predmeti_poslovanja` u ograničenim serijama, koristeći `expand_relations=true`.
-- API podržava filtre `county`, `settlement`, `status`, `activity`, `legal_form`; detalji subjekta uključuju listu djelatnosti.
-- WordPress shortcode prikazuje kartice, pojedinačne profile i mobilno prilagodljive filtre.
-- Windows klijent nudi filtre i učitavanje detalja pri odabiru subjekta.
+## 🪟 TVRTKE za Windows
 
-Upute za nadogradnju i ograničenja: [`docs/RELEASE-0.2.md`](docs/RELEASE-0.2.md). **Ova grana nije produkcijsko izdanje.**
+Svakodnevni rad s poslovnim informacijama na velikom ekranu, uz preglednu tražilicu, profile, favorite i CSV izvoz.
 
-## Izdavanje i Windows instalacija (v0.5.0)
+**Odaberite način korištenja:**
 
-- `windows/installer/Tvrtke.iss` — Inno Setup 6 skripta za instalaciju po korisniku.
-- `.github/workflows/release.yml` — Windows self-contained single-file x64 EXE, Setup EXE, WordPress ZIP, izvorni ZIP i SHA256SUMS.
-- Nakon što `release/v0.5.0` grana primi commit, workflow izrađuje [GitHub razvojno izdanje](https://github.com/bren-wp/Tvrtke/releases/tag/v0.5.0).
-- Windows ima izvoz trenutačno prikazanih rezultata u CSV (ne cijelog registra).
-- Detalji i ograničenja: [`docs/RELEASE-0.4.md`](docs/RELEASE-0.5.md).
-- Binarke **nisu digitalno potpisane**, stvarna Sudreg sinkronizacija i produkcijska instalacija nisu provjerene.
+- **Setup.exe** — klasična instalacija s prečacem i mogućnošću deinstalacije.
+- **Portable.exe** — pokretanje bez klasične instalacije.
 
-## Pouzdanost prikaza u v0.5.0
+[⬇️ Preuzmite Windows aplikaciju](https://github.com/bren-wp/Tvrtke/releases)
 
-Oznaka djelomičnog uvoza pripada **objavljenoj** snimci. Ako započne sinkronizacija sljedeće snimke, upozorenje ostaje vidljivo. Importer odbija objaviti nepotpune ili prazne osnovne skupove. Windows ispravlja pogreške paginacije i hvata nevaljan JSON bez rušenja sučelja.
+## 🧩 TVRTKE za WordPress
 
+Dodajte profesionalnu tražilicu poslovnih subjekata na svoju WordPress stranicu.
 
-## Funkcije dodane u v0.5.0
+**Što dobivate?** Gutenberg blok, shortcode `[tvrtke_pretraga]`, responzivni prikaz, profile i filtre za jednostavno pregledavanje dostupnih registara.
 
-- **Windows:** postavke HTTPS API-ja, lokalno spremanje favorita i pristup favoritima bez mrežne pretrage.
-- **WordPress:** dinamički Gutenberg blok, filtar mjesta i obavezna izričita aktivacija povezivanja s vanjskom uslugom u *Postavke → TVRTKE*. Nakon nadogradnje administrator mora uključiti servis.
-- **WP.org:** službena Plugin Check provjera uključena je u CI. To nije potvrda odobrenja; prije slanja treba objaviti zasebnu politiku privatnosti i uvjete korištenja API-ja.
-- **Izdanje:** GitHub Actions izrađuje Portable EXE, Setup EXE, WordPress ZIP i ZIP izvornog projekta, s SHA-256 kontrolnim zbrojevima.
+[⬇️ Preuzmite WordPress dodatak](https://github.com/bren-wp/Tvrtke/releases)
 
-Detalji: [`docs/RELEASE-0.5.md`](docs/RELEASE-0.5.md).
+## 💙 Izgrađeno za Hrvatsku
+
+TVRTKE je neovisna aplikacija koja objedinjuje informacije iz povezanih javnih izvora kako bi pretraživanje bilo ugodnije i preglednije.
+
+**Službeni izvori:** [Sudski registar](https://sudreg-data.gov.hr/) · [Otvoreni podaci RH](https://data.gov.hr/) · [Preglednik Obrtnog registra](https://pretrazivac-obrta.gov.hr/)
+
+> **Napomena o točnosti:** TVRTKE nije službeni državni servis. Podaci su informativni. Pojedini izvori mogu biti nedostupni, djelomično uvezeni ili vremenski neusklađeni. Za službene pravne postupke provjerite podatke u izvornom registru.
+
+---
+
+<div align="center">
+
+<img src="docs/assets/tvrtke-icon.svg" alt="TVRTKE logotip" width="66"/>
+
+**TVRTKE · Poslovni imenik Hrvatske**
+
+[tvrtke.com.hr](https://tvrtke.com.hr) · [Izdanja](https://github.com/bren-wp/Tvrtke/releases) · [Podrška](https://github.com/bren-wp/Tvrtke/issues)
+
+<sub>© Brendigo · MIT</sub>
+
+</div>
