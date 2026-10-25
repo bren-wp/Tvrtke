@@ -1,0 +1,112 @@
+name: Package and Release
+on:
+  pull_request:
+  push:
+    branches:
+      - 'release/v*'
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build portable Windows executable and packaging assets
+        shell: pwsh
+        env:
+          VERSION: '0.3.0'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $version = $env:VERSION
+          $dist = Join-Path $env:RUNNER_TEMP 'tvrtke-release'
+          $publish = Join-Path $env:RUNNER_TEMP 'tvrtke-publish'
+          New-Item -ItemType Directory -Force -Path $dist, $publish | Out-Null
+          dotnet publish windows/Tvrtke.Desktop/Tvrtke.Desktop.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -p:DebugType=None -p:DebugSymbols=false -o $publish
+          if ($LASTEXITCODE -ne 0) { throw 'dotnet publish failed' }
+          $portableSource = Join-Path $publish 'Tvrtke.Desktop.exe'
+          if (!(Test-Path $portableSource)) { throw 'Published EXE not found' }
+          Copy-Item $portableSource (Join-Path $dist "TVRTKE-Portable-v$version-win-x64.exe")
+          Compress-Archive -Path 'wordpress/tvrtke-registar' -DestinationPath (Join-Path $dist "TVRTKE-WordPress-v$version.zip") -CompressionLevel Optimal
+          git archive --format=zip --output=(Join-Path $dist "TVRTKE-v$version-source.zip") HEAD
+          if ($LASTEXITCODE -ne 0) { throw 'git archive failed' }
+          'DIST_DIR=' + $dist | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      - name: Install Inno Setup
+        shell: pwsh
+        run: |
+          $compiler = 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe'
+          if (!(Test-Path $compiler)) {
+            choco install innosetup -y --no-progress --limit-output
+            if ($LASTEXITCODE -ne 0) { throw 'Inno Setup installation failed' }
+          }
+          if (!(Test-Path $compiler)) { throw 'ISCC.exe not found' }
+      - name: Build per-user Setup EXE
+        shell: pwsh
+        env:
+          VERSION: '0.3.0'
+        run: |
+          $compiler = 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe'
+          $publish = Join-Path $env:RUNNER_TEMP 'tvrtke-publish'
+          & $compiler "/DAppVersion=$env:VERSION" "/DSourceDir=$publish" "/DOutputDir=$env:DIST_DIR" 'windows/installer/Tvrtke.iss'
+          if ($LASTEXITCODE -ne 0) { throw 'ISCC packaging failed' }
+          $expected = Join-Path $env:DIST_DIR "TVRTKE-Setup-v$env:VERSION-win-x64.exe"
+          if (!(Test-Path $expected)) { throw 'Setup EXE was not generated' }
+      - name: Checksums and asset verification
+        shell: pwsh
+        env:
+          VERSION: '0.3.0'
+        run: |
+          $expected = @(
+            "TVRTKE-Portable-v$env:VERSION-win-x64.exe",
+            "TVRTKE-Setup-v$env:VERSION-win-x64.exe",
+            "TVRTKE-WordPress-v$env:VERSION.zip",
+            "TVRTKE-v$env:VERSION-source.zip"
+          )
+          $checksums = @()
+          foreach ($asset in $expected) {
+            $file = Join-Path $env:DIST_DIR $asset
+            if (!(Test-Path $file) -or (Get-Item $file).Length -lt 1024) { throw "Missing or empty asset: $asset" }
+            $hash = (Get-FileHash $file -Algorithm SHA256).Hash.ToLowerInvariant()
+            $checksums += "$hash *$asset"
+          }
+          $checksums | Set-Content -Path (Join-Path $env:DIST_DIR 'SHA256SUMS.txt') -Encoding utf8NoBOM
+          Get-ChildItem $env:DIST_DIR | Format-Table Name,Length
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TVRTKE-v0.3.0-release-assets
+          path: ${{ runner.temp }}/tvrtke-release/*
+          if-no-files-found: error
+          retention-days: 30
+
+  publish:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/release/v0.3.0'
+    needs: package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: TVRTKE-v0.3.0-release-assets
+          path: dist
+      - name: Publish v0.3.0 prerelease to GitHub
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ls -lh dist
+          if gh release view v0.3.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload v0.3.0 dist/* --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create v0.3.0 dist/* \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title 'TVRTKE v0.3.0 (razvojno izdanje)' \
+              --notes-file docs/RELEASE-0.3.md \
+              --prerelease
+          fi
