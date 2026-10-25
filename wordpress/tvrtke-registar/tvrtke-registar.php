@@ -135,9 +135,8 @@ final class Tvrtke_Registar
         // These public GET filters are read-only: no database writes, accounts, or privileged actions.
         // A nonce is deliberately not required so search result links remain shareable.
         $get = static function (string $key, int $max = 100): string {
-            $raw = $_GET[$key] ?? '';
-            if (!is_string($raw)) return '';
-            $clean = trim(sanitize_text_field(wp_unslash($raw)));
+            $raw = isset($_GET[$key]) ? sanitize_text_field(wp_unslash($_GET[$key])) : '';
+            $clean = trim($raw);
             return function_exists('mb_substr') ? mb_substr($clean, 0, $max) : substr($clean, 0, $max);
         };
         $query = $get('tvrtke_q');
@@ -148,7 +147,8 @@ final class Tvrtke_Registar
         if ($legalForm !== '' && !preg_match('/^[0-9]{1,12}$/D', $legalForm)) $legalForm = '';
         $status = $get('tvrtke_status', 1);
         if (!in_array($status, ['', '0', '1'], true)) $status = '';
-        $page = isset($_GET['tvrtke_page']) && is_scalar($_GET['tvrtke_page']) ? max(1, min(10000, absint($_GET['tvrtke_page']))) : 1;
+        $requestedPage = filter_input(INPUT_GET, 'tvrtke_page', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 10000]]);
+        $page = is_int($requestedPage) ? $requestedPage : 1;
         $mbs = $get('tvrtke_mbs', 9);
         $id = wp_unique_id('tvrtke-');
         $output = '<section class="tvrtke-registar" aria-label="' . esc_attr__('Pretraživanje poslovnih subjekata', 'tvrtke-registar') . '">';
