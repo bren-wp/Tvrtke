@@ -1,0 +1,3 @@
+TVRTKE 0.4.0 prerelease packaging trigger.
+CI runs: PHP snapshot tests, WPF build, Windows portable, Inno Setup, WordPress and source ZIP.
+Deployment and Sudreg live integration are not yet verified.
