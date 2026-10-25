@@ -17,7 +17,7 @@ $second = SudregCoverage::page(500,500,500,1250,1250,5000);
 must(!$second['finished'] && $second['next']===1000,'second page');
 $final = SudregCoverage::page(1000,500,250,1250,1250,5000);
 must($final['finished'] && !$final['truncated'] && $final['next']===1250,'last page');
-$bounded = SudregCoverage::page(1000,500,250,2500,2500,1250);
+$bounded = SudregCoverage::page(1000,250,250,2500,2500,1250);
 must($bounded['finished'] && $bounded['truncated'],'capped import');
 $unknown = SudregCoverage::page(0,500,100,null,null,5000);
 must($unknown['finished'] && $unknown['expected'] === null, 'unverified total must stay unknown');
