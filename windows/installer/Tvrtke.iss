@@ -1,7 +1,7 @@
 ; TVRTKE Windows per-user installer (Inno Setup 6).
 ; Values supplied by CI via /DAppVersion, /DSourceDir, /DOutputDir.
 #ifndef AppVersion
-  #define AppVersion "0.4.0"
+  #define AppVersion "0.8.0"
 #endif
 #ifndef SourceDir
   #error SourceDir must be supplied by the build workflow.
@@ -16,6 +16,10 @@ AppName=TVRTKE
 AppVersion={#AppVersion}
 AppVerName=TVRTKE {#AppVersion}
 AppPublisher=Brendigo
+AppCopyright=Copyright (C) 2026 Brendigo
+VersionInfoCompany=Brendigo
+VersionInfoDescription=TVRTKE - Poslovni imenik Hrvatske
+VersionInfoProductName=TVRTKE
 AppPublisherURL=https://tvrtke.com.hr
 AppSupportURL=https://github.com/bren-wp/Tvrtke/issues
 DefaultDirName={autopf}\TVRTKE

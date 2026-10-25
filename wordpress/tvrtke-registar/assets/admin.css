@@ -72,3 +72,42 @@
 }
 @media(max-width:460px){.tvrtke-admin .tvrtke-preview-cats{grid-template-columns:repeat(2,1fr)}}
 @media(prefers-reduced-motion:reduce){.tvrtke-admin *{transition:none!important;animation:none!important}}
+
+/* Read-only registry health panels and compact narrow-admin layout */
+.tvrtke-admin{container-type:inline-size}
+.tvrtke-admin .tvrtke-stats-value{font-size:clamp(2.2rem,5cqw,4rem);
+ line-height:1.2;color:#009d9d;font-weight:800;letter-spacing:-.04em;margin:12px 0}
+.tvrtke-admin .tvrtke-admin-table-scroll{overflow-x:auto;max-width:100%;
+ border:1px solid #dae8f2;border-radius:9px;margin:14px 0}
+.tvrtke-admin .tvrtke-admin-table-scroll table{min-width:620px;margin:0;border:0;border-collapse:collapse}
+.tvrtke-admin .tvrtke-admin-table-scroll th,
+.tvrtke-admin .tvrtke-admin-table-scroll td{padding:13px 14px;font-size:13px}
+.tvrtke-admin .tvrtke-admin-table-scroll th{font-weight:700;color:#294e74}
+.tvrtke-admin .tvrtke-admin-layout>*{min-width:0}
+.tvrtke-admin .tvrtke-hero-copy,.tvrtke-admin .tvrtke-card{min-width:0}
+.tvrtke-admin .tvrtke-tabs{scrollbar-width:thin}
+.tvrtke-admin .tvrtke-tabs a{min-height:50px}
+.tvrtke-admin .tvrtke-card .tvrtke-registar{max-width:100%}
+@container (max-width:1200px){
+ .tvrtke-admin-layout{grid-template-columns:minmax(0,1fr)}
+ .tvrtke-admin-hero{gap:20px;flex-wrap:wrap}
+ .tvrtke-admin .tvrtke-hero-copy{flex:1 1 320px}
+}
+@container (max-width:800px){
+ .tvrtke-admin .tvrtke-admin-hero{padding:17px 19px}
+ .tvrtke-admin .tvrtke-hero-copy{border-left:0;padding-left:0}
+ .tvrtke-admin .tvrtke-server-badge{flex:1 1 100%}
+ .tvrtke-admin .tvrtke-brand strong{font-size:30px}
+ .tvrtke-admin .tvrtke-brand img{width:57px;height:57px}
+ .tvrtke-admin .tvrtke-tabs a{padding:13px 11px}
+}
+@container (max-width:540px){
+ .tvrtke-admin .tvrtke-admin-hero{display:block}
+ .tvrtke-admin .tvrtke-hero-copy{margin:17px 0 0}
+ .tvrtke-admin .tvrtke-card{padding:15px}
+ .tvrtke-admin .tvrtke-row{grid-template-columns:1fr;gap:7px;padding:12px 0}
+ .tvrtke-admin .tvrtke-preview-search{flex-wrap:wrap}
+ .tvrtke-admin .tvrtke-preview-search span,
+ .tvrtke-admin .tvrtke-preview-search b{flex:1 1 100%}
+ .tvrtke-admin .tvrtke-preview-cats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}

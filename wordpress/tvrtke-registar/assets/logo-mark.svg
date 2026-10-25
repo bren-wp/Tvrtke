@@ -1,10 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="TVRTKE znak">
-  <defs><linearGradient id="a" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#07ded0"/><stop offset="1" stop-color="#007c89"/></linearGradient></defs>
-  <path d="M10 111V81L35 65V111Z" fill="#009ca6"/>
-  <path d="M37 111V45L65 26V111Z" fill="url(#a)"/>
-  <path d="M68 111V14L95 30V111Z" fill="#0b2d4a"/>
-  <path d="M98 111V61L119 78V111Z" fill="#0abeb4"/>
-  <path d="M19 99L48 88L74 92L103 52" stroke="#fff" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M19 99L48 88L74 92L103 52" stroke="#00a8a8" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  <g fill="#00b7ae" stroke="#fff" stroke-width="5"><circle cx="19" cy="99" r="9"/><circle cx="48" cy="88" r="9"/><circle cx="74" cy="92" r="9"/><circle cx="103" cy="52" r="9"/></g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="TVRTKE">
+  <defs>
+    <linearGradient id="tv-mark-teal" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#27DECE"/><stop offset="1" stop-color="#009EAB"/>
+    </linearGradient>
+    <linearGradient id="tv-mark-blue" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#0B2D4A"/><stop offset="1" stop-color="#13597F"/>
+    </linearGradient>
+  </defs>
+  <path d="M9 117V81L33 64V117Z" fill="#008C9B"/>
+  <path d="M37 117V44L64 25V117Z" fill="url(#tv-mark-teal)"/>
+  <path d="M68 117V11L94 29V117Z" fill="url(#tv-mark-blue)"/>
+  <path d="M98 117V62L121 79V117Z" fill="#05B7B1"/>
+  <path d="M19 106L48 93L76 96L105 54" stroke="#FFFFFF" stroke-width="11" fill="none"
+    stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M19 106L48 93L76 96L105 54" stroke="#03A9AD" stroke-width="4" fill="none"
+    stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="#00ACAA" stroke="#FFFFFF" stroke-width="5">
+    <circle cx="19" cy="106" r="9"/><circle cx="48" cy="93" r="9"/>
+    <circle cx="76" cy="96" r="9"/><circle cx="105" cy="54" r="9"/>
+  </g>
 </svg>

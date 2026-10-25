@@ -60,3 +60,13 @@ Statični brand SVG je u `wordpress/tvrtke-registar/assets/logo-mark.svg`. Windo
 - Provjeriti `empty/loading/error/partial` stanja te dugotrajni import i prekid veze.
 - Testirati opseg podataka i datum objave na stvarnom MyDataKnox hostingu, tek nakon zasebne privatne konfiguracije.
 - Ne označavati status 1:1 ako vizualna diffs provjera nije stvarno provedena.
+
+## Promjene v0.8.0 i pragovi prilagodbe
+
+**Windows:** referentni desktop raspored ostaje 252 px sidebar + stupac rezultata i profil; pri širini prozora < 1330 DIPs sidebar se sužava na 210 px; pri < 1120 DIPs zamjenjuje se kompaktnim izbornikom koji zadržava sve radnje. Filteri se prelamaju u 4 / 2 / 1 stupac oko 1230 i 790 DIPs. Ispod 995 DIPs detalji se prikazuju ispod rezultata; sadržaj je vertikalno pomičan i kad je Windows skaliranje 150% ili više. Najmanja dopuštena širina prozora: 540 DIPs.
+
+**WordPress:** CSS container query na širini samog kratkog koda/Gutenberg bloka prelama tražilicu na 5 / 3 / 2 / 1 stupac te rezultate i kartice na mobilnom sadržajnom prostoru. Dodatni filtri otvoreni su izvorno podržanim HTML elementom `details` koji radi i bez JavaScripta. Administracija prelama hero, tabove, pregled i podatkovne tablice, a podizbornici za podatkovne izvore i statistiku prikazuju stvarne metapodatke API-ja.
+
+**Autorstvo:** `Author: Brendigo`; `Contributors: brendigo`. Windows Company, Authors i instalacijski izdavač koriste `Brendigo`.
+
+**Granice potvrde:** uspješna kompilacija, lint i Plugin Check ne jamče egzaktan pikselni diff s PNG referencama. Ne postoje automatske snimke Windows desktopa na jednakoj Windows temi/DPI-ju i učitanoj privatnoj bazi, pa je 1:1 stanje i dalje zadatak vizualne provjere.

@@ -1,10 +1,10 @@
 === TVRTKE – Poslovni registar ===
-Contributors: bren-wp
+Contributors: brendigo
 Tags: business directory, company search, registry, croatia
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 0.7.0
+Stable tag: 0.8.0
 License: MIT
 License URI: https://opensource.org/license/mit
 
@@ -30,7 +30,7 @@ Key features:
 **External service disclosure:** This plugin requires a separately deployed
 TVRTKE API and a database. It does not include a complete Croatian registry.
 The administrator configures a trusted HTTPS endpoint and must explicitly opt in
-on Settings > TVRTKE before the plugin makes external requests.
+in the TVRTKE administration panel before the plugin makes external requests.
 
 When a visitor searches after the service is enabled, the WordPress server
 forwards the search term (which may include a company name, OIB or registration
@@ -54,7 +54,7 @@ TVRTKE is independent software, not an official Croatian government service.
 
 1. Configure a separately hosted TVRTKE PHP/MySQL API and complete the applicable database migrations.
 2. Upload the plugin ZIP in WordPress and activate it.
-3. In Settings > TVRTKE, enter the trusted API HTTPS URL and explicitly enable the external service.
+3. In TVRTKE > API postavke, enter the trusted API HTTPS URL and explicitly enable the external service.
 4. Add the Gutenberg block "TVRTKE pretraga" or the shortcode [tvrtke_pretraga].
 5. Once official source data has been imported, visitors can search the published records.
 
@@ -77,6 +77,15 @@ expires through standard transient expiration.
 
 == Changelog ==
 
+= 0.8.0 =
+* New reference-matched Croatian TVRTKE business directory interface with responsive five-field search bar.
+* Native, keyboard-accessible "Više filtara" advanced search and resilient mobile layouts.
+* Rebuilt admin dashboard and layout settings with adaptive design for narrow WordPress screens.
+* Clearer category links, individual registry profiles and publicly sourced status information.
+* Updated plugin branding and release metadata: Author Brendigo, contributor brendigo.
+* WordPress administration submenus for search, official registry source publication details, real source-based statistics, and help.
+
+
 = 0.7.0 =
 * Official registry lifecycle information, including status, start date and removal date when publicly supplied.
 * Multi-registry results enriched with registration provenance and source freshness.
@@ -84,7 +93,7 @@ expires through standard transient expiration.
 * Compatible with a central backend that privately synchronizes official feeds; no API credentials bundled.
 * Displays original registration and status-change dates separately where available.
 
-= 0.7.0 =
+= 0.6.0 =
 * Multi-registry category search for companies, crafts, associations and foundations.
 * Source-aware profiles and registration identifiers.
 * Updated accessibility, responsive user interface, and public service disclosures.
