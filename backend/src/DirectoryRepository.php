@@ -132,7 +132,8 @@ final class DirectoryRepository
         }
         $stmt->execute();
         $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $more = count($items) > $limit;
+        // Prefer narrower filters instead of expensive unbounded deep paging on KNOX L.
+        $more = count($items) > $limit && $page < 500;
         if ($more) array_pop($items);
         return ['items'=>$items, 'page'=>$page, 'limit'=>$limit, 'has_more'=>$more,
             'partial'=>$partial, 'snapshot_id'=>$snapshot, 'sources'=>$registered];
