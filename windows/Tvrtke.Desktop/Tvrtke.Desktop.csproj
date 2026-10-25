@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>Tvrtke.Desktop</AssemblyName>
+    <ApplicationIcon>Assets/Tvrtke.ico</ApplicationIcon>
     <Version>0.6.0</Version>
     <FileVersion>0.6.0.0</FileVersion>
     <AssemblyVersion>0.6.0.0</AssemblyVersion>
