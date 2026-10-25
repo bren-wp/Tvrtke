@@ -48,6 +48,18 @@ final class RegistryImporter
         if ($real === false || !is_file($real) || !is_readable($real)) {
             throw new \RuntimeException('CSV file not found; keep source files outside the public webroot');
         }
+        // Source exports may contain sensitive data: reject known public directories.
+        $home = getenv('HOME');
+        $roots = [
+            realpath(dirname(__DIR__) . '/public'),
+            Config::get('TVRTKE_PUBLIC_ROOT') !== '' ? realpath(Config::get('TVRTKE_PUBLIC_ROOT')) : false,
+            is_string($home) && $home !== '' ? realpath($home . '/public_html') : false,
+        ];
+        foreach ($roots as $root) {
+            if (is_string($root) && ($real === $root || str_starts_with($real, $root . DIRECTORY_SEPARATOR))) {
+                throw new \RuntimeException('Source CSV must be stored outside the public webroot');
+            }
+        }
         $size = filesize($real);
         $mtime = filemtime($real);
         if ($size === false || $mtime === false || $size === 0) throw new \RuntimeException('Invalid CSV file');
