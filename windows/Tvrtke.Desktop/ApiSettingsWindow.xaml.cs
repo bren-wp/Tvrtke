@@ -73,8 +73,12 @@ public partial class ApiSettingsWindow : Window
     {
         // This dialog must also fit laptop screens and scaled displays.
         var available = DisplaySizing.WorkArea(this);
-        Width = Math.Max(MinWidth, Math.Min(700d, available.Width * 0.88));
-        Height = Math.Max(MinHeight, Math.Min(520d, available.Height * 0.82));
+        var maxWidth = Math.Max(220d, available.Width - 24d);
+        var maxHeight = Math.Max(240d, available.Height - 24d);
+        MinWidth = Math.Min(480d, maxWidth);
+        MinHeight = Math.Min(395d, maxHeight);
+        Width = Math.Clamp(Math.Min(700d, available.Width * .88d), MinWidth, maxWidth);
+        Height = Math.Clamp(Math.Min(520d, available.Height * .82d), MinHeight, maxHeight);
         if (Owner is not null)
         {
             Left = Math.Max(available.Left, Owner.Left + (Owner.ActualWidth - Width) / 2);
