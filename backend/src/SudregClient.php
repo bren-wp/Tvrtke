@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Tvrtke;
 
-final class SudregClient
+final class SudregClient implements SudregGateway
 {
     private ?string $token = null;
     private int $expiresAt = 0;
