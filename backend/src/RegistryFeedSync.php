@@ -153,9 +153,16 @@ final class RegistryFeedSync
             curl_setopt($curl,CURLOPT_PROTOCOLS,CURLPROTO_HTTPS);
         }
         try {
-            if (curl_exec($curl)===false || (int)curl_getinfo($curl,CURLINFO_HTTP_CODE)!==200 ||
-                $bytes<1 || $bytes>$maxBytes) {
-                throw new \RuntimeException('Official CSV download failed or exceeded file quota');
+            $ok=curl_exec($curl);
+            $status=(int)curl_getinfo($curl,CURLINFO_HTTP_CODE);
+            $code=curl_errno($curl);
+            if ($ok===false || $status!==200 || $bytes<1 || $bytes>$maxBytes) {
+                // Numeric-only diagnostics; no URLs, tokens, request content or
+                // private record values can be written to the error log.
+                throw new \RuntimeException(sprintf(
+                    'Official CSV transfer failed: HTTP %d, cURL %d, bytes %d',
+                    $status,$code,$bytes
+                ));
             }
         } finally {
             curl_close($curl);
