@@ -18,3 +18,10 @@ windows/**/obj/
 *.suo
 *.log
 node_modules/
+
+# Registry exports, private sync state and approved feed configuration
+backend/feeds.local.json
+backend/private-feeds/
+**/tvrtke-*.pending.sha256
+**/tvrtke-*.published.sha256
+**/tvrtke-*.last-check

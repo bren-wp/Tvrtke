@@ -15,3 +15,5 @@ putenv('TVRTKE_SYNC_BUDGET_SECONDS=15'); // Soft limit, not a process timeout
 putenv('TVRTKE_PUBLIC_ROOT=/home/ACCOUNT/public_html'); // Importer rejects CSV under this directory
 putenv('TVRTKE_SYNC_INCLUDE_INACTIVE=1'); // Include active and inactive Sudreg records
 putenv('TVRTKE_SUDREG_ARCHIVE_RAW=0'); // 1 saves every raw API row; high disk usage
+putenv('TVRTKE_FEEDS_CONFIG=/home/ACCOUNT/tvrtke-backend/feeds.local.json'); // CLI-only approved feeds
+putenv('TVRTKE_FEEDS_CACHE_DIR=/home/ACCOUNT/tvrtke-backend/private-feeds'); // 0700; NOT web-accessible

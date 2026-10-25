@@ -28,7 +28,7 @@ Ako cPanel ne dopušta Document Root unutar `tvrtke-backend/public`, **ne objavl
 ## Instalacija
 
 1. Kreirajte praznu MySQL bazu `CPANELUSER_tvrtke` i korisnika u cPanelu.
-2. Uvezite `backend/database/001_initial.sql`, zatim `backend/database/002_enrichment.sql`, zatim `backend/database/003_publication_state.sql` i naposljetku **`backend/database/004_registry_sources.sql`** (svaku migraciju samo jednom) putem phpMyAdmin (provjerite rezultat migracije).
+2. Uvezite `backend/database/001_initial.sql`, zatim `backend/database/002_enrichment.sql`, zatim `backend/database/003_publication_state.sql` i naposljetku **`backend/database/004_registry_sources.sql`**, **`backend/database/005_sudreg_full_coverage.sql`** i **`backend/database/006_registry_lifecycle.sql`** (svaku migraciju samo jednom) putem phpMyAdmin (provjerite rezultat migracije).
 3. Kopirajte `backend/config.example.php` u **`backend/config.local.php`**, stavite stvarne vrijednosti i postavite datoteku izvan Document Roota. Preporučena prava `0600` gdje su podržana; tajni sadržaj nikada ne slati u Git.
 4. U cPanelu podesite `api.tvrtke.com.hr` sa Document Rootom na `backend/public/` i uključite valjani HTTPS certifikat. Provjerite `https://api.tvrtke.com.hr/v1/health`.
 5. Nakon potvrde stvarnih cron limita konfigurirajte npr. svakih **5–10 minuta** (ne češće od dopuštenog):
@@ -104,3 +104,9 @@ Ako cPanel ne dopušta Document Root unutar `tvrtke-backend/public`, **ne objavl
 - Uspješan test na CI MariaDB ne dokazuje uspješnost produkcijskog uvoza, dostupnost API vjerodajnica ili dovoljnu kvotu hostinga.
 
 **Ne stavljajte Sudreg Client ID/Secret u GitHub, WordPress plugin, snimke zaslona ili chat.** Ako su tajne već javno podijeljene, rotirajte ih.
+
+## Privatni automatski feedovi za druge registre
+
+Nakon što na privatnom poslužitelju pregledate službena CSV zaglavlja i potvrdite pravila ponovne uporabe, kopirajte `backend/feeds.example.json` u `backend/feeds.local.json`, navedite točne nazive stupaca i uključite odobreni izvor. Napravite privatan direktorij `backend/private-feeds` sa pravima 0700 te konfigurirajte `TVRTKE_FEEDS_CONFIG` i `TVRTKE_FEEDS_CACHE_DIR`. Dodatni cPanel cron u `docs/REGISTRY-IMPORT.md` automatski osvježava javne podatke. **Nemojte izložiti CSV izvore i konfiguraciju unutar Document Roota.**
+
+Ako cPanel ne dopušta izvršavanje CLI PHP-a i cron, automatizacija nije operativna; potreban je drugi autorizirani poslužitelj.

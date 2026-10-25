@@ -2,13 +2,13 @@
 
 ## Preduvjeti
 
-Instalirajte SQL migracije `001_initial.sql`, `002_enrichment.sql`, `003_publication_state.sql`, **`004_registry_sources.sql`** redom. PHP 8.2+, MySQL/MariaDB i izvršavanje PHP CLI skripti su obavezni.
+Instalirajte SQL migracije `001_initial.sql`, `002_enrichment.sql`, `003_publication_state.sql`, **`004_registry_sources.sql`**, **`005_sudreg_full_coverage.sql`** i **`006_registry_lifecycle.sql`** redom. PHP 8.2+, MySQL/MariaDB i izvršavanje PHP CLI skripti su obavezni.
 
 Preuzmite isključivo podatke koje pružatelj dopušta ponovno koristiti. CSV datoteku držite u privatnom direktoriju, **izvan web-roota**, nikad u `public_html` ili GitHub repozitoriju.
 
 ### Primjer: izvor s kanonskim stupcima
 
-CSV zaglavlje mora imati `id,name`. Opcionalni stupci: `oib,status,county,settlement,address,activity`.
+CSV zaglavlje mora imati `id,name`. Opcionalni stupci: `oib,status,county,settlement,address,activity,start_date,end_date`.
 
 ```sh
 php backend/bin/import-registry.php \
@@ -74,3 +74,27 @@ php backend/bin/abort-registry-import.php --source=udruga --confirm=DELETE_STAGI
 ```
 
 Ponavljajte naredbu dok ne javi da nema aktivnog uvoza. Svaki poziv briše najviše 250 redaka i **nikada ne briše aktivno objavljenu seriju**. Ako želite samo nastaviti isti uvoz, nemojte pokretati ovu naredbu.
+
+## Automatsko ažuriranje udruga i zaklada
+
+Projekt sadrži administrativni CLI mehanizam `backend/bin/sync-public-feeds.php` za službene CKAN CSV izvoze. Primjerni manifest `backend/feeds.example.json` navodi provjerene izvore za udruge i zaklade s portala data.gov.hr; **nije automatski uključen**, jer je najprije potrebno pregledati zaglavlja i uskladiti dopuštene stupce. Izvoz označen `Osobe` ne koristiti. U programu se ne smiju prikazivati podaci fizičkih osoba koji nisu potrebni za poslovni imenik.
+
+1. Napraviti privatni `backend/feeds.local.json` iz primjera; ne kopirati u `public_html`, web-accessible `api/public` ili Git.
+2. Preuzeti službeni CSV iz odobrenog izvora u privremenu privatnu mapu i utvrditi stvarne nazive stupaca:
+   ```sh
+   php backend/bin/sync-public-feeds.php --inspect=/home/ACCOUNT/private/udruge.csv --delimiter=,
+   ```
+   Parametar `--inspect` ispisuje samo **nazive stupaca**, ne sadržaj fizičkih osoba.
+3. U `columns` unijeti stvarni `id` i `name`, te opcionalno `status`, `county`, `settlement`, `activity`, `start_date`, `end_date`. Kolone koje ne postoje **ne izmišljati**. Ne dodavati podatke o zastupnicima ili vlasnicima.
+4. Tek nakon provjere licence, identifikatora i formata uključiti `"enabled": true` za pojedini izvor. Potpunost (`coverage: complete`) dopuštena je samo uz neovisno potvrđen `expected_rows`.
+5. Pozivati kratku sinkronizaciju za pojedini izvor iz cPanela:
+   ```cron
+   */10 * * * * /usr/local/bin/php /home/ACCOUNT/tvrtke-backend/bin/sync-public-feeds.php --source=udruga >/dev/null 2>&1
+   */10 * * * * /usr/local/bin/php /home/ACCOUNT/tvrtke-backend/bin/sync-public-feeds.php --source=zaklada >/dev/null 2>&1
+   ```
+   Svaki poziv nastavlja postojeći uvoz; za provjeru ima li novog izvoza server ne preuzima identičan CSV svakih deset minuta. Nakon uspješne objave kopija izvoza i napredak ostaju privatni.
+6. Izvor se objavljuje tek nakon potpune validacije svih redaka. Izvorni URL i datum objave izlaze u `GET /v1/sources`.
+
+Službene nacionalne podatke o svim obrtima **nije moguće deklarirati preuzetima** dok nije potvrđen bulk izvor ili autorizirani pristup takvom izvoru. Ne zaobilaziti ograničenja Portala obrtnog registra. Ažuriranje Sudreg API-ja i ovih feedova izvršava se potpuno na privatnom poslužitelju; Windows i WordPress ne dobivaju ključeve ni pristup MySQL-u.
+
+Prilikom povećanja limita tijekom Sudreg uvoza i dalje su potrebni kontrola kvote i dostupnost iste službene snimke; novi limit sam po sebi ne jamči dovršetak prije isteka snimke.
