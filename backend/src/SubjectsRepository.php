@@ -71,7 +71,7 @@ final class SubjectsRepository
         $more = count($items) > $limit;
         if ($more) array_pop($items);
         return ['items' => $items, 'page' => $page, 'limit' => $limit,
-            'has_more' => $more, 'snapshot_id' => $snapshot, 'partial' => $this->isPartial($snapshot)];
+            'has_more' => $more, 'snapshot_id' => $snapshot, 'partial' => $this->isPartial()];
     }
 
     private static function escapedPrefix(string $text): string
@@ -99,20 +99,25 @@ final class SubjectsRepository
         $activities->execute([$snapshot, $mbs]);
         $item['activities'] = $activities->fetchAll();
         $item['snapshot_id'] = $snapshot;
-        $item['partial'] = $this->isPartial($snapshot);
+        $item['partial'] = $this->isPartial();
         return $item;
     }
 
-    private function isPartial(string $snapshot): bool
+    private function isPartial(): bool
     {
-        $stmt = $this->db->prepare('SELECT COUNT(*) FROM sync_progress WHERE snapshot_id=? AND truncated=1');
-        $stmt->execute([$snapshot]);
-        return (int) $stmt->fetchColumn() > 0;
+        // Importing a newer snapshot replaces sync_progress rows, so they are NOT
+        // evidence about the currently published dataset. Read immutable publication
+        // metadata instead. Older installations without it are treated conservatively.
+        $published = $this->db->query("SELECT state_value FROM app_state WHERE state_key='published_partial'")->fetchColumn();
+        return $published === false || (string)$published !== '0';
     }
 
     public function status(): array
     {
-        return ['active_snapshot' => $this->activeSnapshot(),
+        $rows = $this->db->query("SELECT state_key,state_value FROM app_state WHERE state_key IN ('active_snapshot','published_partial','published_at')")->fetchAll(PDO::FETCH_KEY_PAIR);
+        return ['active_snapshot' => $rows['active_snapshot'] ?? null,
+            'published_at_utc' => $rows['published_at'] ?? null,
+            'partial' => !isset($rows['published_partial']) || $rows['published_partial'] !== '0',
             'progress' => $this->db->query('SELECT dataset,snapshot_id,next_offset,imported_rows,finished,truncated,updated_at FROM sync_progress ORDER BY dataset')->fetchAll()];
     }
 }

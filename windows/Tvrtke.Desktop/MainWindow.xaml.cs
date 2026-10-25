@@ -5,6 +5,7 @@ using System.Net.Http.Json;
 using System.Text;
 using Microsoft.Win32;
 using System.Text.Json.Serialization;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -38,7 +39,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private static string Param(string value) => Uri.EscapeDataString(value.Trim());
 
-    private async Task SearchAsync()
+    private async Task SearchAsync(int? requestedPage = null)
     {
         if (_busy) return;
         _busy = true;
@@ -54,12 +55,19 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 return;
             }
             var status = (StatusInput.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "";
-            var uri = $"{_api}/v1/subjects?q={Param(query)}&county={Param(county)}&activity={Param(activity)}&status={Param(status)}&page={_page}&limit=20";
+            var pageToLoad = requestedPage ?? 1;
+            if (!Uri.TryCreate(_api, UriKind.Absolute, out var apiUrl) || apiUrl.Scheme != Uri.UriSchemeHttps)
+            {
+                StatusText.Text = "API mora koristiti valjanu HTTPS adresu (TVRTKE_API_URL).";
+                return;
+            }
+            var uri = $"{_api}/v1/subjects?q={Param(query)}&county={Param(county)}&activity={Param(activity)}&status={Param(status)}&page={pageToLoad}&limit=20";
             using var response = await Client.GetAsync(uri);
             response.EnsureSuccessStatusCode();
             var data = await response.Content.ReadFromJsonAsync<SubjectPage>();
             if (data is null) throw new InvalidOperationException("Nije primljen valjan odgovor API-ja.");
             _detailRequest?.Cancel();
+            _page = pageToLoad; // Update the current page only AFTER a successful request.
             _results.Clear();
             foreach (var item in data.Items) _results.Add(item);
             SelectedSubject = null;
@@ -70,10 +78,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             StatusText.Text = $"Prikazano {_results.Count} · snimka {data.SnapshotId ?? "nije dostupna"}" +
                               (data.Partial ? " · djelomični uvoz" : "");
         }
-        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or InvalidOperationException)
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or InvalidOperationException or JsonException)
         {
-            StatusText.Text = "API nije dostupan. Provjerite internetsku vezu i konfiguraciju.";
-            NextButton.IsEnabled = false;
+            StatusText.Text = "API nije dostupan ili je poslao neispravan odgovor.";
         }
         finally { _busy = false; }
     }
@@ -94,7 +101,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 SelectedSubject = details.Item;
         }
         catch (OperationCanceledException) { /* Changing the selection cancels an obsolete fetch. */ }
-        catch (Exception ex) when (ex is HttpRequestException or InvalidOperationException)
+        catch (Exception ex) when (ex is HttpRequestException or InvalidOperationException or JsonException)
         {
             if (!token.IsCancellationRequested) StatusText.Text = "Detalji trenutačno nisu dostupni.";
         }
@@ -145,22 +152,23 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
     }
 
-    private async void Search_Click(object sender, RoutedEventArgs e) { _page = 1; await SearchAsync(); }
+    private async void Search_Click(object sender, RoutedEventArgs e) { await SearchAsync(1); }
     private async void QueryInput_KeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Enter) { _page = 1; await SearchAsync(); }
+        if (e.Key == Key.Enter) { await SearchAsync(1); }
     }
     private async void Previous_Click(object sender, RoutedEventArgs e)
     {
-        if (_page > 1) { _page--; await SearchAsync(); }
+        if (_page > 1) { await SearchAsync(_page - 1); }
     }
     private async void Next_Click(object sender, RoutedEventArgs e)
     {
-        if (_hasMore) { _page++; await SearchAsync(); }
+        if (_hasMore) { await SearchAsync(_page + 1); }
     }
     private async void ResultsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         var selected = ResultsGrid.SelectedItem as Subject;
+        _detailRequest?.Cancel();
         SelectedSubject = selected;
         if (selected is not null) await LoadDetailsAsync(selected);
     }

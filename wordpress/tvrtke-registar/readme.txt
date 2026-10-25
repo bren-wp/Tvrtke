@@ -3,7 +3,7 @@ Contributors: bren-wp
 Tags: hrvatska, registar, tvrtke
 Requires at least: 6.4
 Requires PHP: 8.2
-Stable tag: 0.3.0
+Stable tag: 0.4.0
 License: MIT
 
 Prikazuje javnu tražilicu poslovnih subjekata iz centralnog TVRTKE API-ja.
@@ -18,5 +18,8 @@ Prikazuje javnu tražilicu poslovnih subjekata iz centralnog TVRTKE API-ja.
 Ne uključuje samu bazu podataka. Ne šalje OAuth2 tajne pregledniku.
 
 == Changelog ==
+= 0.4.0 =
+* Jasno obavještava kada početna snimka nije uvezena. Zaštita od PHP greške bez mbstring proširenja.
+
 = 0.2.0 =
 * Detalji subjekta, mobilni CSS i filtri djelatnosti, županije i statusa.

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: TVRTKE – Poslovni registar
  * Description: Pretraživanje subjekata Sudskog registra preko centralnog API-ja tvrtke.com.hr.
- * Version: 0.3.0
+ * Version: 0.4.0
  * Requires PHP: 8.2
  * Requires at least: 6.4
  * Text Domain: tvrtke-registar
@@ -86,10 +86,12 @@ final class Tvrtke_Registar
     /** @return string */
     public static function shortcode(): string
     {
-        wp_enqueue_style('tvrtke-registar', plugins_url('assets/search.css', __FILE__), [], '0.3.0');
+        wp_enqueue_style('tvrtke-registar', plugins_url('assets/search.css', __FILE__), [], '0.4.0');
         $get = static function (string $key, int $max = 100): string {
             $raw = $_GET[$key] ?? '';
-            return is_string($raw) ? mb_substr(trim(sanitize_text_field(wp_unslash($raw))), 0, $max) : '';
+            if (!is_string($raw)) return '';
+            $clean = trim(sanitize_text_field(wp_unslash($raw)));
+            return function_exists('mb_substr') ? mb_substr($clean, 0, $max) : substr($clean, 0, $max);
         };
         $query = $get('tvrtke_q');
         $county = $get('tvrtke_county');
@@ -138,6 +140,7 @@ final class Tvrtke_Registar
         ]);
         if (is_wp_error($data)) return $output . '<p role="alert">' . esc_html($data->get_error_message()) . '</p></section>';
         if (!isset($data['items']) || !is_array($data['items'])) return $output . '<p role="alert">' . esc_html__('Neispravan odgovor API-ja.', 'tvrtke-registar') . '</p></section>';
+        if (empty($data['snapshot_id'])) return $output . '<p role="status">' . esc_html__('Baza još nije sinkronizirana. Pretraga će biti dostupna nakon prvog uvoza.', 'tvrtke-registar') . '</p></section>';
         $output .= '<div class="tvrtke-results" aria-live="polite">';
         if (empty($data['items'])) $output .= '<p>' . esc_html__('Nema rezultata u dostupnom skupu.', 'tvrtke-registar') . '</p>';
         foreach (array_slice($data['items'], 0, 20) as $row) {

@@ -1,7 +1,7 @@
 ; TVRTKE Windows per-user installer (Inno Setup 6).
-; Parameters supplied by CI using /DAppVersion, /DSourceDir, /DOutputDir.
+; Values supplied by CI via /DAppVersion, /DSourceDir, /DOutputDir.
 #ifndef AppVersion
-  #define AppVersion "0.3.0"
+  #define AppVersion "0.4.0"
 #endif
 #ifndef SourceDir
   #error SourceDir must be supplied by the build workflow.
