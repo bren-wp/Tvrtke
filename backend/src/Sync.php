@@ -9,6 +9,7 @@ use PDO;
 final class Sync
 {
     private const DATASETS = SnapshotPublication::DATASETS;
+    private ?array $cachedSnapshots = null;
 
     public function __construct(private PDO $db, private SudregClient $client) {}
 
@@ -18,7 +19,19 @@ final class Sync
             return 'Sinkronizacija se već izvršava.';
         }
         try {
-            return $this->process();
+            $pages = max(1, min(8, (int)Config::get('TVRTKE_SYNC_PAGES_PER_RUN', '3')));
+            $seconds = max(3, min(35, (int)Config::get('TVRTKE_SYNC_BUDGET_SECONDS', '15')));
+            $deadline = microtime(true) + $seconds;
+            $completed = 0;
+            $last = '';
+            for ($i = 0; $i < $pages && microtime(true) < $deadline; ++$i) {
+                $last = $this->process();
+                ++$completed;
+                if (str_starts_with($last, 'Objavljena snimka') ||
+                    str_starts_with($last, 'Podaci su već sinkronizirani') ||
+                    str_contains($last, 'dosegnuto ograničenje')) break;
+            }
+            return $last . ' (serija: ' . $completed . ' API stranica)';
         } finally {
             $this->db->query("SELECT RELEASE_LOCK('tvrtke_sync_v1')");
         }
@@ -26,7 +39,7 @@ final class Sync
 
     private function process(): string
     {
-        $snapshots = $this->client->get('snapshots')['data'];
+        $snapshots = $this->cachedSnapshots ??= $this->client->get('snapshots')['data'];
         if (!array_is_list($snapshots)) throw new \RuntimeException('Unexpected snapshots payload');
         usort($snapshots, fn(array $a, array $b) => ((int) ($a['staleness'] ?? 99)) <=> ((int) ($b['staleness'] ?? 99)));
         $fresh = (int) ($snapshots[0]['id'] ?? 0);
@@ -91,7 +104,9 @@ final class Sync
         }
         $dataset = (string) $job['dataset'];
         $offset = (int) $job['next_offset'];
-        $maxRows = max(100, min(200000, (int) Config::get('TVRTKE_IMPORT_ROW_LIMIT', '10000')));
+        // Shared hosting defaults stay deliberately conservative. Raise the cap
+        // only after confirming space, import duration and source row counts.
+        $maxRows = max(100, min(5000000, (int) Config::get('TVRTKE_IMPORT_ROW_LIMIT', '10000')));
         $pageSize = max(10, min(500, (int) Config::get('TVRTKE_IMPORT_BATCH', '100')));
         $remaining = $maxRows - $offset;
         if ($remaining <= 0) {
