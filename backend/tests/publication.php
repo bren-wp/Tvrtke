@@ -20,6 +20,8 @@ $rows = array_map(static fn(string $name): array => [
     'finished' => 1,
     'imported_rows' => 100,
     'truncated' => 0,
+    'expected_rows' => 100,
+    'include_inactive' => 1,
 ], SnapshotPublication::DATASETS);
 assert(SnapshotPublication::isPartial($rows) === false);
 $truncated = $rows;
@@ -34,6 +36,22 @@ expect_rejection($unfinished, 'unfinished');
 $empty = $rows;
 $empty[0]['imported_rows'] = 0;
 expect_rejection($empty, 'empty subjects');
+$old = $rows;
+$old[1]['include_inactive'] = 0;
+assert(SnapshotPublication::isPartial($old) === true);
+$withoutCount = $rows;
+$withoutCount[1]['expected_rows'] = null;
+assert(SnapshotPublication::isPartial($withoutCount) === true);
+$incomplete = $rows;
+$incomplete[0]['expected_rows'] = 101;
+expect_rejection($incomplete, 'premature short dataset');
+$tooMany = $rows;
+$tooMany[0]['expected_rows'] = 99;
+expect_rejection($tooMany, 'duplicate rows / wrong expected count');
+$bounded = $rows;
+$bounded[0]['truncated'] = 1;
+$bounded[0]['expected_rows'] = 120;
+assert(SnapshotPublication::isPartial($bounded) === true);
 $duplicate = $rows;
 $duplicate[4] = $duplicate[0];
 expect_rejection($duplicate, 'duplicate dataset');
