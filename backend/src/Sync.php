@@ -74,6 +74,8 @@ final class Sync
         $unfinished = $progressHasWrongScope ? [] :
             array_values(array_filter($progress, fn(array $p) => !(int)$p['finished']));
         $ongoing = $unfinished !== [] ? (int) $unfinished[0]['snapshot_id'] : $fresh;
+        // The snapshot used by a partially imported job may have expired.
+        // Keep the last published snapshot active until a fresh import succeeds.
         $available = array_map(fn(array $s) => (int) ($s['id'] ?? 0), $snapshots);
         if (!in_array($ongoing, $available, true)) {
             // Never mix a partially imported, expired snapshot with a fresh
