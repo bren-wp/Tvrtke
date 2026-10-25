@@ -1,0 +1,2 @@
+TVRTKE v0.3.0 release build trigger.
+Production Sudreg integration and MyDataKnox deployment remain unverified.
