@@ -62,7 +62,7 @@ $db=Database::connect();
 $db->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
 $root=dirname(__DIR__) . '/database/';
 foreach (['001_initial.sql','002_enrichment.sql','003_publication_state.sql',
-          '004_registry_sources.sql','005_sudreg_full_coverage.sql'] as $migration) {
+          '004_registry_sources.sql','005_sudreg_full_coverage.sql', '006_registry_lifecycle.sql'] as $migration) {
     $raw = file_get_contents($root . $migration);
     if ($raw === false) throw new RuntimeException('Missing migration '.$migration);
     foreach (preg_split('/;\s*(?:\r?\n|$)/',$raw) as $part) {
@@ -132,8 +132,6 @@ try {
     $inactive = $directory->search('Primjer',1,20,['type'=>'obrt','status'=>'0']);
     verify(count($inactive['items'])===1,'Inactive craft appears only when filtered');
     $craft = $inactive['items'][0];
-    verify(($craft['datum_osnivanja'] ?? null)==='2022-07-31' ? false : true,
-        'Founding date should not be overwritten by cessation');
     verify(($craft['datum_osnivanja'] ?? '')==='2011-05-20','Craft start date');
     verify(($craft['datum_brisanja'] ?? '')==='2022-07-31','Craft end date');
     verify($craft['oib'] === null,'Craft owner OIB withheld');
