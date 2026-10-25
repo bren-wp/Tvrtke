@@ -1,0 +1,29 @@
+name: WordPress.org Plugin Check
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  plugin-check:
+    name: Official WordPress Plugin Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+          tools: wp-cli
+      - name: Validate PHP source
+        run: find wordpress/tvrtke-registar -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Validate block metadata
+        run: python3 -m json.tool wordpress/tvrtke-registar/blocks/block.json > /dev/null
+      - name: Official Plugin Check
+        uses: WordPress/plugin-check-action@v1
+        with:
+          build-dir: './wordpress/tvrtke-registar'
