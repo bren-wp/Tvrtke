@@ -282,6 +282,7 @@
                         </DockPanel>
                         <DataGrid x:Name="ResultsGrid" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True"
                                   SelectionMode="Single" SelectionChanged="ResultsGrid_SelectionChanged"
+                                  MouseDoubleClick="ResultsGrid_MouseDoubleClick"
                                   Background="White" BorderThickness="0" GridLinesVisibility="None"
                                   HeadersVisibility="Column" RowHeight="52" CanUserAddRows="False"
                                   RowHeaderWidth="0" ColumnHeaderHeight="42" ScrollViewer.HorizontalScrollBarVisibility="Auto">
@@ -347,9 +348,14 @@
                                            Foreground="#A36B19" Visibility="{Binding PartialVisibility}" Margin="0,8,0,0"/>
                             </StackPanel>
                         </ScrollViewer>
-                        <Button Grid.Row="2" Margin="0,12,0,0" Style="{StaticResource GhostButton}"
-                                Content="⇩  Izvezi prikazano (CSV)" Click="Export_Click"
-                                ToolTip="Izvozi samo rezultate trenutačne stranice"/>
+                        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,12,0,0">
+                            <Button x:Name="ProfileButton" Style="{StaticResource PrimaryButton}"
+                                    Content="Otvori profil" Click="OpenProfile_Click"
+                                    IsEnabled="False" Margin="0,0,8,0"/>
+                            <Button Style="{StaticResource GhostButton}"
+                                    Content="Izvoz CSV" Click="Export_Click"
+                                    ToolTip="Izvozi rezultate trenutačne stranice"/>
+                        </StackPanel>
                     </Grid>
                 </Border>
             </Grid>

@@ -171,6 +171,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         await SearchAsync(1);
     }
 
+    private void ResultsGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (ResultsGrid.SelectedItem is Subject) OpenProfile_Click(sender, e);
+    }
+
+    private void OpenProfile_Click(object sender, RoutedEventArgs e)
+    {
+        if (SelectedSubject is not Subject subject) return;
+        var popup = new SubjectWindow(subject) { Owner = this };
+        popup.ShowDialog();
+    }
+
     private void Help_Click(object sender, RoutedEventArgs e)
     {
         MessageBox.Show(this,
@@ -391,6 +403,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         _detailRequest?.Cancel();
         SelectedSubject = selected;
         FavoriteButton.IsEnabled = selected is not null;
+        ProfileButton.IsEnabled = selected is not null;
         FavoriteButton.Content = selected is not null && _preferences.Favorites.Any(x => x.UniqueKey == selected.UniqueKey) ? "Ukloni iz favorita" : "Dodaj u favorite";
         if (selected is not null) await LoadDetailsAsync(selected);
     }
