@@ -11,7 +11,7 @@ final class Sync
     private const DATASETS = SnapshotPublication::DATASETS;
     private ?array $cachedSnapshots = null;
 
-    public function __construct(private PDO $db, private SudregClient $client) {}
+    public function __construct(private PDO $db, private SudregGateway $client) {}
 
     public function tick(): string
     {
