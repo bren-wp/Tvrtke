@@ -110,3 +110,26 @@ Ako cPanel ne dopušta Document Root unutar `tvrtke-backend/public`, **ne objavl
 Nakon što na privatnom poslužitelju pregledate službena CSV zaglavlja i potvrdite pravila ponovne uporabe, kopirajte `backend/feeds.example.json` u `backend/feeds.local.json`, navedite točne nazive stupaca i uključite odobreni izvor. Napravite privatan direktorij `backend/private-feeds` sa pravima 0700 te konfigurirajte `TVRTKE_FEEDS_CONFIG` i `TVRTKE_FEEDS_CACHE_DIR`. Dodatni cPanel cron u `docs/REGISTRY-IMPORT.md` automatski osvježava javne podatke. **Nemojte izložiti CSV izvore i konfiguraciju unutar Document Roota.**
 
 Ako cPanel ne dopušta izvršavanje CLI PHP-a i cron, automatizacija nije operativna; potreban je drugi autorizirani poslužitelj.
+
+## Odvojeni MySQL korisnici i zaštita izvornih podataka
+
+U v0.7.0 **obavezno** postavite zasebnog MySQL korisnika za čitanje javnog imenika. PHP API koristi samo `TVRTKE_DB_READ_USER` i `TVRTKE_DB_READ_PASSWORD`; CLI sinkronizacija koristi `TVRTKE_DB_USER` i `TVRTKE_DB_PASSWORD`. To sprječava da javna pretraga dobije ovlasti za uvoz ili pristup privatnoj arhivi čak i ako se dogodi programski propust.
+
+Primjer SQL pravila (zamijenite ime baze i korisnika stvarnim cPanel vrijednostima):
+
+```sql
+-- Prikaz je informativan: korisnika napravite kroz cPanel/MySQL Administratora.
+GRANT SELECT ON cpaneluser_tvrtke.subjects TO 'cpaneluser_tvrtke_public'@'localhost';
+GRANT SELECT ON cpaneluser_tvrtke.company_names TO 'cpaneluser_tvrtke_public'@'localhost';
+GRANT SELECT ON cpaneluser_tvrtke.addresses TO 'cpaneluser_tvrtke_public'@'localhost';
+GRANT SELECT ON cpaneluser_tvrtke.subject_legal_forms TO 'cpaneluser_tvrtke_public'@'localhost';
+GRANT SELECT ON cpaneluser_tvrtke.subject_activities TO 'cpaneluser_tvrtke_public'@'localhost';
+GRANT SELECT ON cpaneluser_tvrtke.registry_sources TO 'cpaneluser_tvrtke_public'@'localhost';
+GRANT SELECT ON cpaneluser_tvrtke.registry_records TO 'cpaneluser_tvrtke_public'@'localhost';
+GRANT SELECT ON cpaneluser_tvrtke.app_state TO 'cpaneluser_tvrtke_public'@'localhost';
+GRANT SELECT ON cpaneluser_tvrtke.sync_progress TO 'cpaneluser_tvrtke_public'@'localhost';
+```
+
+**Ne dopustiti** `INSERT`, `UPDATE`, `DELETE`, `ALTER`, `DROP`, `CREATE` ili `SELECT` nad `sudreg_raw_records`, `registry_import_jobs` za javnog korisnika. Klijenti (Windows/WordPress) nemaju MySQL pristup i koriste samo javni HTTPS API.
+
+MyDataKnox cPanel može drukčije uređivati prava nad tablicama. Ako granularni `GRANT` nije dopušten, zatražite tehničku mogućnost odvojene read-only baze ili dostupnih pogleda prije javne produkcije. **Nemojte zamijeniti javne podatkovne vjerodajnice u aplikaciji ili WordPress pluginu.**

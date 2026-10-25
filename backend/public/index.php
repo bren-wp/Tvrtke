@@ -70,7 +70,7 @@ try {
             reply(422, ['error' => 'Neispravna šifra pravnog oblika']);
         }
     }
-    $db = Database::connect();
+    $db = Database::connectReadOnly();
     $repo = new SubjectsRepository($db);
     if ($path === '/v1/status') reply(200, $repo->status());
     if ($path === '/v1/sources') reply(200, ['sources' => (new DirectoryRepository($db))->sources()]);

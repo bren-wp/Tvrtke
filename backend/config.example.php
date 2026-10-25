@@ -5,6 +5,10 @@ putenv('TVRTKE_DB_PORT=3306');
 putenv('TVRTKE_DB_NAME=cpaneluser_tvrtke');
 putenv('TVRTKE_DB_USER=cpaneluser_tvrtke');
 putenv('TVRTKE_DB_PASSWORD=CHANGE_ME');
+// Separate database user with ONLY SELECT on curated public tables; no access
+// to sudreg_raw_records, private staging, OAuth credentials or write privileges.
+putenv('TVRTKE_DB_READ_USER=cpaneluser_tvrtke_public');
+putenv('TVRTKE_DB_READ_PASSWORD=CHANGE_ME_TO_SEPARATE_READ_PASSWORD');
 putenv('SUDREG_CLIENT_ID=CHANGE_ME');
 putenv('SUDREG_CLIENT_SECRET=CHANGE_ME');
 putenv('TVRTKE_ADMIN_TOKEN=CHANGE_ME_TO_LONG_RANDOM_SECRET');
