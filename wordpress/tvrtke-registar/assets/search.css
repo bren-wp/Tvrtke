@@ -211,3 +211,32 @@
   .tvrtke-registar .tvrtke-quick-links .tvrtke-icon{width:21px;height:21px}
   .tvrtke-registar .tvrtke-result h3{font-size:.99rem}
 }
+
+/* Reference-inspired detail layout with no invented map tiles or company imagery. */
+.tvrtke-registar .tvrtke-detail-body{display:block;background:#f5fafc}
+.tvrtke-registar .tvrtke-detail-layout{display:grid;grid-template-columns:minmax(0,1.58fr) minmax(250px,.85fr);
+ gap:15px;align-items:start}
+.tvrtke-registar .tvrtke-detail-facts,.tvrtke-registar .tvrtke-detail-aside,
+.tvrtke-registar .tvrtke-detail-activities{border:1px solid #e0eaf2;background:#fff;
+ border-radius:11px;padding:20px;box-shadow:0 3px 10px #0b335609;min-width:0}
+.tvrtke-registar .tvrtke-detail-facts h3,.tvrtke-registar .tvrtke-detail-aside h3,
+.tvrtke-registar .tvrtke-detail-activities h3{margin:0 0 12px;font-size:1.05rem;
+ color:#0b2d4a;line-height:1.3;font-weight:800}
+.tvrtke-registar .tvrtke-detail-aside .tvrtke-detail-address{padding:12px 14px;
+ background:#f0f9fc;border-radius:9px;font-size:.91rem;color:#3e637e;line-height:1.55}
+.tvrtke-registar .tvrtke-detail-aside .tvrtke-source a{display:inline-block;
+ text-decoration:none;color:#086dd2;font-weight:700;border:1px solid #cfe3f3;
+ border-radius:7px;padding:9px 12px;background:#fff}
+.tvrtke-registar .tvrtke-detail-aside .tvrtke-source a:hover{background:#ebf8fe}
+.tvrtke-registar .tvrtke-detail-activities{margin-top:15px}
+.tvrtke-registar .tvrtke-detail-activities ul{margin:8px 0 0 17px;padding:0}
+.tvrtke-registar .tvrtke-detail-activities li{padding:9px 0;border-bottom:1px solid #ebf2f7}
+.tvrtke-registar .tvrtke-detail-activities li:last-child{border-bottom:0}
+@container (max-width:850px){
+ .tvrtke-registar .tvrtke-detail-layout{grid-template-columns:minmax(0,1fr)}
+}
+@container (max-width:500px){
+ .tvrtke-registar .tvrtke-detail-body{padding:11px}
+ .tvrtke-registar .tvrtke-detail-facts,.tvrtke-registar .tvrtke-detail-aside,
+ .tvrtke-registar .tvrtke-detail-activities{padding:15px}
+}
