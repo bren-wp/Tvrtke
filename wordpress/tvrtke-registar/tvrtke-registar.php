@@ -142,8 +142,8 @@ final class Tvrtke_Registar
     /** Shared navigation on all administrator screens, backed by real pages. */
     private static function admin_navigation(): void
     {
-        $active = isset($_GET['page']) && is_string($_GET['page'])
-            ? sanitize_key(wp_unslash($_GET['page'])) : 'tvrtke-registar';
+        $active = isset($GLOBALS['plugin_page']) && is_string($GLOBALS['plugin_page'])
+            ? sanitize_key($GLOBALS['plugin_page']) : 'tvrtke-registar';
         $tabs = [
             'tvrtke-registar' => __('Postavke', 'tvrtke-registar'),
             'tvrtke-pretraga' => __('Pretraga', 'tvrtke-registar'),
