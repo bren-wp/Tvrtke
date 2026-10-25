@@ -1,0 +1,8 @@
+TVRTKE v0.8.0 — responsive Windows/WordPress branding release.
+
+Required artifacts: Windows Setup/Portable EXEs, WordPress plugin ZIP, source archive and SHA256SUMS.
+
+Branding: Brendigo (author, Windows publisher); brendigo (WordPress.org contributor).
+No private registry credentials or complete national database are bundled.
+
+See docs/RELEASE-0.8.md and docs/UI-REFERENCE-AUDIT.md for implementation and visual-QA limitations.
