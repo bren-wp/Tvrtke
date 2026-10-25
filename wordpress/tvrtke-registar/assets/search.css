@@ -240,3 +240,61 @@
  .tvrtke-registar .tvrtke-detail-facts,.tvrtke-registar .tvrtke-detail-aside,
  .tvrtke-registar .tvrtke-detail-activities{padding:15px}
 }
+
+/* v0.10 reference consistency. All overrides are local to the shortcode.
+   Container queries use allocated content width, not the browser viewport. */
+.tvrtke-registar{
+ --tv-navy:#0b2d4a;--tv-teal:#00aea9;--tv-soft:#eff8fb;
+ min-width:0;max-width:100%;color-scheme:light;isolation:isolate;
+}
+.tvrtke-registar .tvrtke-hero{padding:26px 30px;min-width:0;
+ background:linear-gradient(113deg,#f8fcfe 0%,#e5f7fa 100%);
+ border-color:#dbe8f1}
+.tvrtke-registar .tvrtke-form{border-radius:12px}
+.tvrtke-registar .tvrtke-search-main{min-width:0}
+.tvrtke-registar .tvrtke-search-main > div{min-width:0}
+.tvrtke-registar .tvrtke-form label{white-space:normal}
+.tvrtke-registar .tvrtke-form :is(input,select,button){max-width:100%;min-width:0}
+.tvrtke-registar .tvrtke-quick-links a{overflow-wrap:anywhere;text-align:center}
+.tvrtke-registar .tvrtke-result{outline-offset:2px}
+.tvrtke-registar .tvrtke-result h3{overflow-wrap:anywhere}
+.tvrtke-registar .tvrtke-result:focus-within{border-color:#00a8a5;box-shadow:0 0 0 2px #b9eeeb}
+.tvrtke-registar .tvrtke-detail dl dt,.tvrtke-registar .tvrtke-detail dl dd{min-width:0}
+.tvrtke-registar .tvrtke-detail-link:focus-visible{outline:3px solid #147db8;outline-offset:3px}
+.tvrtke-registar .tvrtke-status{white-space:normal}
+.tvrtke-registar :is(.tvrtke-result-activity,.tvrtke-result-numbers,.tvrtke-source){
+ overflow-wrap:anywhere;word-break:normal
+}
+@container (max-width:1000px){
+ .tvrtke-registar[data-view="cards"] .tvrtke-results{
+    grid-template-columns:repeat(2,minmax(0,1fr))
+ }
+}
+@container (max-width:720px){
+ .tvrtke-registar .tvrtke-search-main{
+    grid-template-columns:repeat(2,minmax(0,1fr))
+ }
+ .tvrtke-registar .tvrtke-search-query{grid-column:1/-1}
+ .tvrtke-registar .tvrtke-search-main .tvrtke-submit{grid-column:1/-1}
+ .tvrtke-registar[data-view="cards"] .tvrtke-results{grid-template-columns:minmax(0,1fr)}
+ .tvrtke-registar .tvrtke-detail-layout{grid-template-columns:minmax(0,1fr)}
+}
+@container (max-width:480px){
+ .tvrtke-registar .tvrtke-hero{padding:18px 16px}
+ .tvrtke-registar .tvrtke-public-brand{gap:8px}
+ .tvrtke-registar .tvrtke-form{padding:13px}
+ .tvrtke-registar .tvrtke-search-main{
+    grid-template-columns:minmax(0,1fr)
+ }
+ .tvrtke-registar .tvrtke-search-query,.tvrtke-registar .tvrtke-search-main .tvrtke-submit{grid-column:1}
+ .tvrtke-registar .tvrtke-quick-links{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .tvrtke-registar .tvrtke-detail-layout{grid-template-columns:minmax(0,1fr)}
+ .tvrtke-registar .tvrtke-result{grid-template-columns:44px minmax(0,1fr)}
+ .tvrtke-registar .tvrtke-result-aside,.tvrtke-registar .tvrtke-detail-link{grid-column:2}
+}
+@media (prefers-contrast:more){
+ .tvrtke-registar .tvrtke-form,.tvrtke-registar .tvrtke-result{
+    border:2px solid #315475
+ }
+ .tvrtke-registar .tvrtke-result-type{border:1px solid currentColor}
+}
