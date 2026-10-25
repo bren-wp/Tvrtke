@@ -31,6 +31,7 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 UninstallDisplayIcon={app}\Tvrtke.Desktop.exe
 SetupLogging=yes
+SetupIconFile=..\Tvrtke.Desktop\Assets\Tvrtke.ico
 CloseApplications=yes
 RestartApplications=no
 
