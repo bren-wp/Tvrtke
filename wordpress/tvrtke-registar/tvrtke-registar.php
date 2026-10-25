@@ -284,19 +284,53 @@ final class Tvrtke_Registar
         $output .= '<h2>' . esc_html__('Pronađite prave poslovne informacije', 'tvrtke-registar') . '</h2>';
         $output .= '<p>' . esc_html__('Tvrtke, obrti, udruge i zaklade iz dostupnih službenih izvora — na jednom mjestu.', 'tvrtke-registar') . '</p></header>';
         $output .= '<form method="get" class="tvrtke-form" role="search">';
-        $output .= '<div><label for="' . esc_attr($id) . '-q">' . esc_html__('Naziv ili registracijski broj', 'tvrtke-registar') . '</label><input id="' . esc_attr($id) . '-q" type="search" name="tvrtke_q" value="' . esc_attr($query) . '" maxlength="100" placeholder="' . esc_attr__('Unesite naziv ili identifikator', 'tvrtke-registar') . '"></div>';
-        $output .= '<div><label for="' . esc_attr($id) . '-type">' . esc_html__('Vrsta subjekta', 'tvrtke-registar') . '</label><select id="' . esc_attr($id) . '-type" name="tvrtke_type">';
-        foreach ($types as $v => $label) $output .= '<option value="' . esc_attr($v) . '" ' . selected($registryType, $v, false) . '>' . esc_html($label) . '</option>';
-        $output .= '</select></div>';
-        $output .= '<div><label for="' . esc_attr($id) . '-county">' . esc_html__('Županija', 'tvrtke-registar') . '</label><input id="' . esc_attr($id) . '-county" name="tvrtke_county" value="' . esc_attr($county) . '" maxlength="100"></div>';
-        $output .= '<div><label for="' . esc_attr($id) . '-place">' . esc_html__('Mjesto', 'tvrtke-registar') . '</label><input id="' . esc_attr($id) . '-place" name="tvrtke_settlement" value="' . esc_attr($settlement) . '" maxlength="100"></div>';
-        $output .= '<div><label for="' . esc_attr($id) . '-act">' . esc_html__('Djelatnost ili NKD šifra', 'tvrtke-registar') . '</label><input id="' . esc_attr($id) . '-act" name="tvrtke_activity" value="' . esc_attr($activity) . '" maxlength="100"></div>';
-        $output .= '<div><label for="' . esc_attr($id) . '-legal">' . esc_html__('Šifra pravnog oblika', 'tvrtke-registar') . '</label><input id="' . esc_attr($id) . '-legal" name="tvrtke_legal_form" value="' . esc_attr($legalForm) . '" maxlength="12" inputmode="numeric"></div>';
-        $output .= '<div><label for="' . esc_attr($id) . '-status">' . esc_html__('Status', 'tvrtke-registar') . '</label><select id="' . esc_attr($id) . '-status" name="tvrtke_status">';
-        foreach (['' => __('Svi', 'tvrtke-registar'), '1' => __('Aktivni', 'tvrtke-registar'), '0' => __('Brisani / neaktivni', 'tvrtke-registar')] as $v => $label) {
-            $output .= '<option value="' . esc_attr((string)$v) . '" ' . selected($status, (string)$v, false) . '>' . esc_html($label) . '</option>';
+        $output .= '<div class="tvrtke-search-main">';
+        $output .= '<div class="tvrtke-search-query"><label for="' . esc_attr($id) . '-q">' .
+            esc_html__('Pretraga', 'tvrtke-registar') . '</label><input id="' . esc_attr($id) .
+            '-q" type="search" name="tvrtke_q" value="' . esc_attr($query) .
+            '" maxlength="100" placeholder="' .
+            esc_attr__('Pretraži naziv, OIB ili registracijski broj...', 'tvrtke-registar') . '"></div>';
+        $output .= '<div><label for="' . esc_attr($id) . '-type">' .
+            esc_html__('Vrsta subjekta', 'tvrtke-registar') .
+            '</label><select id="' . esc_attr($id) . '-type" name="tvrtke_type">';
+        foreach ($types as $v => $label) {
+            $output .= '<option value="' . esc_attr($v) . '" ' .
+                selected($registryType, $v, false) . '>' . esc_html($label) . '</option>';
         }
-        $output .= '</select></div><button type="submit">' . esc_html__('⌕ Pretraži', 'tvrtke-registar') . '</button></form>';
+        $output .= '</select></div>';
+        $output .= '<div><label for="' . esc_attr($id) . '-county">' .
+            esc_html__('Županija', 'tvrtke-registar') .
+            '</label><input id="' . esc_attr($id) . '-county" name="tvrtke_county" value="' .
+            esc_attr($county) . '" maxlength="100" placeholder="' .
+            esc_attr__('Sve županije', 'tvrtke-registar') . '"></div>';
+        $output .= '<div><label for="' . esc_attr($id) . '-act">' .
+            esc_html__('Djelatnost / NKD', 'tvrtke-registar') .
+            '</label><input id="' . esc_attr($id) . '-act" name="tvrtke_activity" value="' .
+            esc_attr($activity) . '" maxlength="100" placeholder="' .
+            esc_attr__('Sve djelatnosti', 'tvrtke-registar') . '"></div>';
+        $output .= '<button class="tvrtke-submit" type="submit">' .
+            esc_html__('⌕ Pretraži', 'tvrtke-registar') . '</button></div>';
+        $advancedActive = $settlement !== '' || $legalForm !== '' || $status !== '';
+        $output .= '<details class="tvrtke-advanced"' . ($advancedActive ? ' open' : '') .
+            '><summary>' . esc_html__('Više filtara', 'tvrtke-registar') . '</summary><div class="tvrtke-advanced-grid">';
+        $output .= '<div><label for="' . esc_attr($id) . '-place">' .
+            esc_html__('Grad / općina', 'tvrtke-registar') .
+            '</label><input id="' . esc_attr($id) . '-place" name="tvrtke_settlement" value="' .
+            esc_attr($settlement) . '" maxlength="100"></div>';
+        $output .= '<div><label for="' . esc_attr($id) . '-legal">' .
+            esc_html__('Šifra pravnog oblika', 'tvrtke-registar') .
+            '</label><input id="' . esc_attr($id) . '-legal" name="tvrtke_legal_form" value="' .
+            esc_attr($legalForm) . '" maxlength="12" inputmode="numeric"></div>';
+        $output .= '<div><label for="' . esc_attr($id) . '-status">' .
+            esc_html__('Status', 'tvrtke-registar') .
+            '</label><select id="' . esc_attr($id) . '-status" name="tvrtke_status">';
+        foreach (['' => __('Svi', 'tvrtke-registar'),
+            '1' => __('Aktivni', 'tvrtke-registar'),
+            '0' => __('Brisani / neaktivni', 'tvrtke-registar')] as $v => $label) {
+            $output .= '<option value="' . esc_attr((string)$v) . '" ' .
+                selected($status, (string)$v, false) . '>' . esc_html($label) . '</option>';
+        }
+        $output .= '</select></div></div></details></form>';
         $output .= '<nav class="tvrtke-quick-links" aria-label="' . esc_attr__('Vrste poslovnih subjekata', 'tvrtke-registar') . '">';
         foreach ([
             'sudreg' => ['▥', __('Tvrtke', 'tvrtke-registar')],
