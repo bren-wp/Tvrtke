@@ -96,6 +96,10 @@
                         <TextBlock Text="{Binding LegalForm}" TextWrapping="Wrap" Margin="0,3,0,13"/>
                         <TextBlock Text="Status" Foreground="#5C6C7C"/>
                         <TextBlock Text="{Binding StatusLabel}" Margin="0,3,0,13"/>
+                        <TextBlock Text="Datum osnivanja" Foreground="#5C6C7C"/>
+                        <TextBlock Text="{Binding FoundedAt}" Margin="0,3,0,13"/>
+                        <TextBlock Text="Datum brisanja" Foreground="#5C6C7C"/>
+                        <TextBlock Text="{Binding DeletedAt}" Margin="0,3,0,13"/>
                         <TextBlock Text="Županija i mjesto" Foreground="#5C6C7C"/>
                         <TextBlock Text="{Binding Location}" TextWrapping="Wrap" Margin="0,3,0,13"/>
                         <TextBlock Text="Adresa" Foreground="#5C6C7C"/>
