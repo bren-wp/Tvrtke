@@ -13,3 +13,5 @@ putenv('TVRTKE_IMPORT_ROW_LIMIT=10000'); // Raise only after measuring MySQL sto
 putenv('TVRTKE_SYNC_PAGES_PER_RUN=3'); // Max 8; short cron-friendly series
 putenv('TVRTKE_SYNC_BUDGET_SECONDS=15'); // Soft limit, not a process timeout
 putenv('TVRTKE_PUBLIC_ROOT=/home/ACCOUNT/public_html'); // Importer rejects CSV under this directory
+putenv('TVRTKE_SYNC_INCLUDE_INACTIVE=1'); // Include active and inactive Sudreg records
+putenv('TVRTKE_SUDREG_ARCHIVE_RAW=0'); // 1 saves every raw API row; high disk usage
