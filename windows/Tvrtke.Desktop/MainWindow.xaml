@@ -86,7 +86,7 @@
                                       Fill="#08BDB6"/>
                                 <Path Data="M147 200 V53 L191 88 V200 Z" Fill="#17678F"/>
                                 <Path Data="M51 179 L101 154 L142 160 L199 108" Stroke="White"
-                                      StrokeThickness="14" StrokeLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"/>
+                                      StrokeThickness="14" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"/>
                                 <Ellipse Canvas.Left="37" Canvas.Top="165" Width="28" Height="28"
                                          Stroke="White" StrokeThickness="7" Fill="#00AFA9"/>
                                 <Ellipse Canvas.Left="87" Canvas.Top="140" Width="28" Height="28"
