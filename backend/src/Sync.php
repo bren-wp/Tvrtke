@@ -75,7 +75,11 @@ final class Sync
             array_values(array_filter($progress, fn(array $p) => !(int)$p['finished']));
         $ongoing = $unfinished !== [] ? (int) $unfinished[0]['snapshot_id'] : $fresh;
         $available = array_map(fn(array $s) => (int) ($s['id'] ?? 0), $snapshots);
-        if (!in_array($ongoing, $available, true)) $ongoing = $fresh;
+        if (!in_array($ongoing, $available, true)) {
+            // Never mix a partially imported, expired snapshot with a fresh
+            // one: restart staging under the new pinned snapshot.
+            $ongoing = $fresh;
+        }
         if ((string)$active === (string)$fresh && $unfinished === [] && !$progressHasWrongScope) {
             $scope = $this->db->query("SELECT state_value FROM app_state WHERE state_key='published_scope'")->fetchColumn();
             $flag = $this->db->query("SELECT state_value FROM app_state WHERE state_key='published_partial'")->fetchColumn();
