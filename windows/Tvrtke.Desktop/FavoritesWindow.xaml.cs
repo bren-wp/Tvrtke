@@ -29,8 +29,12 @@ public partial class FavoritesWindow : Window
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         var desktop = DisplaySizing.WorkArea(this);
-        Width = Math.Max(MinWidth, Math.Min(940d, desktop.Width * .88));
-        Height = Math.Max(MinHeight, Math.Min(685d, desktop.Height * .83));
+        var maxWidth = Math.Max(220d, desktop.Width - 24d);
+        var maxHeight = Math.Max(240d, desktop.Height - 24d);
+        MinWidth = Math.Min(520d, maxWidth);
+        MinHeight = Math.Min(470d, maxHeight);
+        Width = Math.Clamp(Math.Min(940d, desktop.Width * .88d), MinWidth, maxWidth);
+        Height = Math.Clamp(Math.Min(685d, desktop.Height * .83d), MinHeight, maxHeight);
         if (Owner is not null)
         {
             Left = Math.Clamp(Owner.Left + (Owner.ActualWidth - Width) / 2,

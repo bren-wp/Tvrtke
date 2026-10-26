@@ -141,3 +141,50 @@
  .tvrtke-admin .tvrtke-card,.tvrtke-registar .tvrtke-result{border-color:#344f6a}
  .tvrtke-admin .tvrtke-tabs a[aria-current=page]{outline:2px solid #007c87}
 }
+
+/* v0.10 precision pass: reference proportions with flexible layout and
+   controls usable in the WP collapsed sidebar / 320px content regions. */
+.tvrtke-admin{
+ --tv-navy:#0b2d4a;--tv-teal:#00aea9;--tv-line:#dbe8f1;
+ width:auto; max-width:none; min-width:0; isolation:isolate;
+}
+.tvrtke-admin .tvrtke-admin-hero{
+ min-height:147px;border-radius:12px;box-shadow:0 4px 14px rgba(12,47,79,.025);
+}
+.tvrtke-admin .tvrtke-brand{min-width:0;max-width:100%}
+.tvrtke-admin .tvrtke-brand strong{letter-spacing:-.045em}
+.tvrtke-admin .tvrtke-card h2{letter-spacing:-.018em}
+.tvrtke-admin .tvrtke-card,.tvrtke-admin .tvrtke-admin-hero,.tvrtke-admin .tvrtke-admin-preview{
+ max-width:100%;overflow-wrap:anywhere
+}
+.tvrtke-admin .tvrtke-tabs a:focus-visible{outline:3px solid #168dc3;outline-offset:-4px}
+.tvrtke-admin .tvrtke-card:target{outline:2px solid rgba(0,174,169,.35);outline-offset:2px}
+.tvrtke-admin .tvrtke-card[id]{scroll-margin-top:55px}
+.tvrtke-admin .tvrtke-shortcode{min-width:0;flex-wrap:wrap}
+.tvrtke-admin .tvrtke-shortcode code{flex:1 1 155px;min-width:0}
+.tvrtke-admin .tvrtke-copy-button{min-height:40px;min-width:100px;flex:0 0 auto;
+ border-color:#c5d8eb;color:#0b3559;background:#fff;border-radius:7px}
+.tvrtke-admin .tvrtke-copy-button:hover{background:#eaf9fa;color:#007f87;border-color:#00aea9}
+.tvrtke-admin .tvrtke-note[aria-live]{min-height:1.1em;margin:8px 0}
+.tvrtke-admin :is(button,input,select):focus-visible{outline:3px solid #138bbf;outline-offset:2px}
+.tvrtke-admin .tvrtke-row :is(input[type=url],input[type=number],select){min-width:0;max-width:100%}
+.tvrtke-admin .tvrtke-inline-switch{min-width:0;flex-wrap:wrap}
+.tvrtke-admin .tvrtke-admin-layout>div,
+.tvrtke-admin .tvrtke-admin-layout>aside{min-width:0}
+@container (max-width:650px){
+ .tvrtke-admin .tvrtke-brand strong{font-size:29px}
+ .tvrtke-admin .tvrtke-brand small{font-size:9px}
+ .tvrtke-admin .tvrtke-brand img{width:53px;height:53px}
+ .tvrtke-admin .tvrtke-admin-layout{grid-template-columns:minmax(0,1fr)}
+ .tvrtke-admin .tvrtke-admin-preview{padding:14px}
+ .tvrtke-admin .tvrtke-card{padding:16px}
+ .tvrtke-admin .tvrtke-row{grid-template-columns:minmax(0,1fr)}
+ .tvrtke-admin .tvrtke-tabs{gap:0;padding:0 6px}
+ .tvrtke-admin .tvrtke-tabs a{padding:12px 11px;font-size:12px}
+}
+@container (max-width:350px){
+ .tvrtke-admin .tvrtke-brand{gap:7px}
+ .tvrtke-admin .tvrtke-brand strong{font-size:24px}
+ .tvrtke-admin .tvrtke-preview-cats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .tvrtke-admin .tvrtke-duration{display:block}
+}

@@ -37,21 +37,34 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (SidebarColumn is null || WorkspaceGrid is null || SearchFilterGrid is null || ResultsLayout is null)
             return;
 
-        var compactNavigation = ActualWidth < 1120;
-        var filterColumns = ActualWidth < 790 ? 1 : ActualWidth < 1230 ? 2 : 4;
-        var stackProfile = ActualWidth < 995;
+        // Measure usable workspace rather than the whole window: the sidebar
+        // consumes substantial width and a per-monitor DPI scale changes DIPs.
+        var compactNavigation = ActualWidth < 1180;
+        var sidebarWidth = compactNavigation ? 0 : ActualWidth < 1450 ? 210 : 270;
+        var workspaceWidth = Math.Max(240, ActualWidth - sidebarWidth - 42);
+        var filterColumns = workspaceWidth < 530 ? 1 : workspaceWidth < 920 ? 2 : 4;
+        var stackProfile = workspaceWidth < 820;
 
-        SidebarColumn.Width = new GridLength(compactNavigation ? 0 : ActualWidth < 1330 ? 210 : 270);
+        SidebarColumn.Width = new GridLength(sidebarWidth);
         Sidebar.Visibility = compactNavigation ? Visibility.Collapsed : Visibility.Visible;
         CompactNavigation.Visibility = compactNavigation ? Visibility.Visible : Visibility.Collapsed;
-        SourceBadge.Visibility = ActualWidth < 930 ? Visibility.Collapsed : Visibility.Visible;
-        ResultCountText.Visibility = ActualWidth < 790 ? Visibility.Collapsed : Visibility.Visible;
-        HeroTitle.FontSize = ActualWidth < 790 ? 18 : ActualWidth < 930 ? 20 : ActualWidth < 1230 ? 23 : 27;
+        SourceBadge.Visibility = workspaceWidth < 680 ? Visibility.Collapsed : Visibility.Visible;
+        ResultCountText.Visibility = workspaceWidth < 540 ? Visibility.Collapsed : Visibility.Visible;
+        HeroTitle.FontSize = workspaceWidth < 560 ? 18 : workspaceWidth < 750 ? 20 : workspaceWidth < 920 ? 23 : 27;
+        // The name and live status are essential on narrow displays. The
+        // other two columns remain available in each subject's profile.
+        if (ResultsGrid.Columns.Count >= 4)
+        {
+            ResultsGrid.Columns[1].Visibility = workspaceWidth < 710
+                ? Visibility.Collapsed : Visibility.Visible;
+            ResultsGrid.Columns[2].Visibility = workspaceWidth < 530
+                ? Visibility.Collapsed : Visibility.Visible;
+        }
 
         if (_filterColumns != filterColumns)
         {
             _filterColumns = filterColumns;
-            SearchRow.Height = new GridLength(filterColumns == 1 ? 350 : filterColumns == 2 ? 225 : 160);
+            SearchRow.Height = new GridLength(filterColumns == 1 ? 407 : filterColumns == 2 ? 244 : 165);
             SearchFilterGrid.RowDefinitions[1].Height = filterColumns < 4
                 ? GridLength.Auto : new GridLength(0);
             SearchFilterGrid.RowDefinitions[2].Height = filterColumns == 1
@@ -88,15 +101,21 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             ResultsLayout.ColumnDefinitions[1].Width = new GridLength(stackProfile ? 0 : 13);
             ResultsLayout.ColumnDefinitions[2].Width = stackProfile
                 ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
+            // Explicit height for the table in stacked layout prevents the
+            // nested outer ScrollViewer from measuring the DataGrid infinitely.
+            ResultsLayout.RowDefinitions[0].Height = stackProfile
+                ? new GridLength(390) : new GridLength(1, GridUnitType.Star);
             ResultsLayout.RowDefinitions[1].Height = stackProfile
-                ? new GridLength(1, GridUnitType.Star) : new GridLength(0);
+                ? GridLength.Auto : new GridLength(0);
+            DetailsCard.Height = stackProfile ? 465 : double.NaN;
+            DetailsCard.MinHeight = stackProfile ? 0 : 420;
             Grid.SetRow(DetailsCard, stackProfile ? 1 : 0);
             Grid.SetColumn(DetailsCard, stackProfile ? 0 : 2);
             DetailsCard.Margin = stackProfile ? new Thickness(0, 12, 0, 0) : new Thickness(0);
         }
 
         WorkspaceGrid.MinHeight = Math.Max(
-            filterColumns == 1 ? 1520 : stackProfile ? 1180 : filterColumns == 2 ? 820 : 730,
+            filterColumns == 1 ? 1480 : stackProfile ? 1170 : filterColumns == 2 ? 870 : 750,
             Math.Max(0, ActualHeight - 30));
     }
 
@@ -124,12 +143,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         // already account for display scaling, including 125% and 150%.
         var workArea = DisplaySizing.WorkArea(this);
         WindowState = WindowState.Normal;
-        var targetWidth = Math.Min(1180d, workArea.Width * 0.84);
-        var targetHeight = Math.Min(780d, workArea.Height * 0.82);
-        Width = Math.Max(MinWidth, Math.Min(workArea.Width, targetWidth));
-        Height = Math.Max(MinHeight, Math.Min(workArea.Height, targetHeight));
-        Left = workArea.Left + Math.Max(0, (workArea.Width - Width) / 2);
-        Top = workArea.Top + Math.Max(0, (workArea.Height - Height) / 2);
+        // A normal, centered window on every monitor, including 1366×768
+        // laptops and 125–200% scaling. Do not exceed a tiny work area.
+        var usableWidth = Math.Max(200d, workArea.Width - 24);
+        var usableHeight = Math.Max(230d, workArea.Height - 24);
+        MinWidth = Math.Min(520d, usableWidth);
+        MinHeight = Math.Min(460d, usableHeight);
+        Width = Math.Clamp(Math.Min(1180d, workArea.Width * .84), MinWidth, usableWidth);
+        Height = Math.Clamp(Math.Min(780d, workArea.Height * .82), MinHeight, usableHeight);
+        Left = workArea.Left + Math.Max(0d, (workArea.Width - Width) / 2d);
+        Top = workArea.Top + Math.Max(0d, (workArea.Height - Height) / 2d);
         await SearchAsync(1);
     }
 
@@ -146,6 +169,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             }
         }
         await SearchAsync(1);
+    }
+
+    private void ResultsGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (ResultsGrid.SelectedItem is Subject) OpenProfile_Click(sender, e);
+    }
+
+    private void OpenProfile_Click(object sender, RoutedEventArgs e)
+    {
+        if (SelectedSubject is not Subject subject) return;
+        var popup = new SubjectWindow(subject) { Owner = this };
+        popup.ShowDialog();
     }
 
     private void Help_Click(object sender, RoutedEventArgs e)
@@ -368,6 +403,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         _detailRequest?.Cancel();
         SelectedSubject = selected;
         FavoriteButton.IsEnabled = selected is not null;
+        ProfileButton.IsEnabled = selected is not null;
         FavoriteButton.Content = selected is not null && _preferences.Favorites.Any(x => x.UniqueKey == selected.UniqueKey) ? "Ukloni iz favorita" : "Dodaj u favorite";
         if (selected is not null) await LoadDetailsAsync(selected);
     }

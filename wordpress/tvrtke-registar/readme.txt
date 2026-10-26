@@ -4,7 +4,7 @@ Tags: business directory, company search, registry, croatia
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 0.9.0
+Stable tag: 0.10.0
 License: MIT
 License URI: https://opensource.org/license/mit
 
@@ -77,6 +77,15 @@ expires through standard transient expiration.
 
 == Changelog ==
 
+= 0.10.0 =
+* Refined navy and teal visual design for public search, company profiles, admin screens and source navigation.
+* More reliable responsive layouts inside narrow WordPress columns, tablets and mobile screens.
+* One-click, accessible shortcode copying and section-aware administration navigation.
+* Unified bar-chart brand mark across the WordPress interface and Windows applications.
+* Contributor: brendigo (lowercase); Author: Brendigo (capital B).
+* No OAuth secrets or private MySQL credentials in the plugin.
+
+
 = 0.9.0 =
 * Consistent navy/teal reference-based SVG icons across public search and WordPress admin screens.
 * Public profile cards for registration information, location, official provenance and activities.
@@ -86,7 +95,6 @@ expires through standard transient expiration.
 * Author Brendigo and contributor brendigo, unchanged.
 
 
-= 0.9.0 =
 * New reference-matched Croatian TVRTKE business directory interface with responsive five-field search bar.
 * Native, keyboard-accessible "Više filtara" advanced search and resilient mobile layouts.
 * Rebuilt admin dashboard and layout settings with adaptive design for narrow WordPress screens.
