@@ -1,0 +1,5 @@
+TVRTKE v0.10.0 branded Windows and WordPress release trigger.
+
+Four responsive Windows screens, new real-data profile dialog, improved mobile and WordPress content-container layout, shortcode copy control, consistent branding Contributors=brendigo and Author=Brendigo.
+
+No private OAuth credentials or full national database are included in the distributed binaries. Pixel-perfect validation still requires real screenshots at matching resolution/DPI; see docs/UI-SCREENSHOT-QA.md.
